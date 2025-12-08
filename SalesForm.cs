@@ -14,27 +14,26 @@ namespace WinFormsApp1
         {
             try
             {
-                using (var connection = new SqliteConnection("Data Source=data.db"))
+                if (!decimal.TryParse(txtPrice.Text, out var price))
                 {
-                    connection.Open();
-
-                    var command = connection.CreateCommand();
-                    command.CommandText = @"
-                INSERT INTO sales (bike_model, bike_serial, price, customer_name)
-                VALUES ($model, $serial, $price, $customer);
-            ";
-
-                    command.Parameters.AddWithValue("$model", txtBikeModel.Text);
-                    command.Parameters.AddWithValue("$serial", txtBikeSerial.Text);
-                    command.Parameters.AddWithValue("$price", Convert.ToDecimal(txtPrice.Text));
-                    command.Parameters.AddWithValue("$customer", txtCustomerName.Text);
-
-                    command.ExecuteNonQuery();
+                    MessageBox.Show("Please enter a valid price.");
+                    return;
                 }
 
-                MessageBox.Show("Sale added successfully!");
+                using var connection = Database.OpenConnection();
+                using var command = connection.CreateCommand();
+                command.CommandText = @"
+            INSERT INTO sales (bike_model, bike_serial, price, customer_name)
+            VALUES ($model, $serial, $price, $customer);";
 
-                // Clear fields
+                command.Parameters.AddWithValue("$model", txtBikeModel.Text.Trim());
+                command.Parameters.AddWithValue("$serial", txtBikeSerial.Text.Trim());
+                command.Parameters.AddWithValue("$price", price);
+                command.Parameters.AddWithValue("$customer", txtCustomerName.Text.Trim());
+
+                command.ExecuteNonQuery();
+
+                MessageBox.Show("Sale added successfully!");
                 txtBikeModel.Clear();
                 txtBikeSerial.Clear();
                 txtPrice.Clear();

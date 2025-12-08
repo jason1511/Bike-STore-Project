@@ -36,6 +36,7 @@ namespace Bike_STore_Project
             numPrice = new NumericUpDown();
             btnOk = new Button();
             btnCancel = new Button();
+            mainMenuControl1 = new MainMenuControl();
             ((System.ComponentModel.ISupportInitialize)numPrice).BeginInit();
             SuspendLayout();
             // 
@@ -97,11 +98,20 @@ namespace Bike_STore_Project
             btnCancel.Text = "CANCEL";
             btnCancel.UseVisualStyleBackColor = true;
             // 
+            // mainMenuControl1
+            // 
+            mainMenuControl1.Dock = DockStyle.Top;
+            mainMenuControl1.Location = new Point(0, 0);
+            mainMenuControl1.Name = "mainMenuControl1";
+            mainMenuControl1.Size = new Size(800, 41);
+            mainMenuControl1.TabIndex = 7;
+            // 
             // ProductEditForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(mainMenuControl1);
             Controls.Add(btnCancel);
             Controls.Add(btnOk);
             Controls.Add(numPrice);
@@ -130,5 +140,6 @@ namespace Bike_STore_Project
         private NumericUpDown numPrice;
         private Button btnOk;
         private Button btnCancel;
+        private MainMenuControl mainMenuControl1;
     }
 }

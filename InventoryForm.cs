@@ -14,6 +14,12 @@ namespace Bike_STore_Project
         {
             InitializeComponent();
             SetupGrid();
+            Load += InventoryForm_Load;
+            txtSearch.TextChanged += (s, a) => LoadData(txtSearch.Text);
+            btnRefresh.Click += (s, a) => LoadData();
+            btnAdd.Click += BtnAdd_Click;
+            btnEdit.Click += BtnEdit_Click;
+            btnDelete.Click += BtnDelete_Click;
         }
 
         private void InventoryForm_Load(object sender, EventArgs e)
@@ -33,7 +39,9 @@ namespace Bike_STore_Project
             dgvProducts.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvProducts.MultiSelect = false;
             dgvProducts.AllowUserToAddRows = false;
-
+            dgvProducts.ReadOnly = true;
+            dgvProducts.AllowUserToAddRows = false;
+            dgvProducts.AllowUserToDeleteRows = false;
             dgvProducts.Columns.Clear();
             dgvProducts.Columns.Add(new DataGridViewTextBoxColumn
             {
@@ -141,6 +149,11 @@ namespace Bike_STore_Project
 
             _repo.Delete(selected.Id);
             LoadData(txtSearch.Text);
+        }
+
+        private void btnRefresh_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

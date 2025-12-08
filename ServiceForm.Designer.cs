@@ -28,14 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            menuStrip1 = new MenuStrip();
-            fileToolStripMenuItem = new ToolStripMenuItem();
-            exitToolStripMenuItem = new ToolStripMenuItem();
-            navigateToolStripMenuItem = new ToolStripMenuItem();
-            inventoryToolStripMenuItem = new ToolStripMenuItem();
-            salesToolStripMenuItem = new ToolStripMenuItem();
-            serviceLogToolStripMenuItem = new ToolStripMenuItem();
-            reportsToolStripMenuItem = new ToolStripMenuItem();
             label1 = new Label();
             txtBikeSerial = new TextBox();
             label2 = new Label();
@@ -46,62 +38,8 @@
             btnAddService = new Button();
             cmbPartUsed = new ComboBox();
             txtPartQty = new TextBox();
-            menuStrip1.SuspendLayout();
+            mainMenuControl1 = new Bike_STore_Project.MainMenuControl();
             SuspendLayout();
-            // 
-            // menuStrip1
-            // 
-            menuStrip1.ImageScalingSize = new Size(20, 20);
-            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, navigateToolStripMenuItem });
-            menuStrip1.Location = new Point(0, 0);
-            menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(800, 28);
-            menuStrip1.TabIndex = 0;
-            menuStrip1.Text = "menuStrip1";
-            // 
-            // fileToolStripMenuItem
-            // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { exitToolStripMenuItem });
-            fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            fileToolStripMenuItem.Size = new Size(46, 24);
-            fileToolStripMenuItem.Text = "File";
-            // 
-            // exitToolStripMenuItem
-            // 
-            exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new Size(116, 26);
-            exitToolStripMenuItem.Text = "Exit";
-            // 
-            // navigateToolStripMenuItem
-            // 
-            navigateToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { inventoryToolStripMenuItem, salesToolStripMenuItem, serviceLogToolStripMenuItem, reportsToolStripMenuItem });
-            navigateToolStripMenuItem.Name = "navigateToolStripMenuItem";
-            navigateToolStripMenuItem.Size = new Size(83, 24);
-            navigateToolStripMenuItem.Text = "Navigate";
-            // 
-            // inventoryToolStripMenuItem
-            // 
-            inventoryToolStripMenuItem.Name = "inventoryToolStripMenuItem";
-            inventoryToolStripMenuItem.Size = new Size(168, 26);
-            inventoryToolStripMenuItem.Text = "Inventory";
-            // 
-            // salesToolStripMenuItem
-            // 
-            salesToolStripMenuItem.Name = "salesToolStripMenuItem";
-            salesToolStripMenuItem.Size = new Size(168, 26);
-            salesToolStripMenuItem.Text = "Sales";
-            // 
-            // serviceLogToolStripMenuItem
-            // 
-            serviceLogToolStripMenuItem.Name = "serviceLogToolStripMenuItem";
-            serviceLogToolStripMenuItem.Size = new Size(168, 26);
-            serviceLogToolStripMenuItem.Text = "Service Log";
-            // 
-            // reportsToolStripMenuItem
-            // 
-            reportsToolStripMenuItem.Name = "reportsToolStripMenuItem";
-            reportsToolStripMenuItem.Size = new Size(168, 26);
-            reportsToolStripMenuItem.Text = "Report";
             // 
             // label1
             // 
@@ -186,11 +124,20 @@
             txtPartQty.Size = new Size(125, 27);
             txtPartQty.TabIndex = 11;
             // 
+            // mainMenuControl1
+            // 
+            mainMenuControl1.Dock = DockStyle.Top;
+            mainMenuControl1.Location = new Point(0, 0);
+            mainMenuControl1.Name = "mainMenuControl1";
+            mainMenuControl1.Size = new Size(800, 37);
+            mainMenuControl1.TabIndex = 12;
+            // 
             // ServiceForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(mainMenuControl1);
             Controls.Add(txtPartQty);
             Controls.Add(cmbPartUsed);
             Controls.Add(btnAddService);
@@ -201,26 +148,13 @@
             Controls.Add(label2);
             Controls.Add(txtBikeSerial);
             Controls.Add(label1);
-            Controls.Add(menuStrip1);
-            MainMenuStrip = menuStrip1;
             Name = "ServiceForm";
             Text = "Service";
-            menuStrip1.ResumeLayout(false);
-            menuStrip1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
-
-        private MenuStrip menuStrip1;
-        private ToolStripMenuItem fileToolStripMenuItem;
-        private ToolStripMenuItem exitToolStripMenuItem;
-        private ToolStripMenuItem navigateToolStripMenuItem;
-        private ToolStripMenuItem inventoryToolStripMenuItem;
-        private ToolStripMenuItem salesToolStripMenuItem;
-        private ToolStripMenuItem serviceLogToolStripMenuItem;
-        private ToolStripMenuItem reportsToolStripMenuItem;
         private Label label1;
         private TextBox txtBikeSerial;
         private Label label2;
@@ -231,5 +165,6 @@
         private Button btnAddService;
         private ComboBox cmbPartUsed;
         private TextBox txtPartQty;
+        private Bike_STore_Project.MainMenuControl mainMenuControl1;
     }
 }

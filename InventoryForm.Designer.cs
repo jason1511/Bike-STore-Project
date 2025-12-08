@@ -35,13 +35,15 @@ namespace Bike_STore_Project
             btnEdit = new Button();
             btnDelete = new Button();
             btnRefresh = new Button();
+            sqliteCommand1 = new Microsoft.Data.Sqlite.SqliteCommand();
+            mainMenuControl1 = new MainMenuControl();
             ((System.ComponentModel.ISupportInitialize)dgvProducts).BeginInit();
             SuspendLayout();
             // 
             // dgvProducts
             // 
             dgvProducts.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvProducts.Location = new Point(21, 23);
+            dgvProducts.Location = new Point(12, 44);
             dgvProducts.Name = "dgvProducts";
             dgvProducts.RowHeadersWidth = 51;
             dgvProducts.Size = new Size(300, 188);
@@ -50,7 +52,7 @@ namespace Bike_STore_Project
             // 
             // txtSearch
             // 
-            txtSearch.Location = new Point(364, 23);
+            txtSearch.Location = new Point(353, 44);
             txtSearch.Name = "txtSearch";
             txtSearch.Size = new Size(125, 27);
             txtSearch.TabIndex = 1;
@@ -92,12 +94,29 @@ namespace Bike_STore_Project
             btnRefresh.TabIndex = 5;
             btnRefresh.Text = "REFRESH";
             btnRefresh.UseVisualStyleBackColor = true;
+            btnRefresh.Click += btnRefresh_Click;
+            // 
+            // sqliteCommand1
+            // 
+            sqliteCommand1.CommandTimeout = 30;
+            sqliteCommand1.Connection = null;
+            sqliteCommand1.Transaction = null;
+            sqliteCommand1.UpdatedRowSource = System.Data.UpdateRowSource.None;
+            // 
+            // mainMenuControl1
+            // 
+            mainMenuControl1.Dock = DockStyle.Top;
+            mainMenuControl1.Location = new Point(0, 0);
+            mainMenuControl1.Name = "mainMenuControl1";
+            mainMenuControl1.Size = new Size(800, 38);
+            mainMenuControl1.TabIndex = 6;
             // 
             // InventoryForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(mainMenuControl1);
             Controls.Add(btnRefresh);
             Controls.Add(btnDelete);
             Controls.Add(btnEdit);
@@ -135,5 +154,7 @@ namespace Bike_STore_Project
         private Button btnEdit;
         private Button btnDelete;
         private Button btnRefresh;
+        private Microsoft.Data.Sqlite.SqliteCommand sqliteCommand1;
+        private MainMenuControl mainMenuControl1;
     }
 }
