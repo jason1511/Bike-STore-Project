@@ -94,7 +94,6 @@ namespace Bike_STore_Project
             btnRefresh.TabIndex = 5;
             btnRefresh.Text = "REFRESH";
             btnRefresh.UseVisualStyleBackColor = true;
-            btnRefresh.Click += btnRefresh_Click;
             // 
             // sqliteCommand1
             // 

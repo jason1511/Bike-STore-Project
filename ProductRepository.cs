@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WinFormsApp1;
 
 namespace Bike_STore_Project
 {
@@ -44,7 +43,6 @@ ORDER BY model;";
                     Price = rdr.IsDBNull(3) ? 0m : Convert.ToDecimal(rdr.GetDouble(3))
                 });
             }
-
             return list;
         }
 
@@ -55,8 +53,8 @@ ORDER BY model;";
             cmd.CommandText = @"
 INSERT INTO products (serial, model, price)
 VALUES ($serial, $model, $price);
-SELECT last_insert_rowid();
-";
+SELECT last_insert_rowid();";
+
             cmd.Parameters.AddWithValue("$serial", p.Serial);
             cmd.Parameters.AddWithValue("$model", p.Model);
             cmd.Parameters.AddWithValue("$price", (double)p.Price);
@@ -73,7 +71,8 @@ UPDATE products
 SET serial = $serial,
     model  = $model,
     price  = $price
-WHERE id = $id;";
+WHERE id   = $id;";
+
             cmd.Parameters.AddWithValue("$serial", p.Serial);
             cmd.Parameters.AddWithValue("$model", p.Model);
             cmd.Parameters.AddWithValue("$price", (double)p.Price);

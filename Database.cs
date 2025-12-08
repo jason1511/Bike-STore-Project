@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 
-namespace WinFormsApp1
+namespace Bike_STore_Project
 {
     public static class Database
     {

@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using Bike_STore_Project;
+using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace WinFormsApp1
+namespace Bike_STore_Project
 {
     public partial class ServiceForm : Form
     {

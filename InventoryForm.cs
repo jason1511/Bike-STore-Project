@@ -150,10 +150,5 @@ namespace Bike_STore_Project
             _repo.Delete(selected.Id);
             LoadData(txtSearch.Text);
         }
-
-        private void btnRefresh_Click(object sender, EventArgs e)
-        {
-
-        }
     }
 }

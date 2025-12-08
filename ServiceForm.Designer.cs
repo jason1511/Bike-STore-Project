@@ -1,4 +1,4 @@
-﻿namespace WinFormsApp1
+﻿namespace Bike_STore_Project
 {
     partial class ServiceForm
     {

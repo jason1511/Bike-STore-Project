@@ -1,7 +1,7 @@
 using Bike_STore_Project;
 using Microsoft.Data.Sqlite;
 
-namespace WinFormsApp1
+namespace Bike_STore_Project
 {
     public partial class SalesForm : Form
     {

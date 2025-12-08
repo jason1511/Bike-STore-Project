@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace WinFormsApp1
+namespace Bike_STore_Project
 {
     internal static class Program
     {
