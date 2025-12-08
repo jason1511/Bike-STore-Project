@@ -1,3 +1,4 @@
+using Bike_STore_Project;
 using Microsoft.Data.Sqlite;
 
 namespace WinFormsApp1
@@ -49,6 +50,14 @@ namespace WinFormsApp1
         {
             var serviceForm = new ServiceForm();
             serviceForm.Show();
+        }
+
+        private void salesFormToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using(var inv = new InventoryForm())
+    {
+                inv.ShowDialog(this);
+            }
         }
     }
 }

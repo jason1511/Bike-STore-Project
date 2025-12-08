@@ -157,6 +157,7 @@
             salesFormToolStripMenuItem.Name = "salesFormToolStripMenuItem";
             salesFormToolStripMenuItem.Size = new Size(224, 26);
             salesFormToolStripMenuItem.Text = "Inventory";
+            salesFormToolStripMenuItem.Click += salesFormToolStripMenuItem_Click;
             // 
             // salesToolStripMenuItem
             // 
