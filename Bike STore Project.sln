@@ -5,7 +5,7 @@ VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bike STore Project", "Bike STore Project.csproj", "{96F3FC69-5FDE-470D-8FE1-A35A62FDB42A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bike_STore_Project.Tests", "..\Bike_STore_Project.Tests\Bike_STore_Project.Tests.csproj", "{9C872ADA-E1F5-4542-A43B-A3C98660D9D6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bike_STore_Project.Tests", "Bike_STore_Project.Tests\Bike_STore_Project.Tests.csproj", "{70316CCE-AAA0-421C-FF7B-A9A5DE952AE7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{96F3FC69-5FDE-470D-8FE1-A35A62FDB42A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96F3FC69-5FDE-470D-8FE1-A35A62FDB42A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96F3FC69-5FDE-470D-8FE1-A35A62FDB42A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9C872ADA-E1F5-4542-A43B-A3C98660D9D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9C872ADA-E1F5-4542-A43B-A3C98660D9D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9C872ADA-E1F5-4542-A43B-A3C98660D9D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9C872ADA-E1F5-4542-A43B-A3C98660D9D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70316CCE-AAA0-421C-FF7B-A9A5DE952AE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70316CCE-AAA0-421C-FF7B-A9A5DE952AE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70316CCE-AAA0-421C-FF7B-A9A5DE952AE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70316CCE-AAA0-421C-FF7B-A9A5DE952AE7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
