@@ -42,10 +42,9 @@
             menuStrip1.Items.AddRange(new ToolStripItem[] { inventoryToolStripMenuItem, salesToolStripMenuItem, serviceToolStripMenuItem, exitToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(462, 28);
+            menuStrip1.Size = new Size(150, 28);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
-            menuStrip1.ItemClicked += menuStrip1_ItemClicked;
             // 
             // inventoryToolStripMenuItem
             // 
@@ -62,8 +61,8 @@
             // serviceToolStripMenuItem
             // 
             serviceToolStripMenuItem.Name = "serviceToolStripMenuItem";
-            serviceToolStripMenuItem.Size = new Size(70, 24);
-            serviceToolStripMenuItem.Text = "Service";
+            serviceToolStripMenuItem.Size = new Size(57, 24);
+            serviceToolStripMenuItem.Text = "Sales";
             // 
             // exitToolStripMenuItem
             // 
@@ -77,7 +76,6 @@
             AutoScaleMode = AutoScaleMode.Font;
             Controls.Add(menuStrip1);
             Name = "MainMenuControl";
-            Size = new Size(462, 31);
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             ResumeLayout(false);

@@ -1,4 +1,13 @@
-﻿using Bike_STore_Project;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
 using System;
 using System.Windows.Forms;
 
@@ -12,45 +21,39 @@ namespace Bike_STore_Project
         {
             InitializeComponent();
             Product = new Product();
-            Load += ProductEditForm_Load;
+
+            btnOk.Click += BtnOk_Click;
+            btnCancel.Click += (s, e) => DialogResult = DialogResult.Cancel;
         }
 
         public ProductEditForm(Product existing) : this()
         {
             Product = existing;
-        }
 
-        private void ProductEditForm_Load(object? sender, EventArgs e)
-        {
-            txtSerial.Text = Product.Serial;
-            txtModel.Text = Product.Model;
+            txtBrand.Text = Product.Brand;
+            txtType.Text = Product.Type;
+            txtColor.Text = Product.Color ?? "";
+            numQuantity.Value = Product.Quantity;
             numPrice.Value = Product.Price;
-
-            btnOk.Click += BtnOk_Click;
-            btnCancel.Click += (s, a) => DialogResult = DialogResult.Cancel;
         }
 
         private void BtnOk_Click(object? sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtSerial.Text))
+            if (string.IsNullOrWhiteSpace(txtBrand.Text))
             {
-                MessageBox.Show("Serial number is required.");
+                MessageBox.Show("Brand is required.");
                 return;
             }
-            if (string.IsNullOrWhiteSpace(txtModel.Text))
+            if (string.IsNullOrWhiteSpace(txtType.Text))
             {
-                MessageBox.Show("Model is required.");
-                return;
-            }
-
-            if (numPrice.Value < 0m)
-            {
-                MessageBox.Show("Price cannot be negative.");
+                MessageBox.Show("Type is required.");
                 return;
             }
 
-            Product.Serial = txtSerial.Text.Trim();
-            Product.Model = txtModel.Text.Trim();
+            Product.Brand = txtBrand.Text.Trim();
+            Product.Type = txtType.Text.Trim();
+            Product.Color = string.IsNullOrWhiteSpace(txtColor.Text) ? null : txtColor.Text.Trim();
+            Product.Quantity = (int)numQuantity.Value;
             Product.Price = numPrice.Value;
 
             DialogResult = DialogResult.OK;
@@ -58,3 +61,4 @@ namespace Bike_STore_Project
         }
     }
 }
+

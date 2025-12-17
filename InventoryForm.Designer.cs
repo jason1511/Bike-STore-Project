@@ -1,5 +1,4 @@
-﻿
-namespace Bike_STore_Project
+﻿namespace Bike_STore_Project
 {
     partial class InventoryForm
     {
@@ -29,86 +28,86 @@ namespace Bike_STore_Project
         /// </summary>
         private void InitializeComponent()
         {
-            dgvProducts = new DataGridView();
+            label1 = new Label();
             txtSearch = new TextBox();
+            btnRefresh = new Button();
+            dgvProducts = new DataGridView();
             btnAdd = new Button();
             btnEdit = new Button();
             btnDelete = new Button();
-            btnRefresh = new Button();
-            sqliteCommand1 = new Microsoft.Data.Sqlite.SqliteCommand();
             mainMenuControl1 = new MainMenuControl();
             ((System.ComponentModel.ISupportInitialize)dgvProducts).BeginInit();
             SuspendLayout();
             // 
-            // dgvProducts
+            // label1
             // 
-            dgvProducts.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvProducts.Location = new Point(12, 44);
-            dgvProducts.Name = "dgvProducts";
-            dgvProducts.RowHeadersWidth = 51;
-            dgvProducts.Size = new Size(300, 188);
-            dgvProducts.TabIndex = 0;
-            dgvProducts.CellContentClick += dgvProducts_CellContentClick;
+            label1.AutoSize = true;
+            label1.Location = new Point(39, 55);
+            label1.Name = "label1";
+            label1.Size = new Size(53, 20);
+            label1.TabIndex = 0;
+            label1.Text = "Search";
             // 
             // txtSearch
             // 
-            txtSearch.Location = new Point(353, 44);
+            txtSearch.Location = new Point(98, 55);
             txtSearch.Name = "txtSearch";
             txtSearch.Size = new Size(125, 27);
             txtSearch.TabIndex = 1;
             // 
+            // btnRefresh
+            // 
+            btnRefresh.Location = new Point(245, 55);
+            btnRefresh.Name = "btnRefresh";
+            btnRefresh.Size = new Size(94, 29);
+            btnRefresh.TabIndex = 2;
+            btnRefresh.Text = "Refresh";
+            btnRefresh.UseVisualStyleBackColor = true;
+            // 
+            // dgvProducts
+            // 
+            dgvProducts.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            dgvProducts.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvProducts.Location = new Point(39, 102);
+            dgvProducts.Name = "dgvProducts";
+            dgvProducts.RowHeadersWidth = 51;
+            dgvProducts.Size = new Size(300, 188);
+            dgvProducts.TabIndex = 3;
+            // 
             // btnAdd
             // 
-            btnAdd.Location = new Point(364, 90);
+            btnAdd.Location = new Point(98, 316);
             btnAdd.Name = "btnAdd";
             btnAdd.Size = new Size(94, 29);
-            btnAdd.TabIndex = 2;
+            btnAdd.TabIndex = 4;
             btnAdd.Text = "ADD";
             btnAdd.UseVisualStyleBackColor = true;
-            btnAdd.Click += btnAdd_Click;
             // 
             // btnEdit
             // 
-            btnEdit.Location = new Point(508, 90);
+            btnEdit.Location = new Point(245, 316);
             btnEdit.Name = "btnEdit";
             btnEdit.Size = new Size(94, 29);
-            btnEdit.TabIndex = 3;
+            btnEdit.TabIndex = 5;
             btnEdit.Text = "EDIT";
             btnEdit.UseVisualStyleBackColor = true;
-            btnEdit.Click += btnEdit_Click;
             // 
             // btnDelete
             // 
-            btnDelete.Location = new Point(659, 90);
+            btnDelete.Location = new Point(390, 316);
             btnDelete.Name = "btnDelete";
             btnDelete.Size = new Size(94, 29);
-            btnDelete.TabIndex = 4;
+            btnDelete.TabIndex = 6;
             btnDelete.Text = "DELETE";
             btnDelete.UseVisualStyleBackColor = true;
-            // 
-            // btnRefresh
-            // 
-            btnRefresh.Location = new Point(508, 153);
-            btnRefresh.Name = "btnRefresh";
-            btnRefresh.Size = new Size(94, 29);
-            btnRefresh.TabIndex = 5;
-            btnRefresh.Text = "REFRESH";
-            btnRefresh.UseVisualStyleBackColor = true;
-            // 
-            // sqliteCommand1
-            // 
-            sqliteCommand1.CommandTimeout = 30;
-            sqliteCommand1.Connection = null;
-            sqliteCommand1.Transaction = null;
-            sqliteCommand1.UpdatedRowSource = System.Data.UpdateRowSource.None;
             // 
             // mainMenuControl1
             // 
             mainMenuControl1.Dock = DockStyle.Top;
             mainMenuControl1.Location = new Point(0, 0);
             mainMenuControl1.Name = "mainMenuControl1";
-            mainMenuControl1.Size = new Size(800, 38);
-            mainMenuControl1.TabIndex = 6;
+            mainMenuControl1.Size = new Size(800, 32);
+            mainMenuControl1.TabIndex = 7;
             // 
             // InventoryForm
             // 
@@ -116,44 +115,30 @@ namespace Bike_STore_Project
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
             Controls.Add(mainMenuControl1);
-            Controls.Add(btnRefresh);
             Controls.Add(btnDelete);
             Controls.Add(btnEdit);
             Controls.Add(btnAdd);
-            Controls.Add(txtSearch);
             Controls.Add(dgvProducts);
+            Controls.Add(btnRefresh);
+            Controls.Add(txtSearch);
+            Controls.Add(label1);
             Name = "InventoryForm";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "InventoryForm";
-            Load += InventoryForm_Load;
             ((System.ComponentModel.ISupportInitialize)dgvProducts).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
 
-        private void btnEdit_Click(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void btnAdd_Click(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void dgvProducts_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
         #endregion
 
-        private DataGridView dgvProducts;
+        private Label label1;
         private TextBox txtSearch;
+        private Button btnRefresh;
+        private DataGridView dgvProducts;
         private Button btnAdd;
         private Button btnEdit;
         private Button btnDelete;
-        private Button btnRefresh;
-        private Microsoft.Data.Sqlite.SqliteCommand sqliteCommand1;
         private MainMenuControl mainMenuControl1;
     }
 }

@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Bike_STore_Project;
+
 
 namespace Bike_STore_Project
 {
@@ -17,24 +17,26 @@ namespace Bike_STore_Project
         {
             InitializeComponent();
 
-            inventoryToolStripMenuItem.Click += (s, e) => OpenForm(new InventoryForm());
-            salesToolStripMenuItem.Click += (s, e) => OpenForm(new SalesForm());
-            serviceToolStripMenuItem.Click += (s, e) => OpenForm(new ServiceForm());
+            inventoryToolStripMenuItem.Click += (s, e) => SwitchTo(() => new InventoryForm());
+            salesToolStripMenuItem.Click += (s, e) => SwitchTo(() => new SalesForm());
+            serviceToolStripMenuItem.Click += (s, e) => SwitchTo(() => new ServiceForm());
             exitToolStripMenuItem.Click += (s, e) => Application.Exit();
         }
-        private void OpenForm(Form f)
+
+        private void SwitchTo(Func<Form> createForm)
         {
-            // Close current top-level form
-            Form parent = this.FindForm();
-            parent.Hide();
+            var current = FindForm();
+            if (current == null) return;
 
-            f.FormClosed += (s, e) => parent.Close();
-            f.Show();
-        }
+            var next = createForm();
 
-        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
+            // Show next form, close current form after next is displayed
+            next.StartPosition = FormStartPosition.CenterScreen;
+            next.FormClosed += (s, e) => current.Close();
 
+            current.Hide();
+            next.Show();
         }
     }
 }
+

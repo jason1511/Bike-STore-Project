@@ -1,7 +1,13 @@
-﻿using Bike_STore_Project;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+
 
 namespace Bike_STore_Project
 {
@@ -14,23 +20,21 @@ namespace Bike_STore_Project
         {
             InitializeComponent();
             SetupGrid();
+
+            // wire events ONCE
             Load += InventoryForm_Load;
-            txtSearch.TextChanged += (s, a) => LoadData(txtSearch.Text);
-            btnRefresh.Click += (s, a) => LoadData();
+            txtSearch.TextChanged += (s, e) => LoadData(txtSearch.Text);
+            btnRefresh.Click += (s, e) => LoadData();
             btnAdd.Click += BtnAdd_Click;
-            btnEdit.Click += BtnEdit_Click;
+            btnEdit.Click += (s, e) => EditSelected();
             btnDelete.Click += BtnDelete_Click;
+
+            dgvProducts.CellDoubleClick += (s, e) => EditSelected();
         }
 
-        private void InventoryForm_Load(object sender, EventArgs e)
+        private void InventoryForm_Load(object? sender, EventArgs e)
         {
             LoadData();
-
-            txtSearch.TextChanged += (s, a) => LoadData(txtSearch.Text);
-            btnRefresh.Click += (s, a) => LoadData();
-            btnAdd.Click += BtnAdd_Click;
-            btnEdit.Click += BtnEdit_Click;
-            btnDelete.Click += BtnDelete_Click;
         }
 
         private void SetupGrid()
@@ -39,37 +43,53 @@ namespace Bike_STore_Project
             dgvProducts.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvProducts.MultiSelect = false;
             dgvProducts.AllowUserToAddRows = false;
-            dgvProducts.ReadOnly = true;
-            dgvProducts.AllowUserToAddRows = false;
             dgvProducts.AllowUserToDeleteRows = false;
+            dgvProducts.ReadOnly = true;
+
             dgvProducts.Columns.Clear();
+
             dgvProducts.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "Id",
                 HeaderText = "ID",
                 Visible = false
             });
+
             dgvProducts.Columns.Add(new DataGridViewTextBoxColumn
             {
-                DataPropertyName = "Serial",
-                HeaderText = "Serial",
-                Width = 150
+                DataPropertyName = "Brand",
+                HeaderText = "Brand",
+                Width = 140
             });
+
             dgvProducts.Columns.Add(new DataGridViewTextBoxColumn
             {
-                DataPropertyName = "Model",
-                HeaderText = "Model",
-                Width = 250
+                DataPropertyName = "Type",
+                HeaderText = "Type",
+                Width = 180
             });
+
+            dgvProducts.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Color",
+                HeaderText = "Color",
+                Width = 120
+            });
+
+            dgvProducts.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Quantity",
+                HeaderText = "Qty",
+                Width = 70
+            });
+
             dgvProducts.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "Price",
                 HeaderText = "Price",
-                Width = 100,
+                Width = 90,
                 DefaultCellStyle = { Format = "C2" }
             });
-
-            dgvProducts.CellDoubleClick += (s, e) => EditSelected();
         }
 
         private void LoadData(string? filter = null)
@@ -89,21 +109,26 @@ namespace Bike_STore_Project
 
         private Product? GetSelected()
         {
-            if (dgvProducts.CurrentRow?.DataBoundItem is Product p) return p;
-            return null;
+            return dgvProducts.CurrentRow?.DataBoundItem as Product;
         }
 
         private void BtnAdd_Click(object? sender, EventArgs e)
         {
-            var dlg = new ProductEditForm();
+            using var dlg = new ProductEditForm();
             if (dlg.ShowDialog(this) == DialogResult.OK)
             {
-                _repo.Insert(dlg.Product);
-                LoadData(txtSearch.Text);
+                try
+                {
+                    _repo.Insert(dlg.Product);
+                    LoadData(txtSearch.Text);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Add failed: " + ex.Message, "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
-
-        private void BtnEdit_Click(object? sender, EventArgs e) => EditSelected();
 
         private void EditSelected()
         {
@@ -122,11 +147,19 @@ namespace Bike_STore_Project
                 return;
             }
 
-            var dlg = new ProductEditForm(full);
+            using var dlg = new ProductEditForm(full);
             if (dlg.ShowDialog(this) == DialogResult.OK)
             {
-                _repo.Update(dlg.Product);
-                LoadData(txtSearch.Text);
+                try
+                {
+                    _repo.Update(dlg.Product);
+                    LoadData(txtSearch.Text);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Update failed: " + ex.Message, "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -139,16 +172,26 @@ namespace Bike_STore_Project
                 return;
             }
 
+            var label = $"{selected.Brand} {selected.Type}";
             var confirm = MessageBox.Show(
-                $"Delete {selected.Model} (Serial {selected.Serial})?",
+                $"Delete {label}?",
                 "Confirm delete",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning);
 
             if (confirm != DialogResult.Yes) return;
 
-            _repo.Delete(selected.Id);
-            LoadData(txtSearch.Text);
+            try
+            {
+                _repo.Delete(selected.Id);
+                LoadData(txtSearch.Text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Delete failed: " + ex.Message, "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }
+

@@ -1,5 +1,12 @@
-using Bike_STore_Project;
-using Microsoft.Data.Sqlite;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Bike_STore_Project
 {
@@ -8,55 +15,67 @@ namespace Bike_STore_Project
         public SalesForm()
         {
             InitializeComponent();
+
+            btnAddSale.Click += BtnAddSale_Click;
+            btnClear.Click += (s, e) => ClearInputs();
         }
 
-        private void btnAddSale_Click(object sender, EventArgs e)
+        private void BtnAddSale_Click(object? sender, EventArgs e)
         {
+            // Basic validation
+            if (string.IsNullOrWhiteSpace(txtBrand.Text))
+            {
+                MessageBox.Show("Brand is required.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtType.Text))
+            {
+                MessageBox.Show("Type is required.");
+                return;
+            }
+
+            var qty = (int)numQuantity.Value;
+            var price = numPrice.Value;
+
             try
             {
-                if (!decimal.TryParse(txtPrice.Text, out var price))
-                {
-                    MessageBox.Show("Please enter a valid price.");
-                    return;
-                }
+                using var conn = Database.OpenConnection();
+                using var cmd = conn.CreateCommand();
 
-                using var connection = Database.OpenConnection();
-                using var command = connection.CreateCommand();
-                command.CommandText = @"
-            INSERT INTO sales (bike_model, bike_serial, price, customer_name)
-            VALUES ($model, $serial, $price, $customer);";
+                cmd.CommandText = @"
+INSERT INTO sales (brand, type, color, quantity, price, customer_name)
+VALUES ($brand, $type, $color, $qty, $price, $customer);";
 
-                command.Parameters.AddWithValue("$model", txtBikeModel.Text.Trim());
-                command.Parameters.AddWithValue("$serial", txtBikeSerial.Text.Trim());
-                command.Parameters.AddWithValue("$price", price);
-                command.Parameters.AddWithValue("$customer", txtCustomerName.Text.Trim());
+                cmd.Parameters.AddWithValue("$brand", txtBrand.Text.Trim());
+                cmd.Parameters.AddWithValue("$type", txtType.Text.Trim());
+                cmd.Parameters.AddWithValue("$color", string.IsNullOrWhiteSpace(txtColor.Text) ? (object)DBNull.Value : txtColor.Text.Trim());
+                cmd.Parameters.AddWithValue("$qty", qty);
+                cmd.Parameters.AddWithValue("$price", (double)price);
+                cmd.Parameters.AddWithValue("$customer", string.IsNullOrWhiteSpace(txtCustomer.Text) ? (object)DBNull.Value : txtCustomer.Text.Trim());
 
-                command.ExecuteNonQuery();
+                cmd.ExecuteNonQuery();
 
-                MessageBox.Show("Sale added successfully!");
-                txtBikeModel.Clear();
-                txtBikeSerial.Clear();
-                txtPrice.Clear();
-                txtCustomerName.Clear();
+                MessageBox.Show("Sale saved!");
+                ClearInputs();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.Message);
+                MessageBox.Show("Failed to save sale: " + ex.Message, "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void salesFormToolStripMenuItem1_Click(object sender, EventArgs e)
+        private void ClearInputs()
         {
-            var serviceForm = new ServiceForm();
-            serviceForm.Show();
-        }
-
-        private void salesFormToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            using(var inv = new InventoryForm())
-    {
-                inv.ShowDialog(this);
-            }
+            txtBrand.Clear();
+            txtType.Clear();
+            txtColor.Clear();
+            numQuantity.Value = 1;
+            numPrice.Value = 0;
+            txtCustomer.Clear();
+            txtBrand.Focus();
         }
     }
 }
+
