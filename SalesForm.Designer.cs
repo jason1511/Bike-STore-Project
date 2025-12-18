@@ -172,8 +172,9 @@
             // SalesForm
             // 
             AcceptButton = btnAddSale;
-            AutoScaleDimensions = new SizeF(8F, 20F);
-            AutoScaleMode = AutoScaleMode.Font;
+            AutoScaleMode = AutoScaleMode.Inherit;
+            AutoSize = true;
+            AutoSizeMode = AutoSizeMode.GrowAndShrink;
             ClientSize = new Size(800, 450);
             Controls.Add(mainMenuControl1);
             Controls.Add(btnClear);

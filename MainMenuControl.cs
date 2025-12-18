@@ -20,6 +20,7 @@ namespace Bike_STore_Project
             inventoryToolStripMenuItem.Click += (s, e) => SwitchTo(() => new InventoryForm());
             salesToolStripMenuItem.Click += (s, e) => SwitchTo(() => new SalesForm());
             serviceToolStripMenuItem.Click += (s, e) => SwitchTo(() => new ServiceForm());
+            transactionLogToolStripMenuItem.Click += (s, e) => SwitchTo(() => new TransactionLogForm());
             exitToolStripMenuItem.Click += (s, e) => Application.Exit();
         }
 

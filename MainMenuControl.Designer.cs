@@ -32,6 +32,7 @@
             inventoryToolStripMenuItem = new ToolStripMenuItem();
             salesToolStripMenuItem = new ToolStripMenuItem();
             serviceToolStripMenuItem = new ToolStripMenuItem();
+            transactionLogToolStripMenuItem = new ToolStripMenuItem();
             exitToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             SuspendLayout();
@@ -39,10 +40,10 @@
             // menuStrip1
             // 
             menuStrip1.ImageScalingSize = new Size(20, 20);
-            menuStrip1.Items.AddRange(new ToolStripItem[] { inventoryToolStripMenuItem, salesToolStripMenuItem, serviceToolStripMenuItem, exitToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { inventoryToolStripMenuItem, salesToolStripMenuItem, serviceToolStripMenuItem, transactionLogToolStripMenuItem, exitToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(150, 28);
+            menuStrip1.Size = new Size(504, 28);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -61,8 +62,14 @@
             // serviceToolStripMenuItem
             // 
             serviceToolStripMenuItem.Name = "serviceToolStripMenuItem";
-            serviceToolStripMenuItem.Size = new Size(57, 24);
-            serviceToolStripMenuItem.Text = "Sales";
+            serviceToolStripMenuItem.Size = new Size(70, 24);
+            serviceToolStripMenuItem.Text = "Service";
+            // 
+            // transactionLogToolStripMenuItem
+            // 
+            transactionLogToolStripMenuItem.Name = "transactionLogToolStripMenuItem";
+            transactionLogToolStripMenuItem.Size = new Size(98, 24);
+            transactionLogToolStripMenuItem.Text = "Transaction";
             // 
             // exitToolStripMenuItem
             // 
@@ -76,6 +83,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             Controls.Add(menuStrip1);
             Name = "MainMenuControl";
+            Size = new Size(504, 150);
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             ResumeLayout(false);
@@ -89,5 +97,6 @@
         private ToolStripMenuItem salesToolStripMenuItem;
         private ToolStripMenuItem serviceToolStripMenuItem;
         private ToolStripMenuItem exitToolStripMenuItem;
+        private ToolStripMenuItem transactionLogToolStripMenuItem;
     }
 }
