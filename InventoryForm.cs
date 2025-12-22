@@ -119,7 +119,7 @@ namespace Bike_STore_Project
             {
                 try
                 {
-                    _repo.Insert(dlg.Product);
+                    _repo.AddOrIncreaseStock(dlg.Product);
                     LoadData(txtSearch.Text);
                 }
                 catch (Exception ex)

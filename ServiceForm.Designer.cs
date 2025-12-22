@@ -60,6 +60,7 @@
             // 
             // txtBrand
             // 
+            txtBrand.CharacterCasing = CharacterCasing.Upper;
             txtBrand.Location = new Point(87, 41);
             txtBrand.Name = "txtBrand";
             txtBrand.Size = new Size(125, 27);
@@ -67,6 +68,7 @@
             // 
             // txtType
             // 
+            txtType.CharacterCasing = CharacterCasing.Upper;
             txtType.Location = new Point(87, 87);
             txtType.Name = "txtType";
             txtType.Size = new Size(125, 27);
@@ -83,6 +85,7 @@
             // 
             // txtColor
             // 
+            txtColor.CharacterCasing = CharacterCasing.Upper;
             txtColor.Location = new Point(87, 138);
             txtColor.Name = "txtColor";
             txtColor.Size = new Size(125, 27);
@@ -140,6 +143,7 @@
             // 
             // txtNotes
             // 
+            txtNotes.CharacterCasing = CharacterCasing.Upper;
             txtNotes.Location = new Point(102, 272);
             txtNotes.Multiline = true;
             txtNotes.Name = "txtNotes";
@@ -178,6 +182,7 @@
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(txtBrand);
             Controls.Add(mainMenuControl1);
             Controls.Add(btnClear);
             Controls.Add(btnAddService);
@@ -191,7 +196,6 @@
             Controls.Add(txtColor);
             Controls.Add(label2);
             Controls.Add(txtType);
-            Controls.Add(txtBrand);
             Controls.Add(label1);
             Name = "ServiceForm";
             Text = "ServiceForm";

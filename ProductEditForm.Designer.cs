@@ -47,6 +47,7 @@
             // 
             // txtBrand
             // 
+            txtBrand.CharacterCasing = CharacterCasing.Upper;
             txtBrand.Location = new Point(77, 40);
             txtBrand.Name = "txtBrand";
             txtBrand.Size = new Size(125, 27);
@@ -63,6 +64,7 @@
             // 
             // txtType
             // 
+            txtType.CharacterCasing = CharacterCasing.Upper;
             txtType.Location = new Point(77, 86);
             txtType.Name = "txtType";
             txtType.Size = new Size(125, 27);
@@ -95,10 +97,13 @@
             // 
             // numPrice
             // 
+            numPrice.DecimalPlaces = 2;
             numPrice.Location = new Point(519, 87);
+            numPrice.Maximum = new decimal(new int[] { 1410065408, 2, 0, 0 });
             numPrice.Name = "numPrice";
             numPrice.Size = new Size(150, 27);
             numPrice.TabIndex = 6;
+            numPrice.ThousandsSeparator = true;
             // 
             // Price
             // 
@@ -129,6 +134,7 @@
             // 
             // txtColor
             // 
+            txtColor.CharacterCasing = CharacterCasing.Upper;
             txtColor.Location = new Point(77, 127);
             txtColor.Name = "txtColor";
             txtColor.Size = new Size(125, 27);

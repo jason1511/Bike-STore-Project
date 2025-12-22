@@ -29,10 +29,7 @@
         private void InitializeComponent()
         {
             label1 = new Label();
-            txtBrand = new TextBox();
-            txtType = new TextBox();
             label2 = new Label();
-            txtColor = new TextBox();
             label3 = new Label();
             numQuantity = new NumericUpDown();
             numPrice = new NumericUpDown();
@@ -43,6 +40,9 @@
             btnAddSale = new Button();
             btnClear = new Button();
             mainMenuControl1 = new MainMenuControl();
+            cmbBrand = new ComboBox();
+            cmbType = new ComboBox();
+            cmbColor = new ComboBox();
             ((System.ComponentModel.ISupportInitialize)numQuantity).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numPrice).BeginInit();
             SuspendLayout();
@@ -56,20 +56,6 @@
             label1.TabIndex = 0;
             label1.Text = "Brand";
             // 
-            // txtBrand
-            // 
-            txtBrand.Location = new Point(75, 35);
-            txtBrand.Name = "txtBrand";
-            txtBrand.Size = new Size(125, 27);
-            txtBrand.TabIndex = 1;
-            // 
-            // txtType
-            // 
-            txtType.Location = new Point(75, 66);
-            txtType.Name = "txtType";
-            txtType.Size = new Size(125, 27);
-            txtType.TabIndex = 2;
-            // 
             // label2
             // 
             label2.AutoSize = true;
@@ -78,13 +64,6 @@
             label2.Size = new Size(40, 20);
             label2.TabIndex = 3;
             label2.Text = "Type";
-            // 
-            // txtColor
-            // 
-            txtColor.Location = new Point(75, 99);
-            txtColor.Name = "txtColor";
-            txtColor.Size = new Size(125, 27);
-            txtColor.TabIndex = 4;
             // 
             // label3
             // 
@@ -98,16 +77,21 @@
             // numQuantity
             // 
             numQuantity.Location = new Point(75, 166);
+            numQuantity.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numQuantity.Name = "numQuantity";
             numQuantity.Size = new Size(150, 27);
             numQuantity.TabIndex = 6;
+            numQuantity.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // numPrice
             // 
+            numPrice.DecimalPlaces = 2;
             numPrice.Location = new Point(75, 212);
+            numPrice.Maximum = new decimal(new int[] { 1410065408, 2, 0, 0 });
             numPrice.Name = "numPrice";
             numPrice.Size = new Size(150, 27);
             numPrice.TabIndex = 7;
+            numPrice.ThousandsSeparator = true;
             // 
             // label4
             // 
@@ -138,6 +122,7 @@
             // 
             // txtCustomer
             // 
+            txtCustomer.CharacterCasing = CharacterCasing.Upper;
             txtCustomer.Location = new Point(75, 253);
             txtCustomer.Name = "txtCustomer";
             txtCustomer.Size = new Size(304, 27);
@@ -169,6 +154,33 @@
             mainMenuControl1.Size = new Size(800, 29);
             mainMenuControl1.TabIndex = 15;
             // 
+            // cmbBrand
+            // 
+            cmbBrand.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbBrand.FormattingEnabled = true;
+            cmbBrand.Location = new Point(75, 35);
+            cmbBrand.Name = "cmbBrand";
+            cmbBrand.Size = new Size(151, 28);
+            cmbBrand.TabIndex = 16;
+            // 
+            // cmbType
+            // 
+            cmbType.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbType.FormattingEnabled = true;
+            cmbType.Location = new Point(75, 66);
+            cmbType.Name = "cmbType";
+            cmbType.Size = new Size(151, 28);
+            cmbType.TabIndex = 17;
+            // 
+            // cmbColor
+            // 
+            cmbColor.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbColor.FormattingEnabled = true;
+            cmbColor.Location = new Point(75, 99);
+            cmbColor.Name = "cmbColor";
+            cmbColor.Size = new Size(151, 28);
+            cmbColor.TabIndex = 18;
+            // 
             // SalesForm
             // 
             AcceptButton = btnAddSale;
@@ -176,6 +188,9 @@
             AutoSize = true;
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
             ClientSize = new Size(800, 450);
+            Controls.Add(cmbColor);
+            Controls.Add(cmbType);
+            Controls.Add(cmbBrand);
             Controls.Add(mainMenuControl1);
             Controls.Add(btnClear);
             Controls.Add(btnAddSale);
@@ -186,10 +201,7 @@
             Controls.Add(numPrice);
             Controls.Add(numQuantity);
             Controls.Add(label3);
-            Controls.Add(txtColor);
             Controls.Add(label2);
-            Controls.Add(txtType);
-            Controls.Add(txtBrand);
             Controls.Add(label1);
             Name = "SalesForm";
             Text = "SalesForm";
@@ -202,10 +214,7 @@
         #endregion
 
         private Label label1;
-        private TextBox txtBrand;
-        private TextBox txtType;
         private Label label2;
-        private TextBox txtColor;
         private Label label3;
         private NumericUpDown numQuantity;
         private NumericUpDown numPrice;
@@ -216,5 +225,8 @@
         private Button btnAddSale;
         private Button btnClear;
         private MainMenuControl mainMenuControl1;
+        private ComboBox cmbBrand;
+        private ComboBox cmbType;
+        private ComboBox cmbColor;
     }
 }

@@ -34,8 +34,10 @@ CREATE TABLE IF NOT EXISTS products (
     type     TEXT NOT NULL,
     color    TEXT,
     quantity INTEGER NOT NULL DEFAULT 0,
-    price    REAL NOT NULL DEFAULT 0.0
+    price    REAL NOT NULL DEFAULT 0.0,
+    UNIQUE(brand, type, color)
 );
+
 
 CREATE TABLE IF NOT EXISTS sales (
     id            INTEGER PRIMARY KEY AUTOINCREMENT,
