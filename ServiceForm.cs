@@ -1,24 +1,78 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-
 
 namespace Bike_STore_Project
 {
     public partial class ServiceForm : Form
     {
+        private readonly ProductRepository _repo = new();
+
         public ServiceForm()
         {
             InitializeComponent();
 
+            // uppercase everywhere
+            txtBrand.CharacterCasing = CharacterCasing.Upper;
+            txtType.CharacterCasing = CharacterCasing.Upper;
+            txtColor.CharacterCasing = CharacterCasing.Upper;
+
+            SetupAutocomplete();
+
+            txtBrand.TextChanged += (s, e) =>
+            {
+                SetupTypeAutocomplete();
+                SetupColorAutocomplete();
+            };
+
+            txtType.TextChanged += (s, e) =>
+            {
+                SetupColorAutocomplete();
+            };
+
             btnAddService.Click += BtnAddService_Click;
             btnClear.Click += (s, e) => ClearInputs();
+        }
+
+        private void SetupAutocomplete()
+        {
+            txtBrand.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            txtBrand.AutoCompleteSource = AutoCompleteSource.CustomSource;
+
+            txtType.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            txtType.AutoCompleteSource = AutoCompleteSource.CustomSource;
+
+            txtColor.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            txtColor.AutoCompleteSource = AutoCompleteSource.CustomSource;
+
+            SetupBrandAutocomplete();
+        }
+
+        private void SetupBrandAutocomplete()
+        {
+            var src = new AutoCompleteStringCollection();
+            src.AddRange(_repo.GetDistinctBrands().ToArray());
+            txtBrand.AutoCompleteCustomSource = src;
+        }
+
+        private void SetupTypeAutocomplete()
+        {
+            var src = new AutoCompleteStringCollection();
+
+            if (!string.IsNullOrWhiteSpace(txtBrand.Text))
+                src.AddRange(_repo.GetDistinctTypes(txtBrand.Text).ToArray());
+
+            txtType.AutoCompleteCustomSource = src;
+        }
+
+        private void SetupColorAutocomplete()
+        {
+            var src = new AutoCompleteStringCollection();
+
+            if (!string.IsNullOrWhiteSpace(txtBrand.Text) &&
+                !string.IsNullOrWhiteSpace(txtType.Text))
+                src.AddRange(_repo.GetDistinctColors(txtBrand.Text, txtType.Text).ToArray());
+
+            txtColor.AutoCompleteCustomSource = src;
         }
 
         private void BtnAddService_Click(object? sender, EventArgs e)
@@ -35,9 +89,6 @@ namespace Bike_STore_Project
                 return;
             }
 
-            var qty = (int)numQuantity.Value;
-            var cost = numServiceCost.Value;
-
             try
             {
                 using var conn = Database.OpenConnection();
@@ -45,14 +96,19 @@ namespace Bike_STore_Project
 
                 cmd.CommandText = @"
 INSERT INTO services (brand, type, color, quantity, service_cost, notes)
-VALUES ($brand, $type, $color, $qty, $cost, $notes);";
+VALUES ($brand, $type, $color, 1, $cost, $notes);";
 
-                cmd.Parameters.AddWithValue("$brand", txtBrand.Text.Trim());
-                cmd.Parameters.AddWithValue("$type", txtType.Text.Trim());
-                cmd.Parameters.AddWithValue("$color", string.IsNullOrWhiteSpace(txtColor.Text) ? (object)DBNull.Value : txtColor.Text.Trim());
-                cmd.Parameters.AddWithValue("$qty", qty);
-                cmd.Parameters.AddWithValue("$cost", (double)cost);
-                cmd.Parameters.AddWithValue("$notes", string.IsNullOrWhiteSpace(txtNotes.Text) ? (object)DBNull.Value : txtNotes.Text.Trim());
+                cmd.Parameters.AddWithValue("$brand", txtBrand.Text.Trim().ToUpperInvariant());
+                cmd.Parameters.AddWithValue("$type", txtType.Text.Trim().ToUpperInvariant());
+                cmd.Parameters.AddWithValue("$color",
+                    string.IsNullOrWhiteSpace(txtColor.Text)
+                        ? (object)DBNull.Value
+                        : txtColor.Text.Trim().ToUpperInvariant());
+                cmd.Parameters.AddWithValue("$cost", (double)numServiceCost.Value);
+                cmd.Parameters.AddWithValue("$notes",
+                    string.IsNullOrWhiteSpace(txtNotes.Text)
+                        ? (object)DBNull.Value
+                        : txtNotes.Text.Trim());
 
                 cmd.ExecuteNonQuery();
 
@@ -61,8 +117,8 @@ VALUES ($brand, $type, $color, $qty, $cost, $notes);";
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to save service: " + ex.Message, "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Failed to save service: " + ex.Message,
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -71,11 +127,11 @@ VALUES ($brand, $type, $color, $qty, $cost, $notes);";
             txtBrand.Clear();
             txtType.Clear();
             txtColor.Clear();
-            numQuantity.Value = 1;
-            numServiceCost.Value = 0;
             txtNotes.Clear();
+            numServiceCost.Value = 0;
+
+            SetupBrandAutocomplete();
             txtBrand.Focus();
         }
     }
 }
-

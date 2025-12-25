@@ -1,6 +1,6 @@
 ﻿namespace Bike_STore_Project
 {
-    partial class TransactionLogForm
+    partial class ServiceLogForm
     {
         /// <summary>
         /// Required designer variable.
@@ -29,11 +29,11 @@
         private void InitializeComponent()
         {
             mainMenuControl1 = new MainMenuControl();
-            dgvSales = new DataGridView();
+            dgvServices = new DataGridView();
             btnRefresh = new Button();
-            label1 = new Label();
             txtSearch = new TextBox();
-            ((System.ComponentModel.ISupportInitialize)dgvSales).BeginInit();
+            label1 = new Label();
+            ((System.ComponentModel.ISupportInitialize)dgvServices).BeginInit();
             SuspendLayout();
             // 
             // mainMenuControl1
@@ -41,27 +41,34 @@
             mainMenuControl1.Dock = DockStyle.Top;
             mainMenuControl1.Location = new Point(0, 0);
             mainMenuControl1.Name = "mainMenuControl1";
-            mainMenuControl1.Size = new Size(800, 30);
+            mainMenuControl1.Size = new Size(800, 32);
             mainMenuControl1.TabIndex = 0;
             // 
-            // dgvSales
+            // dgvServices
             // 
-            dgvSales.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvSales.Dock = DockStyle.Bottom;
-            dgvSales.Location = new Point(0, 88);
-            dgvSales.Name = "dgvSales";
-            dgvSales.RowHeadersWidth = 51;
-            dgvSales.Size = new Size(800, 362);
-            dgvSales.TabIndex = 1;
+            dgvServices.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvServices.Dock = DockStyle.Bottom;
+            dgvServices.Location = new Point(0, 77);
+            dgvServices.Name = "dgvServices";
+            dgvServices.RowHeadersWidth = 51;
+            dgvServices.Size = new Size(800, 373);
+            dgvServices.TabIndex = 1;
             // 
             // btnRefresh
             // 
-            btnRefresh.Location = new Point(215, 43);
+            btnRefresh.Location = new Point(220, 42);
             btnRefresh.Name = "btnRefresh";
-            btnRefresh.Size = new Size(122, 29);
+            btnRefresh.Size = new Size(97, 29);
             btnRefresh.TabIndex = 2;
             btnRefresh.Text = "REFRESH";
             btnRefresh.UseVisualStyleBackColor = true;
+            // 
+            // txtSearch
+            // 
+            txtSearch.Location = new Point(71, 42);
+            txtSearch.Name = "txtSearch";
+            txtSearch.Size = new Size(125, 27);
+            txtSearch.TabIndex = 3;
             // 
             // label1
             // 
@@ -69,29 +76,22 @@
             label1.Location = new Point(12, 45);
             label1.Name = "label1";
             label1.Size = new Size(53, 20);
-            label1.TabIndex = 3;
+            label1.TabIndex = 4;
             label1.Text = "Search";
             // 
-            // txtSearch
-            // 
-            txtSearch.Location = new Point(71, 45);
-            txtSearch.Name = "txtSearch";
-            txtSearch.Size = new Size(125, 27);
-            txtSearch.TabIndex = 4;
-            // 
-            // TransactionLogForm
+            // ServiceLogForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
-            Controls.Add(txtSearch);
             Controls.Add(label1);
+            Controls.Add(txtSearch);
             Controls.Add(btnRefresh);
-            Controls.Add(dgvSales);
+            Controls.Add(dgvServices);
             Controls.Add(mainMenuControl1);
-            Name = "TransactionLogForm";
-            Text = "TransactionLogForm";
-            ((System.ComponentModel.ISupportInitialize)dgvSales).EndInit();
+            Name = "ServiceLogForm";
+            Text = "ServiceLogForm";
+            ((System.ComponentModel.ISupportInitialize)dgvServices).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -99,9 +99,9 @@
         #endregion
 
         private MainMenuControl mainMenuControl1;
-        private DataGridView dgvSales;
+        private DataGridView dgvServices;
         private Button btnRefresh;
-        private Label label1;
         private TextBox txtSearch;
+        private Label label1;
     }
 }

@@ -30,13 +30,8 @@
         {
             backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             label1 = new Label();
-            txtBrand = new TextBox();
-            txtType = new TextBox();
             label2 = new Label();
-            txtColor = new TextBox();
             label3 = new Label();
-            label4 = new Label();
-            numQuantity = new NumericUpDown();
             numServiceCost = new NumericUpDown();
             label5 = new Label();
             label6 = new Label();
@@ -44,7 +39,9 @@
             btnAddService = new Button();
             btnClear = new Button();
             mainMenuControl1 = new MainMenuControl();
-            ((System.ComponentModel.ISupportInitialize)numQuantity).BeginInit();
+            txtBrand = new TextBox();
+            txtType = new TextBox();
+            txtColor = new TextBox();
             ((System.ComponentModel.ISupportInitialize)numServiceCost).BeginInit();
             SuspendLayout();
             // 
@@ -58,22 +55,6 @@
             label1.Text = "Brand";
             label1.TextAlign = ContentAlignment.TopCenter;
             // 
-            // txtBrand
-            // 
-            txtBrand.CharacterCasing = CharacterCasing.Upper;
-            txtBrand.Location = new Point(87, 41);
-            txtBrand.Name = "txtBrand";
-            txtBrand.Size = new Size(125, 27);
-            txtBrand.TabIndex = 1;
-            // 
-            // txtType
-            // 
-            txtType.CharacterCasing = CharacterCasing.Upper;
-            txtType.Location = new Point(87, 87);
-            txtType.Name = "txtType";
-            txtType.Size = new Size(125, 27);
-            txtType.TabIndex = 2;
-            // 
             // label2
             // 
             label2.AutoSize = true;
@@ -82,14 +63,6 @@
             label2.Size = new Size(40, 20);
             label2.TabIndex = 3;
             label2.Text = "Type";
-            // 
-            // txtColor
-            // 
-            txtColor.CharacterCasing = CharacterCasing.Upper;
-            txtColor.Location = new Point(87, 138);
-            txtColor.Name = "txtColor";
-            txtColor.Size = new Size(125, 27);
-            txtColor.TabIndex = 4;
             // 
             // label3
             // 
@@ -100,33 +73,19 @@
             label3.TabIndex = 5;
             label3.Text = "Color";
             // 
-            // label4
-            // 
-            label4.AutoSize = true;
-            label4.Location = new Point(31, 190);
-            label4.Name = "label4";
-            label4.Size = new Size(65, 20);
-            label4.TabIndex = 6;
-            label4.Text = "Quantity";
-            // 
-            // numQuantity
-            // 
-            numQuantity.Location = new Point(102, 188);
-            numQuantity.Name = "numQuantity";
-            numQuantity.Size = new Size(150, 27);
-            numQuantity.TabIndex = 7;
-            // 
             // numServiceCost
             // 
-            numServiceCost.Location = new Point(102, 234);
+            numServiceCost.Location = new Point(102, 190);
+            numServiceCost.Maximum = new decimal(new int[] { 1000000, 0, 0, 0 });
             numServiceCost.Name = "numServiceCost";
             numServiceCost.Size = new Size(150, 27);
             numServiceCost.TabIndex = 8;
+            numServiceCost.ThousandsSeparator = true;
             // 
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(7, 236);
+            label5.Location = new Point(12, 194);
             label5.Name = "label5";
             label5.Size = new Size(89, 20);
             label5.TabIndex = 9;
@@ -176,12 +135,35 @@
             mainMenuControl1.Size = new Size(800, 31);
             mainMenuControl1.TabIndex = 14;
             // 
+            // txtBrand
+            // 
+            txtBrand.Location = new Point(102, 41);
+            txtBrand.Name = "txtBrand";
+            txtBrand.Size = new Size(125, 27);
+            txtBrand.TabIndex = 15;
+            // 
+            // txtType
+            // 
+            txtType.Location = new Point(102, 90);
+            txtType.Name = "txtType";
+            txtType.Size = new Size(125, 27);
+            txtType.TabIndex = 16;
+            // 
+            // txtColor
+            // 
+            txtColor.Location = new Point(102, 138);
+            txtColor.Name = "txtColor";
+            txtColor.Size = new Size(125, 27);
+            txtColor.TabIndex = 17;
+            // 
             // ServiceForm
             // 
             AcceptButton = btnAddService;
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(txtColor);
+            Controls.Add(txtType);
             Controls.Add(txtBrand);
             Controls.Add(mainMenuControl1);
             Controls.Add(btnClear);
@@ -190,16 +172,11 @@
             Controls.Add(label6);
             Controls.Add(label5);
             Controls.Add(numServiceCost);
-            Controls.Add(numQuantity);
-            Controls.Add(label4);
             Controls.Add(label3);
-            Controls.Add(txtColor);
             Controls.Add(label2);
-            Controls.Add(txtType);
             Controls.Add(label1);
             Name = "ServiceForm";
             Text = "ServiceForm";
-            ((System.ComponentModel.ISupportInitialize)numQuantity).EndInit();
             ((System.ComponentModel.ISupportInitialize)numServiceCost).EndInit();
             ResumeLayout(false);
             PerformLayout();
@@ -209,13 +186,8 @@
 
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private Label label1;
-        private TextBox txtBrand;
-        private TextBox txtType;
         private Label label2;
-        private TextBox txtColor;
         private Label label3;
-        private Label label4;
-        private NumericUpDown numQuantity;
         private NumericUpDown numServiceCost;
         private Label label5;
         private Label label6;
@@ -223,5 +195,8 @@
         private Button btnAddService;
         private Button btnClear;
         private MainMenuControl mainMenuControl1;
+        private TextBox txtBrand;
+        private TextBox txtType;
+        private TextBox txtColor;
     }
 }

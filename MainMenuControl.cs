@@ -22,6 +22,8 @@ namespace Bike_STore_Project
             serviceToolStripMenuItem.Click += (s, e) => SwitchTo(() => new ServiceForm());
             transactionLogToolStripMenuItem.Click += (s, e) => SwitchTo(() => new TransactionLogForm());
             exitToolStripMenuItem.Click += (s, e) => Application.Exit();
+            serviceLogToolStripMenuItem.Click += (s, e) => SwitchTo(() => new ServiceLogForm());
+
         }
 
         private void SwitchTo(Func<Form> createForm)

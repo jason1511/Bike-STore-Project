@@ -34,13 +34,14 @@
             serviceToolStripMenuItem = new ToolStripMenuItem();
             transactionLogToolStripMenuItem = new ToolStripMenuItem();
             exitToolStripMenuItem = new ToolStripMenuItem();
+            serviceLogToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // menuStrip1
             // 
             menuStrip1.ImageScalingSize = new Size(20, 20);
-            menuStrip1.Items.AddRange(new ToolStripItem[] { inventoryToolStripMenuItem, salesToolStripMenuItem, serviceToolStripMenuItem, transactionLogToolStripMenuItem, exitToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { inventoryToolStripMenuItem, salesToolStripMenuItem, serviceToolStripMenuItem, transactionLogToolStripMenuItem, serviceLogToolStripMenuItem, exitToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(504, 28);
@@ -77,6 +78,12 @@
             exitToolStripMenuItem.Size = new Size(47, 24);
             exitToolStripMenuItem.Text = "Exit";
             // 
+            // serviceLogToolStripMenuItem
+            // 
+            serviceLogToolStripMenuItem.Name = "serviceLogToolStripMenuItem";
+            serviceLogToolStripMenuItem.Size = new Size(99, 24);
+            serviceLogToolStripMenuItem.Text = "Service Log";
+            // 
             // MainMenuControl
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
@@ -98,5 +105,6 @@
         private ToolStripMenuItem serviceToolStripMenuItem;
         private ToolStripMenuItem exitToolStripMenuItem;
         private ToolStripMenuItem transactionLogToolStripMenuItem;
+        private ToolStripMenuItem serviceLogToolStripMenuItem;
     }
 }
