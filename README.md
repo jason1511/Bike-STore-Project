@@ -1,189 +1,79 @@
-🚲 Bike Store Management System
+# 🚲 Bike Store Management System
 
-A desktop-based Bike Store Management System built with C# (.NET 8 WinForms) and SQLite, designed for small to medium bike shops to manage inventory, sales, and service records in an offline-first environment.
-📌 Features
-🧾 Inventory Management
+A desktop-based **Bike Store Management System** built with **C# (.NET 8 WinForms)** and **SQLite**, designed for offline-first inventory, sales, and service management.
 
-Add, edit, and delete bike products
+This application is intended for small to medium bike shops that require a simple, reliable, and locally stored system without internet dependency.
 
-Products tracked by Brand, Type, Color, Quantity, Price
+---
 
-Automatic stock merging when adding identical products
+## ✨ Features
 
-Autocomplete suggestions for Brand / Type / Color
+### Inventory Management
+- Add, edit, and delete products
+- Products tracked by **Brand, Type, Color, Quantity, and Price**
+- Automatic stock merging for identical items
+- Autocomplete suggestions to maintain data consistency
+- Uppercase normalization for all product identifiers
 
-IDR currency formatting
+### Sales Management
+- Sales created only from available inventory
+- Prevents overselling with real-time stock validation
+- Automatic stock deduction after successful sale
+- Quantity-based total price calculation
+- Transaction log with live search
 
-Uppercase normalization to ensure data consistency
+### Service Logging
+- Log bike services independently from inventory
+- Service cost and notes support
+- Autocomplete for Brand, Type, and Color
+- Read-only service log for audit purposes
 
-💰 Sales Management
+### Logs & History
+- Transaction Log (Sales)
+- Service Log
+- Read-only design
+- Searchable by brand, type, color, customer, or notes
+- IDR (Indonesian Rupiah) currency formatting
 
-Create sales directly from available inventory
+---
 
-Inventory-aware dropdown selection (prevents selling unavailable items)
+## 🛠 Tech Stack
 
-Automatic stock deduction after sale
+- **Language:** C#
+- **Framework:** .NET 8 (WinForms)
+- **Database:** SQLite (Microsoft.Data.Sqlite)
+- **Testing:** MSTest
+- **Platform:** Windows (offline-first desktop application)
 
-Prevents overselling
+---
 
-Auto-calculated total price based on quantity
+## 🏗 Architecture Overview
 
-Transaction log with searchable history
+The application follows a simple layered structure:
 
-🛠️ Service Logging
+- **UI Layer (WinForms):** Inventory, Sales, Service, and Log forms
+- **Repository Layer:** Handles all database access and business logic
+- **Data Storage:** SQLite database stored locally on the machine
 
-Log bike services (non-inventory affecting)
+Critical business rules such as stock validation and transaction safety are enforced at the repository level rather than the UI.
 
-Autocomplete suggestions for Brand / Type / Color
+---
 
-Fixed quantity (1 service per log entry)
+## 🗄 Database Behavior
 
-Service cost and notes supported
+- The database file (`data.db`) is created automatically on first run
+- No manual database setup is required
+- Data is stored locally and persists between application runs
+- The application functions fully offline
 
-Dedicated service log (read-only)
+---
 
-📊 Logs & Reporting
+## ▶ How to Run
 
-Transaction Log
+1. Download the latest release from **GitHub Releases**
+2. Extract the folder
+3. Run `BikeStore.exe`
 
-Service Log
+> The database file (`data.db`) will be generated automatically on first launch.
 
-Live search filtering
-
-IDR currency formatting
-
-Read-only, audit-friendly design
-
-🧑‍💻 Tech Stack
-
-Language: C#
-
-Framework: .NET 8 (WinForms)
-
-Database: SQLite (local file-based)
-
-ORM: None (raw SQL for clarity & control)
-
-Testing: MSTest (repository-level tests)
-
-Bike-STore-Project/
-│
-├── Bike_STore_Project/          # Main WinForms application
-│   ├── Forms/                   # Inventory, Sales, Service, Logs
-│   ├── Repositories/            # ProductRepository, etc.
-│   ├── Models/                  # Product model
-│   ├── Database.cs              # SQLite initialization & connection
-│   └── MainMenuControl.cs
-│
-├── Bike_STore_Project.Tests/    # Unit tests (MSTest)
-│
-├── data.db                      # SQLite database (local)
-└── README.md
-
-🗄️ Database Schema (Simplified)
-products
-Column	Type
-id	INTEGER
-brand	TEXT
-type	TEXT
-color	TEXT
-quantity	INTEGER
-price	REAL
-sales
-Column	Type
-id	INTEGER
-brand	TEXT
-type	TEXT
-color	TEXT
-quantity	INTEGER
-price	REAL
-customer_name	TEXT
-date_time	TEXT
-services
-Column	Type
-id	INTEGER
-brand	TEXT
-type	TEXT
-color	TEXT
-quantity	INTEGER
-service_cost	REAL
-notes	TEXT
-date_time	TEXT
-🧪 Testing
-
-Repository-level tests using MSTest
-
-Tests run against isolated temporary SQLite databases
-
-Covers:
-
-Insert
-
-Update
-
-Delete
-
-Search filtering
-
-Stock logic
-
-To run tests:
-
-dotnet test
-
-🔐 Design Principles
-
-Offline-first (no internet required)
-
-Data integrity first
-
-Separation of concerns
-
-UI (Forms)
-
-Data access (Repositories)
-
-Fail-safe operations
-
-No overselling
-
-Transaction-based updates
-
-User error prevention
-
-Autocomplete
-
-Dropdown constraints
-
-Read-only logs
-
-🌏 Localization
-
-Currency formatted for Indonesian Rupiah (IDR)
-
-No decimal fractions for prices
-
-Culture-aware formatting
-
-🚧 Future Improvements (Planned)
-
-Printable transaction & service reports
-
-Discount handling
-
-Customer management
-
-Role-based access
-
-Cloud sync (optional)
-
-Export reports (PDF / CSV)
-
-👤 Author
-
-Jason Leonard
-Bachelor of Information and Communication Technology (Software Technology)
-
-📄 License
-
-This project is for educational and internal business use.
+---
