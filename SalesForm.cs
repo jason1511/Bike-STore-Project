@@ -8,7 +8,7 @@ namespace Bike_STore_Project
     {
         private const string NoColor = "(NO COLOR)";
         private int _availableQty = 0;
-        private bool _priceTouched = false;
+        private int _selectedProductId = 0;
 
         public SalesForm()
         {
@@ -16,43 +16,15 @@ namespace Bike_STore_Project
 
             btnAddSale.Click += BtnAddSale_Click;
             btnClear.Click += (s, e) => ClearInputs();
-
-            cmbBrand.SelectedIndexChanged += (s, e) => { _priceTouched = false; LoadTypes(); };
-            cmbType.SelectedIndexChanged += (s, e) => { _priceTouched = false; LoadColors(); };
-            cmbColor.SelectedIndexChanged += (s, e) => { _priceTouched = false; UpdateStockAndDefaults(); };
-
-            numPrice.ValueChanged += (s, e) => _priceTouched = true;
+            cmbBrand.SelectedIndexChanged += (s, e) => LoadTypes();
+            cmbType.SelectedIndexChanged += (s, e) => LoadColors();
+            cmbColor.SelectedIndexChanged += (s, e) => UpdateStockAndDefaults();
 
             numQuantity.Minimum = 1;
             numQuantity.Value = 1;
 
             LoadBrands();
         }
-
-
-        private void LoadBrands()
-        {
-            cmbBrand.Items.Clear();
-            cmbType.Items.Clear();
-            cmbColor.Items.Clear();
-
-            using var conn = Database.OpenConnection();
-            using var cmd = conn.CreateCommand();
-            cmd.CommandText = @"SELECT DISTINCT brand FROM products ORDER BY brand;";
-
-            using var rdr = cmd.ExecuteReader();
-            while (rdr.Read())
-                cmbBrand.Items.Add(rdr.GetString(0));
-
-            cmbBrand.Enabled = cmbBrand.Items.Count > 0;
-            cmbType.Enabled = false;
-            cmbColor.Enabled = false;
-            btnAddSale.Enabled = false;
-
-            if (cmbBrand.Items.Count > 0)
-                cmbBrand.SelectedIndex = 0;
-        }
-
         private void LoadTypes()
         {
             cmbType.Items.Clear();
@@ -82,7 +54,6 @@ namespace Bike_STore_Project
             if (cmbType.Items.Count > 0)
                 cmbType.SelectedIndex = 0;
         }
-
         private void LoadColors()
         {
             cmbColor.Items.Clear();
@@ -118,10 +89,33 @@ ORDER BY color;";
                 cmbColor.SelectedIndex = 0;
         }
 
+        private void LoadBrands()
+        {
+            cmbBrand.Items.Clear();
+            cmbType.Items.Clear();
+            cmbColor.Items.Clear();
+
+            using var conn = Database.OpenConnection();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = @"SELECT DISTINCT brand FROM products ORDER BY brand;";
+
+            using var rdr = cmd.ExecuteReader();
+            while (rdr.Read())
+                cmbBrand.Items.Add(rdr.GetString(0));
+
+            cmbBrand.Enabled = cmbBrand.Items.Count > 0;
+            cmbType.Enabled = false;
+            cmbColor.Enabled = false;
+            btnAddSale.Enabled = false;
+
+            if (cmbBrand.Items.Count > 0)
+                cmbBrand.SelectedIndex = 0;
+        }
         private void UpdateStockAndDefaults()
         {
             btnAddSale.Enabled = false;
             _availableQty = 0;
+            _selectedProductId = 0;
 
             if (cmbBrand.SelectedItem == null || cmbType.SelectedItem == null || cmbColor.SelectedItem == null)
                 return;
@@ -134,32 +128,42 @@ ORDER BY color;";
             using var conn = Database.OpenConnection();
             using var cmd = conn.CreateCommand();
             cmd.CommandText = @"
-SELECT quantity, price
-FROM products
-WHERE brand = $brand
-  AND type  = $type
-  AND ((color IS NULL AND $color IS NULL) OR (color = $color))
+SELECT
+  p.id,
+  COALESCE(SUM(l.qty_remaining),0) AS available_qty
+FROM products p
+LEFT JOIN stock_lots l ON l.product_id = p.id AND l.qty_remaining > 0
+WHERE p.brand = $brand
+  AND p.type  = $type
+  AND ((p.color IS NULL AND $color IS NULL) OR (p.color = $color))
+GROUP BY p.id
 LIMIT 1;";
+
             cmd.Parameters.AddWithValue("$brand", brand);
             cmd.Parameters.AddWithValue("$type", type);
             cmd.Parameters.AddWithValue("$color", (object?)color ?? DBNull.Value);
 
             using var rdr = cmd.ExecuteReader();
-            if (!rdr.Read()) return;
+            if (!rdr.Read())
+            {
+                _selectedProductId = 0;
+                _availableQty = 0;
+                numQuantity.Maximum = 1;
+                numQuantity.Value = 1;
+                numPrice.Enabled = false;
+                btnAddSale.Enabled = false;
+                return;
 
-            _availableQty = rdr.GetInt32(0);
-            var invPrice = Convert.ToDecimal(rdr.GetDouble(1));
+            }
 
-            // limit quantity to available stock
+            _selectedProductId = rdr.GetInt32(0);
+            _availableQty = rdr.GetInt32(1);
+
             numQuantity.Maximum = Math.Max(1, _availableQty);
             if (numQuantity.Value < 1) numQuantity.Value = 1;
             if (numQuantity.Value > numQuantity.Maximum) numQuantity.Value = numQuantity.Maximum;
 
-            // optional: default sale price from inventory if user left it 0
-            if (!_priceTouched)
-                numPrice.Value = invPrice;
-
-
+            numPrice.Enabled = _availableQty > 0;
             btnAddSale.Enabled = _availableQty > 0;
         }
 
@@ -171,17 +175,22 @@ LIMIT 1;";
                 return;
             }
 
-            var brand = cmbBrand.SelectedItem.ToString()!;
-            var type = cmbType.SelectedItem.ToString()!;
-            var colorText = cmbColor.SelectedItem.ToString()!;
-            string? color = (colorText == NoColor) ? null : colorText;
+            if (numPrice.Value <= 0)
+            {
+                MessageBox.Show("Enter a selling price.");
+                return;
+            }
+
+            if (_selectedProductId == 0)
+            {
+                MessageBox.Show("No product selected.");
+                return;
+            }
 
             var repo = new ProductRepository();
 
-            var ok = repo.TryMakeSale(
-                brand: brand,
-                type: type,
-                color: color,
+            var ok = repo.TryMakeSaleFifoManualPrice(
+                productId: _selectedProductId,
                 saleQty: (int)numQuantity.Value,
                 saleUnitPrice: numPrice.Value,
                 customerName: txtCustomer.Text,
@@ -191,26 +200,26 @@ LIMIT 1;";
             if (!ok)
             {
                 MessageBox.Show(error, "Sale blocked", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                UpdateStockAndDefaults(); // refresh limits if something changed
+                UpdateStockAndDefaults();
                 return;
             }
 
             MessageBox.Show("Sale saved and stock updated!");
             ClearInputs();
-            LoadBrands(); // refresh dropdown lists (stock may hit 0 and be deleted)
+            LoadBrands();
         }
 
         private void ClearInputs()
         {
             txtCustomer.Clear();
             numQuantity.Value = 1;
-
-            _priceTouched = false;
+            // optional reset:
             numPrice.Value = 0;
 
             if (cmbBrand.Items.Count > 0)
                 cmbBrand.SelectedIndex = 0;
         }
+
 
     }
 }

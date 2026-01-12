@@ -33,9 +33,9 @@
             txtType = new TextBox();
             Type = new Label();
             numQuantity = new NumericUpDown();
-            label1 = new Label();
+            lblQuantity = new Label();
             numPrice = new NumericUpDown();
-            Price = new Label();
+            lblPrice = new Label();
             btnOk = new Button();
             btnCancel = new Button();
             txtColor = new TextBox();
@@ -82,18 +82,19 @@
             // numQuantity
             // 
             numQuantity.Location = new Point(519, 41);
+            numQuantity.Maximum = new decimal(new int[] { 10000000, 0, 0, 0 });
             numQuantity.Name = "numQuantity";
             numQuantity.Size = new Size(150, 27);
             numQuantity.TabIndex = 4;
             // 
-            // label1
+            // lblQuantity
             // 
-            label1.AutoSize = true;
-            label1.Location = new Point(448, 40);
-            label1.Name = "label1";
-            label1.Size = new Size(65, 20);
-            label1.TabIndex = 5;
-            label1.Text = "Quantity";
+            lblQuantity.AutoSize = true;
+            lblQuantity.Location = new Point(448, 40);
+            lblQuantity.Name = "lblQuantity";
+            lblQuantity.Size = new Size(65, 20);
+            lblQuantity.TabIndex = 5;
+            lblQuantity.Text = "Quantity";
             // 
             // numPrice
             // 
@@ -105,18 +106,18 @@
             numPrice.TabIndex = 6;
             numPrice.ThousandsSeparator = true;
             // 
-            // Price
+            // lblPrice
             // 
-            Price.AutoSize = true;
-            Price.Location = new Point(472, 89);
-            Price.Name = "Price";
-            Price.Size = new Size(41, 20);
-            Price.TabIndex = 7;
-            Price.Text = "Price";
+            lblPrice.AutoSize = true;
+            lblPrice.Location = new Point(472, 89);
+            lblPrice.Name = "lblPrice";
+            lblPrice.Size = new Size(41, 20);
+            lblPrice.TabIndex = 7;
+            lblPrice.Text = "Price";
             // 
             // btnOk
             // 
-            btnOk.Location = new Point(135, 160);
+            btnOk.Location = new Point(134, 202);
             btnOk.Name = "btnOk";
             btnOk.Size = new Size(94, 29);
             btnOk.TabIndex = 8;
@@ -125,7 +126,7 @@
             // 
             // btnCancel
             // 
-            btnCancel.Location = new Point(448, 160);
+            btnCancel.Location = new Point(459, 202);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(94, 29);
             btnCancel.TabIndex = 9;
@@ -153,6 +154,7 @@
             // 
             mainMenuControl1.Dock = DockStyle.Top;
             mainMenuControl1.Location = new Point(0, 0);
+            mainMenuControl1.Margin = new Padding(4, 4, 4, 4);
             mainMenuControl1.Name = "mainMenuControl1";
             mainMenuControl1.Size = new Size(800, 34);
             mainMenuControl1.TabIndex = 12;
@@ -167,9 +169,9 @@
             Controls.Add(txtColor);
             Controls.Add(btnCancel);
             Controls.Add(btnOk);
-            Controls.Add(Price);
+            Controls.Add(lblPrice);
             Controls.Add(numPrice);
-            Controls.Add(label1);
+            Controls.Add(lblQuantity);
             Controls.Add(numQuantity);
             Controls.Add(Type);
             Controls.Add(txtType);
@@ -190,9 +192,9 @@
         private TextBox txtType;
         private Label Type;
         private NumericUpDown numQuantity;
-        private Label label1;
+        private Label lblQuantity;
         private NumericUpDown numPrice;
-        private Label Price;
+        private Label lblPrice;
         private Button btnOk;
         private Button btnCancel;
         private TextBox txtColor;

@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.4" />
-    <PackageReference Include="MSTest.TestFramework" Version="4.0.2" />
   </ItemGroup>
 
 </Project>

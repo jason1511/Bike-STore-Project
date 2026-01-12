@@ -14,6 +14,8 @@ namespace Bike_STore_Project
         public string? Color { get; set; }
         public int Quantity { get; set; }
         public decimal Price { get; set; }
+        public DateTime? LastReceivedAt { get; set; }
+
     }
 }
 

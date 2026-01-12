@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.VisualBasic;
+
 
 
 namespace Bike_STore_Project
@@ -14,7 +16,9 @@ namespace Bike_STore_Project
     public partial class InventoryForm : Form
     {
         private readonly ProductRepository _repo = new();
-        private BindingList<Product> _bindingList = new();
+        private BindingList<StockLotRow> _bindingList = new();
+
+
 
         public InventoryForm()
         {
@@ -22,15 +26,20 @@ namespace Bike_STore_Project
             SetupGrid();
 
             // wire events ONCE
+
             Load += InventoryForm_Load;
             txtSearch.TextChanged += (s, e) => LoadData(txtSearch.Text);
             btnRefresh.Click += (s, e) => LoadData();
             btnAdd.Click += BtnAdd_Click;
             btnEdit.Click += (s, e) => EditSelected();
             btnDelete.Click += BtnDelete_Click;
+            // btnReceiveStock.Click += (s, e) => ReceiveStockForSelected();
+            btnReceiveStock.Visible = false;   // or Enabled = false;
+
 
             dgvProducts.CellDoubleClick += (s, e) => EditSelected();
         }
+        
 
         private void InventoryForm_Load(object? sender, EventArgs e)
         {
@@ -50,8 +59,15 @@ namespace Bike_STore_Project
 
             dgvProducts.Columns.Add(new DataGridViewTextBoxColumn
             {
-                DataPropertyName = "Id",
-                HeaderText = "ID",
+                DataPropertyName = "LotId",
+                HeaderText = "Lot ID",
+                Visible = false
+            });
+
+            dgvProducts.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "ProductId",
+                HeaderText = "Product ID",
                 Visible = false
             });
 
@@ -78,26 +94,51 @@ namespace Bike_STore_Project
 
             dgvProducts.Columns.Add(new DataGridViewTextBoxColumn
             {
-                DataPropertyName = "Quantity",
-                HeaderText = "Qty",
-                Width = 70
+                DataPropertyName = "QtyReceived",
+                HeaderText = "Received",
+                Width = 80
             });
 
             dgvProducts.Columns.Add(new DataGridViewTextBoxColumn
             {
-                DataPropertyName = "Price",
-                HeaderText = "Price",
-                Width = 90,
+                DataPropertyName = "QtyRemaining",
+                HeaderText = "Remaining",
+                Width = 90
+            });
+
+            dgvProducts.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "UnitCost",
+                HeaderText = "Unit Cost",
+                Width = 100,
                 DefaultCellStyle = { Format = "C2" }
             });
+
+            dgvProducts.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "ReceivedAt",
+                HeaderText = "Received At",
+                Width = 140,
+                DefaultCellStyle = { Format = "yyyy-MM-dd HH:mm" }
+            });
+
+            dgvProducts.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Notes",
+                HeaderText = "Notes",
+                Width = 220
+            });
+
+
+
         }
 
         private void LoadData(string? filter = null)
         {
             try
             {
-                var list = _repo.GetAll(filter);
-                _bindingList = new BindingList<Product>(list);
+                var list = _repo.GetStockLots(filter);
+                _bindingList = new BindingList<StockLotRow>(list);
                 dgvProducts.DataSource = _bindingList;
             }
             catch (Exception ex)
@@ -106,84 +147,111 @@ namespace Bike_STore_Project
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        
 
-        private Product? GetSelected()
+        private StockLotRow? GetSelected()
         {
-            return dgvProducts.CurrentRow?.DataBoundItem as Product;
+            return dgvProducts.CurrentRow?.DataBoundItem as StockLotRow;
         }
 
         private void BtnAdd_Click(object? sender, EventArgs e)
         {
-            using var dlg = new ProductEditForm();
-            if (dlg.ShowDialog(this) == DialogResult.OK)
+            // Use ReceiveStock mode for Add (receive a batch)
+            using var dlg = new ProductEditForm(ProductEditMode.ReceiveStock);
+
+            if (dlg.ShowDialog(this) != DialogResult.OK)
+                return;
+
+            try
             {
-                try
-                {
-                    _repo.AddOrIncreaseStock(dlg.Product);
-                    LoadData(txtSearch.Text);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Add failed: " + ex.Message, "Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                // Create or reuse the identity row (brand/type/color)
+                var productId = _repo.GetOrCreateProductId(
+                    dlg.Product.Brand,
+                    dlg.Product.Type,
+                    dlg.Product.Color
+                );
+
+                // Insert the batch into stock_lots
+                _repo.ReceiveBatch(
+                    productId: productId,
+                    qtyReceived: dlg.QuantityReceived,
+                    unitCost: dlg.UnitCost,
+                    receivedAt: DateTime.Now,
+                    notes: null
+                );
+
+                LoadData(txtSearch.Text);
+                MessageBox.Show("Stock batch added!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Add stock failed: " + ex.Message, "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
 
         private void EditSelected()
         {
             var selected = GetSelected();
             if (selected == null)
             {
-                MessageBox.Show("Select a product first.");
+                MessageBox.Show("Select a batch first.");
                 return;
             }
 
-            var full = _repo.GetById(selected.Id);
-            if (full == null)
-            {
-                MessageBox.Show("Product not found.");
-                LoadData();
+            using var dlg = new ProductEditForm(selected, ProductEditMode.ReceiveStock);
+            if (dlg.ShowDialog(this) != DialogResult.OK)
                 return;
-            }
 
-            using var dlg = new ProductEditForm(full);
-            if (dlg.ShowDialog(this) == DialogResult.OK)
+            try
             {
-                try
-                {
-                    _repo.Update(dlg.Product);
-                    LoadData(txtSearch.Text);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Update failed: " + ex.Message, "Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                _repo.UpdateStockLot(
+                    lotId: selected.LotId,
+                    newQtyReceived: dlg.QuantityReceived,
+                    newUnitCost: dlg.UnitCost
+                );
+
+                LoadData(txtSearch.Text);
+                MessageBox.Show("Batch updated!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Update batch failed: " + ex.Message, "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+
 
         private void BtnDelete_Click(object? sender, EventArgs e)
         {
             var selected = GetSelected();
             if (selected == null)
             {
-                MessageBox.Show("Select a product first.");
+                MessageBox.Show("Select a Batch first.");
                 return;
             }
-
-            var label = $"{selected.Brand} {selected.Type}";
+            if (selected.QtyRemaining != selected.QtyReceived)
+            {
+                MessageBox.Show("Can't delete this batch because some items were already sold from it.");
+                return;
+            }
+            var label = $"{selected.Brand} {selected.Type} - {selected.ReceivedAt:yyyy-MM-dd HH:mm}";
             var confirm = MessageBox.Show(
-                $"Delete {label}?",
+                $"Delete batch: {label}?",
                 "Confirm delete",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning);
+            
+
 
             if (confirm != DialogResult.Yes) return;
 
             try
             {
-                _repo.Delete(selected.Id);
+                _repo.DeleteStockLot(selected.LotId);
+
                 LoadData(txtSearch.Text);
             }
             catch (Exception ex)
