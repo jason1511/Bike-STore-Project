@@ -60,6 +60,7 @@ ORDER BY p.brand, p.type;";
 
             return list;
         }
+
         public bool TryMakeSaleFifoManualPrice(
             int productId,
             int saleQty,
@@ -113,13 +114,13 @@ ORDER BY p.brand, p.type;";
                 int available;
                 using (var availCmd = conn.CreateCommand())
                 {
-                    availCmd.Transaction = tx;
                     availCmd.CommandText = @"
-SELECT COALESCE(SUM(qty_remaining),0)
+SELECT COALESCE(SUM(qty_remaining), 0)
 FROM stock_lots
-WHERE product_id=$id AND qty_remaining > 0;";
-                    availCmd.Parameters.AddWithValue("$id", productId);
+WHERE product_id = $pid AND qty_remaining > 0;";
+                    availCmd.Parameters.AddWithValue("$pid", productId);
                     available = Convert.ToInt32(availCmd.ExecuteScalar() ?? 0);
+
                 }
 
                 if (available < saleQty)
@@ -159,7 +160,7 @@ SELECT last_insert_rowid();";
 SELECT id, unit_cost, qty_remaining
 FROM stock_lots
 WHERE product_id=$pid AND qty_remaining > 0
-ORDER BY received_at ASC, id ASC;";
+ORDER BY datetime(received_at) ASC, id ASC;";
                     lotsCmd.Parameters.AddWithValue("$pid", productId);
 
                     using var rdr = lotsCmd.ExecuteReader();
@@ -208,6 +209,58 @@ VALUES ($saleId, $lotId, $qty, $cost, $sell);";
                 errorMessage = "Sale failed: " + ex.Message;
                 return false;
             }
+        }
+        public List<FifoPreviewRow> PreviewFifoConsumption(int productId, int qtyRequested)
+        {
+            var list = new List<FifoPreviewRow>();
+
+            using var conn = Database.OpenConnection();
+            using var cmd = conn.CreateCommand();
+
+            cmd.CommandText = @"
+WITH fifo AS (
+    SELECT
+        l.id AS lot_id,
+        l.received_at,
+        l.unit_cost,
+        l.qty_remaining,
+        SUM(l.qty_remaining) OVER (
+            ORDER BY l.received_at, l.id
+        ) AS run_qty
+    FROM stock_lots l
+    WHERE l.product_id = $pid
+      AND l.qty_remaining > 0
+)
+SELECT
+    lot_id,
+    received_at,
+    unit_cost,
+    CASE
+        WHEN run_qty <= $qty THEN qty_remaining
+        WHEN run_qty - qty_remaining >= $qty THEN 0
+        ELSE $qty - (run_qty - qty_remaining)
+    END AS qty_to_take
+FROM fifo
+WHERE run_qty - qty_remaining < $qty
+ORDER BY received_at, lot_id;
+";
+
+            cmd.Parameters.AddWithValue("$pid", productId);
+            cmd.Parameters.AddWithValue("$qty", qtyRequested);
+
+            using var rdr = cmd.ExecuteReader();
+            while (rdr.Read())
+            {
+                list.Add(new FifoPreviewRow
+                {
+                    LotId = rdr.GetInt32(0),
+                    ReceivedAt = DateTime.Parse(rdr.GetString(1)),
+                    UnitCost = Convert.ToDecimal(rdr.GetDouble(2)),
+                    QtyToTake = rdr.GetInt32(3)
+                });
+            }
+
+            return list;
         }
 
         public int AddProductIdentity(Product p)
@@ -413,7 +466,7 @@ ORDER BY color;";
         {
             using var conn = Database.OpenConnection();
             using var cmd = conn.CreateCommand();
-            cmd.CommandText = "DELETE FROM stock_lots WHERE id=$id;";
+            cmd.CommandText = "DELETE FROM stock_lots WHERE id = $id  AND qty_remaining = qty_received;";
             cmd.Parameters.AddWithValue("$id", lotId);
             return cmd.ExecuteNonQuery() > 0;
         }

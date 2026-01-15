@@ -33,7 +33,9 @@
             btnRefresh = new Button();
             label1 = new Label();
             txtSearch = new TextBox();
+            dgvSaleLines = new DataGridView();
             ((System.ComponentModel.ISupportInitialize)dgvSales).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)dgvSaleLines).BeginInit();
             SuspendLayout();
             // 
             // mainMenuControl1
@@ -48,10 +50,10 @@
             // 
             dgvSales.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvSales.Dock = DockStyle.Bottom;
-            dgvSales.Location = new Point(0, 88);
+            dgvSales.Location = new Point(0, 244);
             dgvSales.Name = "dgvSales";
             dgvSales.RowHeadersWidth = 51;
-            dgvSales.Size = new Size(800, 362);
+            dgvSales.Size = new Size(800, 206);
             dgvSales.TabIndex = 1;
             // 
             // btnRefresh
@@ -79,11 +81,22 @@
             txtSearch.Size = new Size(125, 27);
             txtSearch.TabIndex = 4;
             // 
+            // dgvSaleLines
+            // 
+            dgvSaleLines.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvSaleLines.Dock = DockStyle.Bottom;
+            dgvSaleLines.Location = new Point(0, 78);
+            dgvSaleLines.Name = "dgvSaleLines";
+            dgvSaleLines.RowHeadersWidth = 51;
+            dgvSaleLines.Size = new Size(800, 166);
+            dgvSaleLines.TabIndex = 5;
+            // 
             // TransactionLogForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(dgvSaleLines);
             Controls.Add(txtSearch);
             Controls.Add(label1);
             Controls.Add(btnRefresh);
@@ -92,6 +105,7 @@
             Name = "TransactionLogForm";
             Text = "TransactionLogForm";
             ((System.ComponentModel.ISupportInitialize)dgvSales).EndInit();
+            ((System.ComponentModel.ISupportInitialize)dgvSaleLines).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -103,5 +117,6 @@
         private Button btnRefresh;
         private Label label1;
         private TextBox txtSearch;
+        private DataGridView dgvSaleLines;
     }
 }

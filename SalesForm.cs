@@ -25,6 +25,8 @@ namespace Bike_STore_Project
 
             LoadBrands();
         }
+        
+
         private void LoadTypes()
         {
             cmbType.Items.Clear();

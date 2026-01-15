@@ -8,9 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-using System;
-using System.Windows.Forms;
-
 namespace Bike_STore_Project
 {
     public enum ProductEditMode
