@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Bike_STore_Project
@@ -15,6 +16,10 @@ namespace Bike_STore_Project
             txtBrand.CharacterCasing = CharacterCasing.Upper;
             txtType.CharacterCasing = CharacterCasing.Upper;
             txtColor.CharacterCasing = CharacterCasing.Upper;
+
+            // money-like input
+            numServiceCost.DecimalPlaces = 2;
+            numServiceCost.Minimum = 0;
 
             SetupAutocomplete();
 
@@ -70,7 +75,9 @@ namespace Bike_STore_Project
 
             if (!string.IsNullOrWhiteSpace(txtBrand.Text) &&
                 !string.IsNullOrWhiteSpace(txtType.Text))
+            {
                 src.AddRange(_repo.GetDistinctColors(txtBrand.Text, txtType.Text).ToArray());
+            }
 
             txtColor.AutoCompleteCustomSource = src;
         }
@@ -80,12 +87,14 @@ namespace Bike_STore_Project
             if (string.IsNullOrWhiteSpace(txtBrand.Text))
             {
                 MessageBox.Show("Brand is required.");
+                txtBrand.Focus();
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(txtType.Text))
             {
                 MessageBox.Show("Type is required.");
+                txtType.Focus();
                 return;
             }
 
@@ -104,6 +113,7 @@ VALUES ($brand, $type, $color, 1, $cost, $notes);";
                     string.IsNullOrWhiteSpace(txtColor.Text)
                         ? (object)DBNull.Value
                         : txtColor.Text.Trim().ToUpperInvariant());
+
                 cmd.Parameters.AddWithValue("$cost", (double)numServiceCost.Value);
                 cmd.Parameters.AddWithValue("$notes",
                     string.IsNullOrWhiteSpace(txtNotes.Text)
@@ -128,6 +138,8 @@ VALUES ($brand, $type, $color, 1, $cost, $notes);";
             txtType.Clear();
             txtColor.Clear();
             txtNotes.Clear();
+
+            // reset safely
             numServiceCost.Value = 0;
 
             SetupBrandAutocomplete();

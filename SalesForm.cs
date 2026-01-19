@@ -16,6 +16,7 @@ namespace Bike_STore_Project
 
             btnAddSale.Click += BtnAddSale_Click;
             btnClear.Click += (s, e) => ClearInputs();
+
             cmbBrand.SelectedIndexChanged += (s, e) => LoadTypes();
             cmbType.SelectedIndexChanged += (s, e) => LoadColors();
             cmbColor.SelectedIndexChanged += (s, e) => UpdateStockAndDefaults();
@@ -25,7 +26,29 @@ namespace Bike_STore_Project
 
             LoadBrands();
         }
-        
+
+        private void LoadBrands()
+        {
+            cmbBrand.Items.Clear();
+            cmbType.Items.Clear();
+            cmbColor.Items.Clear();
+
+            using var conn = Database.OpenConnection();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = @"SELECT DISTINCT brand FROM products ORDER BY brand;";
+
+            using var rdr = cmd.ExecuteReader();
+            while (rdr.Read())
+                cmbBrand.Items.Add(rdr.GetString(0));
+
+            cmbBrand.Enabled = cmbBrand.Items.Count > 0;
+            cmbType.Enabled = false;
+            cmbColor.Enabled = false;
+            btnAddSale.Enabled = false;
+
+            if (cmbBrand.Items.Count > 0)
+                cmbBrand.SelectedIndex = 0;
+        }
 
         private void LoadTypes()
         {
@@ -56,6 +79,7 @@ namespace Bike_STore_Project
             if (cmbType.Items.Count > 0)
                 cmbType.SelectedIndex = 0;
         }
+
         private void LoadColors()
         {
             cmbColor.Items.Clear();
@@ -91,28 +115,6 @@ ORDER BY color;";
                 cmbColor.SelectedIndex = 0;
         }
 
-        private void LoadBrands()
-        {
-            cmbBrand.Items.Clear();
-            cmbType.Items.Clear();
-            cmbColor.Items.Clear();
-
-            using var conn = Database.OpenConnection();
-            using var cmd = conn.CreateCommand();
-            cmd.CommandText = @"SELECT DISTINCT brand FROM products ORDER BY brand;";
-
-            using var rdr = cmd.ExecuteReader();
-            while (rdr.Read())
-                cmbBrand.Items.Add(rdr.GetString(0));
-
-            cmbBrand.Enabled = cmbBrand.Items.Count > 0;
-            cmbType.Enabled = false;
-            cmbColor.Enabled = false;
-            btnAddSale.Enabled = false;
-
-            if (cmbBrand.Items.Count > 0)
-                cmbBrand.SelectedIndex = 0;
-        }
         private void UpdateStockAndDefaults()
         {
             btnAddSale.Enabled = false;
@@ -150,12 +152,13 @@ LIMIT 1;";
             {
                 _selectedProductId = 0;
                 _availableQty = 0;
+
                 numQuantity.Maximum = 1;
                 numQuantity.Value = 1;
+
                 numPrice.Enabled = false;
                 btnAddSale.Enabled = false;
                 return;
-
             }
 
             _selectedProductId = rdr.GetInt32(0);
@@ -215,13 +218,15 @@ LIMIT 1;";
         {
             txtCustomer.Clear();
             numQuantity.Value = 1;
-            // optional reset:
-            numPrice.Value = 0;
+
+            // reset price safely (avoid Value < Minimum exceptions if you later set Minimum)
+            if (numPrice.Minimum <= 0)
+                numPrice.Value = 0;
+            else
+                numPrice.Value = numPrice.Minimum;
 
             if (cmbBrand.Items.Count > 0)
                 cmbBrand.SelectedIndex = 0;
         }
-
-
     }
 }

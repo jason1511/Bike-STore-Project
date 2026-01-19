@@ -14,18 +14,13 @@
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
-            {
                 components.Dispose();
-            }
+
             base.Dispose(disposing);
         }
 
         #region Windows Form Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
             backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
@@ -42,144 +37,176 @@
             txtBrand = new TextBox();
             txtType = new TextBox();
             txtColor = new TextBox();
+
+            tableLayoutPanel1 = new TableLayoutPanel();
+
             ((System.ComponentModel.ISupportInitialize)numServiceCost).BeginInit();
             SuspendLayout();
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(33, 41);
-            label1.Name = "label1";
-            label1.Size = new Size(48, 20);
-            label1.TabIndex = 0;
-            label1.Text = "Brand";
-            label1.TextAlign = ContentAlignment.TopCenter;
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Location = new Point(33, 90);
-            label2.Name = "label2";
-            label2.Size = new Size(40, 20);
-            label2.TabIndex = 3;
-            label2.Text = "Type";
-            // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Location = new Point(31, 141);
-            label3.Name = "label3";
-            label3.Size = new Size(45, 20);
-            label3.TabIndex = 5;
-            label3.Text = "Color";
-            // 
-            // numServiceCost
-            // 
-            numServiceCost.Location = new Point(102, 190);
-            numServiceCost.Maximum = new decimal(new int[] { 1000000, 0, 0, 0 });
-            numServiceCost.Name = "numServiceCost";
-            numServiceCost.Size = new Size(150, 27);
-            numServiceCost.TabIndex = 8;
-            numServiceCost.ThousandsSeparator = true;
-            // 
-            // label5
-            // 
-            label5.AutoSize = true;
-            label5.Location = new Point(12, 194);
-            label5.Name = "label5";
-            label5.Size = new Size(89, 20);
-            label5.TabIndex = 9;
-            label5.Text = "Service Cost";
-            // 
-            // label6
-            // 
-            label6.AutoSize = true;
-            label6.Location = new Point(33, 279);
-            label6.Name = "label6";
-            label6.Size = new Size(48, 20);
-            label6.TabIndex = 10;
-            label6.Text = "Notes";
-            // 
-            // txtNotes
-            // 
-            txtNotes.CharacterCasing = CharacterCasing.Upper;
-            txtNotes.Location = new Point(102, 272);
-            txtNotes.Multiline = true;
-            txtNotes.Name = "txtNotes";
-            txtNotes.Size = new Size(193, 97);
-            txtNotes.TabIndex = 11;
-            // 
-            // btnAddService
-            // 
-            btnAddService.Location = new Point(356, 41);
-            btnAddService.Name = "btnAddService";
-            btnAddService.Size = new Size(122, 29);
-            btnAddService.TabIndex = 12;
-            btnAddService.Text = "ADD SERVICE";
-            btnAddService.UseVisualStyleBackColor = true;
-            // 
-            // btnClear
-            // 
-            btnClear.Location = new Point(531, 41);
-            btnClear.Name = "btnClear";
-            btnClear.Size = new Size(94, 29);
-            btnClear.TabIndex = 13;
-            btnClear.Text = "CLEAR";
-            btnClear.UseVisualStyleBackColor = true;
-            // 
+
             // mainMenuControl1
-            // 
             mainMenuControl1.Dock = DockStyle.Top;
             mainMenuControl1.Location = new Point(0, 0);
             mainMenuControl1.Name = "mainMenuControl1";
             mainMenuControl1.Size = new Size(800, 31);
-            mainMenuControl1.TabIndex = 14;
-            // 
+            mainMenuControl1.TabIndex = 0;
+
+            // tableLayoutPanel1 (ROOT)
+            tableLayoutPanel1.Dock = DockStyle.Fill;
+            tableLayoutPanel1.Padding = new Padding(12);
+            tableLayoutPanel1.Name = "tableLayoutPanel1";
+            tableLayoutPanel1.TabIndex = 1;
+
+            // 2 columns: label + input
+            tableLayoutPanel1.ColumnCount = 2;
+            tableLayoutPanel1.ColumnStyles.Clear();
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+
+            // rows: Brand, Type, Color, Cost, Notes, Buttons
+            tableLayoutPanel1.RowCount = 6;
+            tableLayoutPanel1.RowStyles.Clear();
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 140F)); // Notes fixed height
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+
+            // label1 - Brand
+            label1.AutoSize = true;
+            label1.Name = "label1";
+            label1.Text = "Brand";
+            label1.Anchor = AnchorStyles.Left;
+            label1.Margin = new Padding(3, 8, 10, 8);
+
+            // label2 - Type
+            label2.AutoSize = true;
+            label2.Name = "label2";
+            label2.Text = "Type";
+            label2.Anchor = AnchorStyles.Left;
+            label2.Margin = new Padding(3, 8, 10, 8);
+
+            // label3 - Color
+            label3.AutoSize = true;
+            label3.Name = "label3";
+            label3.Text = "Color";
+            label3.Anchor = AnchorStyles.Left;
+            label3.Margin = new Padding(3, 8, 10, 8);
+
+            // label5 - Service Cost
+            label5.AutoSize = true;
+            label5.Name = "label5";
+            label5.Text = "Service Cost";
+            label5.Anchor = AnchorStyles.Left;
+            label5.Margin = new Padding(3, 8, 10, 8);
+
+            // label6 - Notes
+            label6.AutoSize = true;
+            label6.Name = "label6";
+            label6.Text = "Notes";
+            label6.Anchor = AnchorStyles.Left;
+            label6.Margin = new Padding(3, 8, 10, 8);
+
             // txtBrand
-            // 
-            txtBrand.Location = new Point(102, 41);
             txtBrand.Name = "txtBrand";
-            txtBrand.Size = new Size(125, 27);
-            txtBrand.TabIndex = 15;
-            // 
+            txtBrand.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            txtBrand.Margin = new Padding(3, 6, 3, 6);
+            txtBrand.TabIndex = 0;
+
             // txtType
-            // 
-            txtType.Location = new Point(102, 90);
             txtType.Name = "txtType";
-            txtType.Size = new Size(125, 27);
-            txtType.TabIndex = 16;
-            // 
+            txtType.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            txtType.Margin = new Padding(3, 6, 3, 6);
+            txtType.TabIndex = 1;
+
             // txtColor
-            // 
-            txtColor.Location = new Point(102, 138);
             txtColor.Name = "txtColor";
-            txtColor.Size = new Size(125, 27);
-            txtColor.TabIndex = 17;
-            // 
+            txtColor.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            txtColor.Margin = new Padding(3, 6, 3, 6);
+            txtColor.TabIndex = 2;
+
+            // numServiceCost
+            numServiceCost.Name = "numServiceCost";
+            numServiceCost.Maximum = new decimal(new int[] { 1000000, 0, 0, 0 });
+            numServiceCost.ThousandsSeparator = true;
+            numServiceCost.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            numServiceCost.Margin = new Padding(3, 6, 3, 6);
+            numServiceCost.TabIndex = 3;
+
+            // txtNotes
+            txtNotes.Name = "txtNotes";
+            txtNotes.CharacterCasing = CharacterCasing.Upper;
+            txtNotes.Multiline = true;
+            txtNotes.ScrollBars = ScrollBars.Vertical;
+            txtNotes.Dock = DockStyle.Fill; // fill the fixed-height row
+            txtNotes.Margin = new Padding(3, 6, 3, 6);
+            txtNotes.TabIndex = 4;
+
+            // btnAddService
+            btnAddService.Name = "btnAddService";
+            btnAddService.Text = "ADD SERVICE";
+            btnAddService.AutoSize = true;
+            btnAddService.Margin = new Padding(6);
+            btnAddService.TabIndex = 5;
+            btnAddService.UseVisualStyleBackColor = true;
+
+            // btnClear
+            btnClear.Name = "btnClear";
+            btnClear.Text = "CLEAR";
+            btnClear.AutoSize = true;
+            btnClear.Margin = new Padding(6);
+            btnClear.TabIndex = 6;
+            btnClear.UseVisualStyleBackColor = true;
+
+            // buttons panel (inside root table)
+            var flpButtons = new FlowLayoutPanel();
+            flpButtons.Name = "flpButtons";
+            flpButtons.Dock = DockStyle.Fill;
+            flpButtons.AutoSize = true;
+            flpButtons.WrapContents = false;
+            flpButtons.FlowDirection = FlowDirection.RightToLeft;
+            flpButtons.Controls.Add(btnClear);
+            flpButtons.Controls.Add(btnAddService);
+
+            // add controls to root table
+            tableLayoutPanel1.SuspendLayout();
+
+            tableLayoutPanel1.Controls.Add(label1, 0, 0);
+            tableLayoutPanel1.Controls.Add(txtBrand, 1, 0);
+
+            tableLayoutPanel1.Controls.Add(label2, 0, 1);
+            tableLayoutPanel1.Controls.Add(txtType, 1, 1);
+
+            tableLayoutPanel1.Controls.Add(label3, 0, 2);
+            tableLayoutPanel1.Controls.Add(txtColor, 1, 2);
+
+            tableLayoutPanel1.Controls.Add(label5, 0, 3);
+            tableLayoutPanel1.Controls.Add(numServiceCost, 1, 3);
+
+            tableLayoutPanel1.Controls.Add(label6, 0, 4);
+            tableLayoutPanel1.Controls.Add(txtNotes, 1, 4);
+
+            tableLayoutPanel1.Controls.Add(flpButtons, 0, 5);
+            tableLayoutPanel1.SetColumnSpan(flpButtons, 2);
+
+            tableLayoutPanel1.ResumeLayout(false);
+            tableLayoutPanel1.PerformLayout();
+
             // ServiceForm
-            // 
             AcceptButton = btnAddService;
-            AutoScaleDimensions = new SizeF(8F, 20F);
-            AutoScaleMode = AutoScaleMode.Font;
+            AutoScaleMode = AutoScaleMode.Dpi;
+            AutoSize = false;
+            MinimumSize = new Size(620, 460);
+
             ClientSize = new Size(800, 450);
-            Controls.Add(txtColor);
-            Controls.Add(txtType);
-            Controls.Add(txtBrand);
+            Controls.Add(tableLayoutPanel1);
             Controls.Add(mainMenuControl1);
-            Controls.Add(btnClear);
-            Controls.Add(btnAddService);
-            Controls.Add(txtNotes);
-            Controls.Add(label6);
-            Controls.Add(label5);
-            Controls.Add(numServiceCost);
-            Controls.Add(label3);
-            Controls.Add(label2);
-            Controls.Add(label1);
+
             Name = "ServiceForm";
-            Text = "ServiceForm";
+            Text = "Service";
+
             ((System.ComponentModel.ISupportInitialize)numServiceCost).EndInit();
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
@@ -198,5 +225,7 @@
         private TextBox txtBrand;
         private TextBox txtType;
         private TextBox txtColor;
+
+        private TableLayoutPanel tableLayoutPanel1;
     }
 }

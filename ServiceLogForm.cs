@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Globalization;
-using System.Threading;
 using System.Windows.Forms;
 
 namespace Bike_STore_Project
@@ -12,6 +11,9 @@ namespace Bike_STore_Project
         {
             InitializeComponent();
             SetupGrid();
+
+            // keep consistent input style
+            txtSearch.CharacterCasing = CharacterCasing.Upper;
 
             Load += (s, e) => LoadData();
             btnRefresh.Click += (s, e) => LoadData(txtSearch.Text);
@@ -25,6 +27,7 @@ namespace Bike_STore_Project
             dgvServices.AllowUserToDeleteRows = false;
             dgvServices.MultiSelect = false;
             dgvServices.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+
             dgvServices.AutoGenerateColumns = true;
             dgvServices.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvServices.RowHeadersVisible = false;

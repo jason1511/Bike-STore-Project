@@ -1,14 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-
-
 
 namespace Bike_STore_Project
 {
@@ -17,28 +9,24 @@ namespace Bike_STore_Project
         private readonly ProductRepository _repo = new();
         private BindingList<StockLotRow> _bindingList = new();
 
-
-
         public InventoryForm()
         {
             InitializeComponent();
             SetupGrid();
 
             // wire events ONCE
-
             Load += InventoryForm_Load;
             txtSearch.TextChanged += (s, e) => LoadData(txtSearch.Text);
             btnRefresh.Click += (s, e) => LoadData();
+
             btnAdd.Click += BtnAdd_Click;
             btnEdit.Click += (s, e) => EditSelected();
             btnDelete.Click += BtnDelete_Click;
-            // btnReceiveStock.Click += (s, e) => ReceiveStockForSelected();
-            btnReceiveStock.Visible = false;   // or Enabled = false;
 
+            btnReceiveStock.Visible = false; // keep hidden for now
 
             dgvProducts.CellDoubleClick += (s, e) => EditSelected();
         }
-        
 
         private void InventoryForm_Load(object? sender, EventArgs e)
         {
@@ -53,6 +41,9 @@ namespace Bike_STore_Project
             dgvProducts.AllowUserToAddRows = false;
             dgvProducts.AllowUserToDeleteRows = false;
             dgvProducts.ReadOnly = true;
+
+            // Optional: makes columns adjust nicely on resize/fullscreen
+            // dgvProducts.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
             dgvProducts.Columns.Clear();
 
@@ -127,9 +118,6 @@ namespace Bike_STore_Project
                 HeaderText = "Notes",
                 Width = 220
             });
-
-
-
         }
 
         private void LoadData(string? filter = null)
@@ -146,7 +134,6 @@ namespace Bike_STore_Project
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        
 
         private StockLotRow? GetSelected()
         {
@@ -189,7 +176,6 @@ namespace Bike_STore_Project
             }
         }
 
-
         private void EditSelected()
         {
             var selected = GetSelected();
@@ -221,8 +207,6 @@ namespace Bike_STore_Project
             }
         }
 
-
-
         private void BtnDelete_Click(object? sender, EventArgs e)
         {
             var selected = GetSelected();
@@ -231,26 +215,25 @@ namespace Bike_STore_Project
                 MessageBox.Show("Select a Batch first.");
                 return;
             }
+
             if (selected.QtyRemaining != selected.QtyReceived)
             {
                 MessageBox.Show("Can't delete this batch because some items were already sold from it.");
                 return;
             }
+
             var label = $"{selected.Brand} {selected.Type} - {selected.ReceivedAt:yyyy-MM-dd HH:mm}";
             var confirm = MessageBox.Show(
                 $"Delete batch: {label}?",
                 "Confirm delete",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning);
-            
-
 
             if (confirm != DialogResult.Yes) return;
 
             try
             {
                 _repo.DeleteStockLot(selected.LotId);
-
                 LoadData(txtSearch.Text);
             }
             catch (Exception ex)
@@ -261,4 +244,3 @@ namespace Bike_STore_Project
         }
     }
 }
-

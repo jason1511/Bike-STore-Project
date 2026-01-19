@@ -12,6 +12,8 @@ namespace Bike_STore_Project
             InitializeComponent();
             SetupGrid();
 
+            txtSearch.CharacterCasing = CharacterCasing.Upper;
+
             Load += (s, e) => LoadData();
             btnRefresh.Click += (s, e) => LoadData(txtSearch.Text);
             txtSearch.TextChanged += (s, e) => LoadData(txtSearch.Text);
@@ -28,10 +30,9 @@ namespace Bike_STore_Project
             dgvSales.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvSales.RowHeadersVisible = false;
 
-            // NEW: when a sale row is selected, load its FIFO lines
+            // when a sale row is selected, load its FIFO lines
             dgvSales.SelectionChanged += (s, e) => LoadSelectedSaleLines();
 
-            // If you added dgvSaleLines:
             dgvSaleLines.ReadOnly = true;
             dgvSaleLines.AllowUserToAddRows = false;
             dgvSaleLines.AllowUserToDeleteRows = false;
@@ -68,6 +69,7 @@ ORDER BY sl.stock_lot_id ASC;";
                 table.Load(reader);
 
                 dgvSaleLines.DataSource = table;
+
                 foreach (var name in new[] { "unit_cost", "unit_sell", "line_cost", "line_revenue", "line_profit" })
                 {
                     if (dgvSaleLines.Columns.Contains(name))
@@ -77,7 +79,6 @@ ORDER BY sl.stock_lot_id ASC;";
                         col.DefaultCellStyle.FormatProvider = CultureInfo.GetCultureInfo("id-ID");
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -94,8 +95,6 @@ ORDER BY sl.stock_lot_id ASC;";
             int saleId = Convert.ToInt32(row["id"]);
             LoadSaleLines(saleId);
         }
-
-
 
         private void LoadData(string? search = null)
         {
@@ -162,8 +161,14 @@ ORDER BY datetime(s.date_time) DESC, s.id DESC;";
                 {
                     dgvSales.ClearSelection();
                     dgvSales.Rows[0].Selected = true;
-                    dgvSales.CurrentCell =
-                        dgvSales.Rows[0].Cells[dgvSales.Columns.GetFirstColumn(DataGridViewElementStates.Visible)!.Index];
+
+                    var firstVisible = dgvSales.Columns.GetFirstColumn(DataGridViewElementStates.Visible);
+                    if (firstVisible != null)
+                        dgvSales.CurrentCell = dgvSales.Rows[0].Cells[firstVisible.Index];
+                }
+                else
+                {
+                    dgvSaleLines.DataSource = null;
                 }
             }
             catch (Exception ex)
@@ -172,8 +177,6 @@ ORDER BY datetime(s.date_time) DESC, s.id DESC;";
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-
 
         private void ApplyColumnPolish()
         {
@@ -189,18 +192,7 @@ ORDER BY datetime(s.date_time) DESC, s.id DESC;";
             if (dgvSales.Columns.Contains("date_time"))
                 dgvSales.Columns["date_time"].HeaderText = "Date/Time";
 
-            // IDR formatting for price (no decimals)
-            if (dgvSales.Columns.Contains("price"))
-            {
-                var col = dgvSales.Columns["price"];
-                col.DefaultCellStyle.Format = "C0";
-                col.DefaultCellStyle.FormatProvider = CultureInfo.GetCultureInfo("id-ID");
-            }
-
-            // Optional: hide voided if you aren't using it yet
-            // if (dgvSales.Columns.Contains("voided"))
-            //     dgvSales.Columns["voided"].Visible = false;
-            // Currency formatting (IDR) for revenue/cost/profit too
+            // Currency formatting (IDR) for revenue/cost/profit
             foreach (var name in new[] { "revenue", "cost", "profit" })
             {
                 if (dgvSales.Columns.Contains(name))
@@ -220,7 +212,6 @@ ORDER BY datetime(s.date_time) DESC, s.id DESC;";
                 dgvSales.Columns["cost"].HeaderText = "Cost";
             if (dgvSales.Columns.Contains("profit"))
                 dgvSales.Columns["profit"].HeaderText = "Profit";
-
         }
     }
 }
