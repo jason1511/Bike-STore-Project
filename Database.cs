@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 
 namespace Bike_STore_Project
@@ -113,8 +109,40 @@ WHERE p.quantity > 0
 ";
                 migrate.ExecuteNonQuery();
             }
+
+            // Ensure audit fields exist on sales (for migrated DBs)
+            EnsureColumn(conn, "sales", "created_by_user_id", "INTEGER");
+            EnsureColumn(conn, "sales", "created_by_username", "TEXT");
+            EnsureColumn(conn, "sales", "created_at", "TEXT");
+
+            // ✅ NEW: Ensure audit fields exist on sale_lines (for migrated DBs)
+            EnsureColumn(conn, "sale_lines", "created_by_user_id", "INTEGER");
+            EnsureColumn(conn, "sale_lines", "created_by_username", "TEXT");
+            EnsureColumn(conn, "sale_lines", "created_at", "TEXT");
         }
 
+        private static void EnsureColumn(SqliteConnection conn, string table, string column, string columnSqlType)
+        {
+            // Check if the column already exists
+            using (var check = conn.CreateCommand())
+            {
+                check.CommandText = $"PRAGMA table_info({table});";
+                using var rdr = check.ExecuteReader();
+                while (rdr.Read())
+                {
+                    var name = rdr.GetString(1); // column name
+                    if (string.Equals(name, column, StringComparison.OrdinalIgnoreCase))
+                        return;
+                }
+            }
+
+            // Add the column
+            using (var alter = conn.CreateCommand())
+            {
+                alter.CommandText = $"ALTER TABLE {table} ADD COLUMN {column} {columnSqlType};";
+                alter.ExecuteNonQuery();
+            }
+        }
 
         public static SqliteConnection OpenConnection()
         {

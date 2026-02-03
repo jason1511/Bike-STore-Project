@@ -1,8 +1,7 @@
-using System;
+﻿using System;
 using System.Globalization;
-using System.Windows.Forms;
 using System.Threading;
-
+using System.Windows.Forms;
 
 namespace Bike_STore_Project
 {
@@ -12,10 +11,29 @@ namespace Bike_STore_Project
         static void Main()
         {
             ApplicationConfiguration.Initialize();
+
+            // Database init (your existing logic)
             Database.Initialize();
+
+            // Ensure users table + default admin
+            var userRepo = new UserRepository();
+            userRepo.EnsureUsersSchemaAndSeed();
+
+            // Culture (keep as-is)
             Thread.CurrentThread.CurrentCulture = new CultureInfo("id-ID");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("id-ID");
-            Application.Run(new InventoryForm()); // start on inventory for now
+
+            // --- LOGIN FLOW ---
+            using (var login = new LoginForm())
+            {
+                // If login cancelled or failed → exit app
+                if (login.ShowDialog() != DialogResult.OK)
+                    return;
+            }
+
+            // At this point AppSession is populated
+            // Start main app
+            Application.Run(new InventoryForm());
         }
     }
 }

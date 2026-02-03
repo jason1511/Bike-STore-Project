@@ -14,6 +14,9 @@ namespace Bike_STore_Project
             InitializeComponent();
             SetupGrid();
 
+            // ✅ Apply role permissions early
+            ApplyPermissions();
+
             // wire events ONCE
             Load += InventoryForm_Load;
             txtSearch.TextChanged += (s, e) => LoadData(txtSearch.Text);
@@ -22,15 +25,78 @@ namespace Bike_STore_Project
             btnAdd.Click += BtnAdd_Click;
             btnEdit.Click += (s, e) => EditSelected();
             btnDelete.Click += BtnDelete_Click;
+            btnLogout.Click += BtnLogout_Click;
 
             btnReceiveStock.Visible = false; // keep hidden for now
 
             dgvProducts.CellDoubleClick += (s, e) => EditSelected();
+
+            // ✅ Re-apply after shown (safe if some controls are created late / designer quirks)
+            Shown += (_, __) => ApplyPermissions();
+        }
+        private void BtnLogout_Click(object? sender, EventArgs e)
+        {
+            var confirm = MessageBox.Show(
+                "Log out now?",
+                "Logout",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (confirm != DialogResult.Yes) return;
+
+            AppSession.SignOut();
+
+            Hide();
+            using var login = new LoginForm();
+            if (login.ShowDialog(this) == DialogResult.OK)
+            {
+                ApplyPermissions();
+                LoadData(txtSearch.Text);
+                Show();
+            }
+            else
+            {
+                // user cancelled login -> exit the app
+                Close();
+            }
         }
 
         private void InventoryForm_Load(object? sender, EventArgs e)
         {
             LoadData();
+
+            // ✅ Apply again after load (in case designer changes Enabled states)
+            ApplyPermissions();
+        }
+
+        /// <summary>
+        /// Admin/User gating for InventoryForm.
+        /// Non-admin users can view/search/refresh, but cannot add/edit/delete lots.
+        /// </summary>
+        private void ApplyPermissions()
+        {
+            var isAdmin = AppSession.IsAdmin;
+
+            // Allow viewing for everyone
+            txtSearch.Enabled = true;
+            btnRefresh.Enabled = true;
+            dgvProducts.ReadOnly = true;
+
+            // Admin-only actions
+            btnAdd.Enabled = isAdmin;
+            btnEdit.Enabled = isAdmin;
+            btnDelete.Enabled = isAdmin;
+
+            // Optional: hide instead of disable (uncomment if you prefer)
+            // btnAdd.Visible = isAdmin;
+            // btnEdit.Visible = isAdmin;
+            // btnDelete.Visible = isAdmin;
+
+            // Optional: show user in title bar (no designer changes needed)
+            var who = AppSession.IsSignedIn
+                ? $"{AppSession.Username} ({AppSession.Role})"
+                : "Not signed in";
+            Text = $"Inventory - {who}";
         }
 
         private void SetupGrid()
@@ -142,6 +208,14 @@ namespace Bike_STore_Project
 
         private void BtnAdd_Click(object? sender, EventArgs e)
         {
+            // ✅ Gate: Admin only
+            if (!AppSession.IsAdmin)
+            {
+                MessageBox.Show("You do not have permission to add stock.", "Access denied",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             // Use ReceiveStock mode for Add (receive a batch)
             using var dlg = new ProductEditForm(ProductEditMode.ReceiveStock);
 
@@ -178,6 +252,14 @@ namespace Bike_STore_Project
 
         private void EditSelected()
         {
+            // ✅ Gate: Admin only
+            if (!AppSession.IsAdmin)
+            {
+                MessageBox.Show("You do not have permission to edit stock.", "Access denied",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             var selected = GetSelected();
             if (selected == null)
             {
@@ -209,6 +291,14 @@ namespace Bike_STore_Project
 
         private void BtnDelete_Click(object? sender, EventArgs e)
         {
+            // ✅ Gate: Admin only
+            if (!AppSession.IsAdmin)
+            {
+                MessageBox.Show("You do not have permission to delete stock.", "Access denied",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             var selected = GetSelected();
             if (selected == null)
             {

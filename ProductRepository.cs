@@ -1,14 +1,26 @@
 ﻿using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Bike_STore_Project
 {
     public class ProductRepository
     {
+        // ✅ NEW: backfill for reused/migrated DBs
+        // If received_at is NULL/empty, force it to a very old date
+        // so FIFO always consumes migrated lots first.
+        private static void BackfillMissingReceivedAt(SqliteConnection conn, SqliteTransaction tx)
+        {
+            using var fix = conn.CreateCommand();
+            fix.Transaction = tx;
+            fix.CommandText = @"
+UPDATE stock_lots
+SET received_at = '2000-01-01 00:00:00'
+WHERE received_at IS NULL OR TRIM(received_at) = '';
+";
+            fix.ExecuteNonQuery();
+        }
+
         public List<Product> GetAll(string? search = null)
         {
             var list = new List<Product>();
@@ -39,7 +51,6 @@ LEFT JOIN stock_lots l
 GROUP BY p.id, p.brand, p.type, p.color
 ORDER BY p.brand, p.type;";
 
-
             using var rdr = cmd.ExecuteReader();
             while (rdr.Read())
             {
@@ -51,11 +62,8 @@ ORDER BY p.brand, p.type;";
                     Color = rdr.IsDBNull(3) ? null : rdr.GetString(3),
                     Quantity = rdr.GetInt32(4),
                     Price = Convert.ToDecimal(rdr.GetDouble(5)),
-                    LastReceivedAt = rdr.IsDBNull(6)
-        ? (DateTime?)null
-        : DateTime.Parse(rdr.GetString(6))
+                    LastReceivedAt = rdr.IsDBNull(6) ? (DateTime?)null : DateTime.Parse(rdr.GetString(6))
                 });
-
             }
 
             return list;
@@ -87,6 +95,9 @@ ORDER BY p.brand, p.type;";
 
             try
             {
+                // ✅ IMPORTANT: fix migrated lots before FIFO runs
+                BackfillMissingReceivedAt(conn, tx);
+
                 // Load product identity for sales table
                 string brand, type;
                 string? color;
@@ -110,17 +121,17 @@ ORDER BY p.brand, p.type;";
                     color = rdr.IsDBNull(2) ? null : rdr.GetString(2);
                 }
 
-                // Check total available across lots
+                // Check total available across lots (inside tx)
                 int available;
                 using (var availCmd = conn.CreateCommand())
                 {
+                    availCmd.Transaction = tx;
                     availCmd.CommandText = @"
 SELECT COALESCE(SUM(qty_remaining), 0)
 FROM stock_lots
 WHERE product_id = $pid AND qty_remaining > 0;";
                     availCmd.Parameters.AddWithValue("$pid", productId);
                     available = Convert.ToInt32(availCmd.ExecuteScalar() ?? 0);
-
                 }
 
                 if (available < saleQty)
@@ -130,14 +141,23 @@ WHERE product_id = $pid AND qty_remaining > 0;";
                     return false;
                 }
 
-                // Insert sale header (price = UNIT sell price)
+                // Insert sale header (price = UNIT sell price) + AUDIT
                 long saleId;
                 using (var saleCmd = conn.CreateCommand())
                 {
                     saleCmd.Transaction = tx;
+
+                    // date_time already exists in your table, so we keep it.
+                    // created_at is your new audit timestamp (we fill both for clarity)
                     saleCmd.CommandText = @"
-INSERT INTO sales (brand, type, color, quantity, price, customer_name)
-VALUES ($brand, $type, $color, $qty, $price, $customer);
+INSERT INTO sales (
+    brand, type, color, quantity, price, customer_name,
+    created_by_user_id, created_by_username, created_at
+)
+VALUES (
+    $brand, $type, $color, $qty, $price, $customer,
+    $uid, $uname, $createdAt
+);
 SELECT last_insert_rowid();";
 
                     saleCmd.Parameters.AddWithValue("$brand", brand);
@@ -145,7 +165,15 @@ SELECT last_insert_rowid();";
                     saleCmd.Parameters.AddWithValue("$color", (object?)color ?? DBNull.Value);
                     saleCmd.Parameters.AddWithValue("$qty", saleQty);
                     saleCmd.Parameters.AddWithValue("$price", (double)saleUnitPrice);
-                    saleCmd.Parameters.AddWithValue("$customer", string.IsNullOrWhiteSpace(customerName) ? (object)DBNull.Value : customerName.Trim());
+                    saleCmd.Parameters.AddWithValue("$customer",
+                        string.IsNullOrWhiteSpace(customerName) ? (object)DBNull.Value : customerName.Trim());
+
+                    // ✅ Audit values from session
+                    saleCmd.Parameters.AddWithValue("$uid", AppSession.UserId);
+                    saleCmd.Parameters.AddWithValue("$uname", AppSession.Username ?? "");
+
+                    // store a consistent timestamp string
+                    saleCmd.Parameters.AddWithValue("$createdAt", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
 
                     saleId = (long)(saleCmd.ExecuteScalar() ?? 0L);
                 }
@@ -187,14 +215,23 @@ ORDER BY datetime(received_at) ASC, id ASC;";
                         using (var lineCmd = conn.CreateCommand())
                         {
                             lineCmd.Transaction = tx;
-                            lineCmd.CommandText = @"
-INSERT INTO sale_lines (sale_id, stock_lot_id, qty_sold, unit_cost, unit_sell)
-VALUES ($saleId, $lotId, $qty, $cost, $sell);";
+                            lineCmd.CommandText = @"INSERT INTO sale_lines (
+    sale_id, stock_lot_id, qty_sold, unit_cost, unit_sell,
+    created_by_user_id, created_by_username, created_at
+)
+VALUES (
+    $saleId, $lotId, $qty, $cost, $sell,
+    $uid, $uname, $createdAt
+);";
                             lineCmd.Parameters.AddWithValue("$saleId", saleId);
                             lineCmd.Parameters.AddWithValue("$lotId", lotId);
                             lineCmd.Parameters.AddWithValue("$qty", take);
                             lineCmd.Parameters.AddWithValue("$cost", (double)unitCost);
                             lineCmd.Parameters.AddWithValue("$sell", (double)saleUnitPrice);
+                            lineCmd.Parameters.AddWithValue("$uid", AppSession.UserId);
+                            lineCmd.Parameters.AddWithValue("$uname", AppSession.Username ?? "");
+                            lineCmd.Parameters.AddWithValue("$createdAt", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+
                             lineCmd.ExecuteNonQuery();
                         }
                     }
@@ -210,6 +247,7 @@ VALUES ($saleId, $lotId, $qty, $cost, $sell);";
                 return false;
             }
         }
+
         public List<FifoPreviewRow> PreviewFifoConsumption(int productId, int qtyRequested)
         {
             var list = new List<FifoPreviewRow>();
@@ -217,6 +255,7 @@ VALUES ($saleId, $lotId, $qty, $cost, $sell);";
             using var conn = Database.OpenConnection();
             using var cmd = conn.CreateCommand();
 
+            // ✅ FIX: match the real FIFO ordering (datetime(received_at), id)
             cmd.CommandText = @"
 WITH fifo AS (
     SELECT
@@ -225,7 +264,7 @@ WITH fifo AS (
         l.unit_cost,
         l.qty_remaining,
         SUM(l.qty_remaining) OVER (
-            ORDER BY l.received_at, l.id
+            ORDER BY datetime(l.received_at), l.id
         ) AS run_qty
     FROM stock_lots l
     WHERE l.product_id = $pid
@@ -242,9 +281,8 @@ SELECT
     END AS qty_to_take
 FROM fifo
 WHERE run_qty - qty_remaining < $qty
-ORDER BY received_at, lot_id;
+ORDER BY datetime(received_at), lot_id;
 ";
-
             cmd.Parameters.AddWithValue("$pid", productId);
             cmd.Parameters.AddWithValue("$qty", qtyRequested);
 
@@ -282,6 +320,7 @@ SELECT last_insert_rowid();";
 
             return Convert.ToInt32(cmd.ExecuteScalar() ?? 0);
         }
+
         public void ReceiveBatch(int productId, int qtyReceived, decimal unitCost, DateTime? receivedAt = null, string? notes = null)
         {
             if (qtyReceived <= 0) throw new ArgumentException("Quantity must be at least 1.");
@@ -321,6 +360,7 @@ SELECT last_insert_rowid();";
 
             return Convert.ToInt32(cmd.ExecuteScalar() ?? 0);
         }
+
         public int GetOrCreateProductId(string brand, string type, string? color)
         {
             brand = brand.Trim().ToUpperInvariant();
@@ -411,6 +451,7 @@ WHERE id=$id;";
                 Price = Convert.ToDecimal(rdr.GetDouble(5))
             };
         }
+
         public List<string> GetDistinctBrands()
         {
             var list = new List<string>();
@@ -462,6 +503,7 @@ ORDER BY color;";
             }
             return list;
         }
+
         public bool DeleteStockLot(int lotId)
         {
             using var conn = Database.OpenConnection();
@@ -470,6 +512,7 @@ ORDER BY color;";
             cmd.Parameters.AddWithValue("$id", lotId);
             return cmd.ExecuteNonQuery() > 0;
         }
+
         public decimal? GetExistingPrice(string brand, string type, string? color)
         {
             brand = brand.Trim().ToUpperInvariant();
@@ -494,6 +537,7 @@ LIMIT 1;";
 
             return Convert.ToDecimal((double)result);
         }
+
         public List<StockLotRow> GetStockLots(string? search = null)
         {
             var list = new List<StockLotRow>();
@@ -545,12 +589,10 @@ ORDER BY datetime(l.received_at) DESC, l.id DESC;";
             return list;
         }
 
-
         public bool UpdateStockLot(int lotId, int newQtyReceived, decimal newUnitCost)
         {
             using var conn = Database.OpenConnection();
 
-            // Load current received/remaining to compute how many already sold
             int oldQtyReceived, oldQtyRemaining;
             using (var get = conn.CreateCommand())
             {
@@ -564,7 +606,7 @@ ORDER BY datetime(l.received_at) DESC, l.id DESC;";
                 oldQtyRemaining = rdr.GetInt32(1);
             }
 
-            var sold = oldQtyReceived - oldQtyRemaining; // already consumed
+            var sold = oldQtyReceived - oldQtyRemaining;
             if (newQtyReceived < sold)
                 throw new InvalidOperationException($"Cannot set received qty below already sold qty ({sold}).");
 
@@ -584,7 +626,5 @@ WHERE id = $id;";
 
             return cmd.ExecuteNonQuery() > 0;
         }
-
-
     }
 }
