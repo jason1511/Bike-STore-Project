@@ -1,105 +1,67 @@
-# 🚲 Bike Store Management System
+# Bike Store Management System
 
-A professional **offline-first desktop management system** built with **C# (.NET 8 WinForms)** and **SQLite**, designed to support day-to-day operations of small to medium bike shops.
+A desktop-based bike / e-bike store management system built with **C# (.NET 8 WinForms)** and **SQLite**, designed for offline-first use in a small retail environment.
 
-The application focuses on **data integrity, usability, and reliability**, providing inventory, sales, and service tracking without requiring an internet connection.
-
----
-
-## 🔍 Project Overview
-
-This system was developed to solve a real-world business need: managing bike store operations in environments where **simplicity, speed, and offline reliability** are critical.
-
-Key design goals:
-- Offline-first operation
-- Strong data consistency and validation
-- Clear separation between UI and business logic
-- Minimal setup and maintenance
+This project focuses on **real-world inventory handling**, including **FIFO stock logic**, sales tracking, service records, and responsive desktop UI.
 
 ---
 
-## ✨ Core Features
+## ✨ Features
 
-### Inventory Management
-- Create, update, and remove products
-- Products tracked by **Brand, Type, Color, Quantity, and Price**
-- Automatic stock merging for identical items
-- Autocomplete inputs to ensure consistent data entry
-- Normalization of product identifiers for clean records
+### 📦 Inventory Management
+- Product identity management (Brand / Type / Color)
+- Batch-based stock receiving
+- FIFO (First-In, First-Out) stock handling
+- Real-time quantity tracking per batch
+- Inventory search and filtering
 
-### Sales Management
-- Sales can only be created from available inventory
-- Real-time validation prevents overselling
-- Automatic stock deduction after completed transactions
-- Quantity-based total price calculation
+### 💰 Sales Management
+- Sales processing with manual pricing
+- Automatic FIFO stock deduction
+- Customer name recording
+- Validation to prevent overselling
+- Transaction history with profit calculation
+
+### 🧾 Transaction Log
+- Sales summary view
+- FIFO sale line breakdown per transaction
+- Revenue, cost, and profit calculation
 - Searchable transaction history
+- Split view for sales and sale lines
 
-### Service Logging
-- Service records managed independently from inventory
-- Supports service cost and technician notes
-- Autocomplete for Brand, Type, and Color
-- Read-only service logs to preserve audit integrity
+### 🔧 Service Management
+- Service entry for bikes/e-bikes
+- Service cost and notes
+- Autocomplete for brand/type/color
+- Service log with searchable history
 
-### Logs & History
-- Sales transaction log
-- Service log
-- Read-only records for accountability
-- Search by brand, type, color, customer, or notes
-- Currency formatting using **IDR (Indonesian Rupiah)**
+### 🖥️ User Interface
+- Responsive WinForms layout (no overlapping controls)
+- Proper fullscreen and resize support
+- High-DPI friendly scaling
+- Consistent UI across all forms
+- Keyboard-friendly inputs
 
 ---
 
-## 🛠 Technology Stack
+## 🧠 FIFO Stock Handling (Core Logic)
+
+Stock is managed using a **FIFO (First-In, First-Out)** approach:
+- Each received batch is stored as a separate stock lot
+- Sales consume stock starting from the oldest available batch
+- Partial batch consumption is supported
+- Accurate cost and profit calculation per sale
+
+This mirrors how real-world inventory systems operate.
+
+---
+
+## 🛠️ Tech Stack
 
 - **Language:** C#
 - **Framework:** .NET 8 (WinForms)
-- **Database:** SQLite (`Microsoft.Data.Sqlite`)
-- **Testing:** MSTest
-- **Platform:** Windows Desktop
-- **Architecture:** Offline-first, layered design
+- **Database:** SQLite
+- **Architecture:** Repository pattern (data access separation)
+- **Platform:** Windows desktop
 
 ---
-
-## 🏗 Architecture & Design
-
-The application follows a **layered architecture**:
-
-- **UI Layer (WinForms):** Handles user interaction only
-- **Repository Layer:** Enforces business rules and manages database access
-- **Data Layer:** SQLite database stored locally on the machine
-
-Critical logic such as **stock validation, transaction safety, and consistency rules** is enforced at the repository level rather than the UI, improving maintainability and reliability.
-
----
-
-## 🗄 Database Behavior
-
-- Database file (`data.db`) is created automatically on first launch
-- No manual setup or configuration required
-- Data persists between application runs
-- Fully functional without internet connectivity
-
----
-
-## ▶ Running the Application
-
-1. Download the latest release from **GitHub Releases**
-2. Extract the application folder
-3. Run `BikeStore.exe`
-
-The database file will be generated automatically on first run.
-
----
-
-## 📈 Future Enhancements
-
-- Reporting and analytics module
-- Role-based access control (Admin / Staff)
-- Data export (CSV)
-- Optional cloud synchronization
-
----
-
-## 📄 License
-
-This project is licensed under the **GNU General Public License (GPL)**.
