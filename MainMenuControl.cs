@@ -1,13 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-
 
 namespace Bike_STore_Project
 {
@@ -17,13 +9,31 @@ namespace Bike_STore_Project
         {
             InitializeComponent();
 
-            inventoryToolStripMenuItem.Click += (s, e) => SwitchTo(() => new InventoryForm());
-            salesToolStripMenuItem.Click += (s, e) => SwitchTo(() => new SalesForm());
-            serviceToolStripMenuItem.Click += (s, e) => SwitchTo(() => new ServiceForm());
-            transactionLogToolStripMenuItem.Click += (s, e) => SwitchTo(() => new TransactionLogForm());
-            exitToolStripMenuItem.Click += (s, e) => Application.Exit();
-            serviceLogToolStripMenuItem.Click += (s, e) => SwitchTo(() => new ServiceLogForm());
+            // Operations
+            menuInventory.Click += (_, __) => SwitchTo(() => new InventoryForm());
+            menuSales.Click += (_, __) => SwitchTo(() => new SalesForm());
+            menuService.Click += (_, __) => SwitchTo(() => new ServiceForm());
 
+            // Logs
+            menuTransactionLog.Click += (_, __) => SwitchTo(() => new TransactionLogForm());
+            menuServiceLog.Click += (_, __) => SwitchTo(() => new ServiceLogForm());
+
+            // Admin
+            menuUserManagement.Click += (_, __) => OpenUserManagement();
+
+            // File
+            menuLogout.Click += (_, __) => Logout();
+            menuExit.Click += (_, __) => Application.Exit();
+
+            ApplyRoleVisibility();
+        }
+
+        private void ApplyRoleVisibility()
+        {
+            var isAdmin = AppSession.IsAdmin;
+
+            adminToolStripMenuItem.Visible = isAdmin;
+            menuUserManagement.Visible = isAdmin;
         }
 
         private void SwitchTo(Func<Form> createForm)
@@ -32,14 +42,69 @@ namespace Bike_STore_Project
             if (current == null) return;
 
             var next = createForm();
-
-            // Show next form, close current form after next is displayed
             next.StartPosition = FormStartPosition.CenterScreen;
-            next.FormClosed += (s, e) => current.Close();
+
+            next.FormClosed += (_, __) => current.Close();
 
             current.Hide();
             next.Show();
         }
+        private void OpenUserManagement()
+        {
+            var current = FindForm();
+            if (current == null) return;
+
+            // extra safety (even though menu is hidden for non-admin)
+            if (!AppSession.IsAdmin)
+            {
+                MessageBox.Show("Admin access required.", "Access denied",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            using var f = new UserManagementForm
+            {
+                StartPosition = FormStartPosition.CenterParent
+            };
+
+            // modal: closing it returns you to the same screen
+            f.ShowDialog(current);
+        }
+
+        private void Logout()
+        {
+            var confirm = MessageBox.Show(
+                "Logout from the application?",
+                "Confirm Logout",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (confirm != DialogResult.Yes)
+                return;
+
+            // Clear session
+            AppSession.SignOut();
+
+            var current = FindForm();
+            if (current == null) return;
+
+            // Show login again
+            using var login = new LoginForm();
+            if (login.ShowDialog() == DialogResult.OK)
+            {
+                // User logged in again → reopen main screen
+                var next = new InventoryForm();
+                next.StartPosition = FormStartPosition.CenterScreen;
+
+                current.Hide();
+                next.Show();
+                current.Close();
+            }
+            else
+            {
+                // User cancelled login → exit app
+                Application.Exit();
+            }
+        }
     }
 }
-

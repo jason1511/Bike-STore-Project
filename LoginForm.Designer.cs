@@ -108,7 +108,6 @@
             Name = "LoginForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Login";
-            WindowState = FormWindowState.Maximized;
             tableRoot.ResumeLayout(false);
             panelLogin.ResumeLayout(false);
             panelLogin.PerformLayout();

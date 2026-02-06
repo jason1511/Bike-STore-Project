@@ -50,7 +50,7 @@
             dgvSales.Location = new Point(0, 0);
             dgvSales.Name = "dgvSales";
             dgvSales.RowHeadersWidth = 51;
-            dgvSales.Size = new Size(852, 120);
+            dgvSales.Size = new Size(852, 257);
             dgvSales.TabIndex = 0;
             // 
             // btnRefresh
@@ -92,7 +92,7 @@
             dgvSaleLines.Location = new Point(0, 0);
             dgvSaleLines.Name = "dgvSaleLines";
             dgvSaleLines.RowHeadersWidth = 51;
-            dgvSaleLines.Size = new Size(852, 223);
+            dgvSaleLines.Size = new Size(852, 78);
             dgvSaleLines.TabIndex = 0;
             // 
             // tableLayoutPanel1
@@ -135,18 +135,20 @@
             splitContainer1.Location = new Point(15, 121);
             splitContainer1.Name = "splitContainer1";
             splitContainer1.Orientation = Orientation.Horizontal;
+            splitContainer1.FixedPanel = FixedPanel.Panel1;
+            splitContainer1.IsSplitterFixed = true;
             // 
             // splitContainer1.Panel1
             // 
             splitContainer1.Panel1.Controls.Add(dgvSaleLines);
-            splitContainer1.Panel1MinSize = 120;
+            splitContainer1.Panel1MinSize = 70;
             // 
             // splitContainer1.Panel2
             // 
             splitContainer1.Panel2.Controls.Add(dgvSales);
-            splitContainer1.Panel2MinSize = 120;
+            splitContainer1.Panel2MinSize = 200;
             splitContainer1.Size = new Size(852, 347);
-            splitContainer1.SplitterDistance = 223;
+            splitContainer1.SplitterDistance = 78;
             splitContainer1.TabIndex = 3;
             // 
             // TransactionLogForm

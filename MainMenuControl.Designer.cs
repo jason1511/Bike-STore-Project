@@ -2,15 +2,8 @@
 {
     partial class MainMenuControl
     {
-        /// <summary> 
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary> 
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -22,67 +15,123 @@
 
         #region Component Designer generated code
 
-        /// <summary> 
-        /// Required method for Designer support - do not modify 
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
             menuStrip1 = new MenuStrip();
-            inventoryToolStripMenuItem = new ToolStripMenuItem();
-            salesToolStripMenuItem = new ToolStripMenuItem();
-            serviceToolStripMenuItem = new ToolStripMenuItem();
-            transactionLogToolStripMenuItem = new ToolStripMenuItem();
-            exitToolStripMenuItem = new ToolStripMenuItem();
-            serviceLogToolStripMenuItem = new ToolStripMenuItem();
+            fileToolStripMenuItem = new ToolStripMenuItem();
+            menuLogout = new ToolStripMenuItem();
+            toolStripSeparator1 = new ToolStripSeparator();
+            menuExit = new ToolStripMenuItem();
+            operationsToolStripMenuItem = new ToolStripMenuItem();
+            menuInventory = new ToolStripMenuItem();
+            menuSales = new ToolStripMenuItem();
+            menuService = new ToolStripMenuItem();
+            logsToolStripMenuItem = new ToolStripMenuItem();
+            menuTransactionLog = new ToolStripMenuItem();
+            menuServiceLog = new ToolStripMenuItem();
+            adminToolStripMenuItem = new ToolStripMenuItem();
+            menuUserManagement = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // menuStrip1
             // 
             menuStrip1.ImageScalingSize = new Size(20, 20);
-            menuStrip1.Items.AddRange(new ToolStripItem[] { inventoryToolStripMenuItem, salesToolStripMenuItem, serviceToolStripMenuItem, transactionLogToolStripMenuItem, serviceLogToolStripMenuItem, exitToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, operationsToolStripMenuItem, logsToolStripMenuItem, adminToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(504, 28);
+            menuStrip1.Padding = new Padding(8, 2, 0, 2);
+            menuStrip1.Size = new Size(700, 28);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             // 
-            // inventoryToolStripMenuItem
+            // fileToolStripMenuItem
             // 
-            inventoryToolStripMenuItem.Name = "inventoryToolStripMenuItem";
-            inventoryToolStripMenuItem.Size = new Size(84, 24);
-            inventoryToolStripMenuItem.Text = "Inventory";
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { menuLogout, toolStripSeparator1, menuExit });
+            fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            fileToolStripMenuItem.Size = new Size(46, 24);
+            fileToolStripMenuItem.Text = "&File";
             // 
-            // salesToolStripMenuItem
+            // menuLogout
             // 
-            salesToolStripMenuItem.Name = "salesToolStripMenuItem";
-            salesToolStripMenuItem.Size = new Size(57, 24);
-            salesToolStripMenuItem.Text = "Sales";
+            menuLogout.Name = "menuLogout";
+            menuLogout.ShortcutKeys = Keys.Control | Keys.Shift | Keys.L;
+            menuLogout.Size = new Size(224, 26);
+            menuLogout.Text = "&Logout";
             // 
-            // serviceToolStripMenuItem
+            // toolStripSeparator1
             // 
-            serviceToolStripMenuItem.Name = "serviceToolStripMenuItem";
-            serviceToolStripMenuItem.Size = new Size(70, 24);
-            serviceToolStripMenuItem.Text = "Service";
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new Size(221, 6);
             // 
-            // transactionLogToolStripMenuItem
+            // menuExit
             // 
-            transactionLogToolStripMenuItem.Name = "transactionLogToolStripMenuItem";
-            transactionLogToolStripMenuItem.Size = new Size(98, 24);
-            transactionLogToolStripMenuItem.Text = "Transaction";
+            menuExit.Name = "menuExit";
+            menuExit.ShortcutKeys = Keys.Alt | Keys.F4;
+            menuExit.Size = new Size(224, 26);
+            menuExit.Text = "E&xit";
             // 
-            // exitToolStripMenuItem
+            // operationsToolStripMenuItem
             // 
-            exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new Size(47, 24);
-            exitToolStripMenuItem.Text = "Exit";
+            operationsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { menuInventory, menuSales, menuService });
+            operationsToolStripMenuItem.Name = "operationsToolStripMenuItem";
+            operationsToolStripMenuItem.Size = new Size(96, 24);
+            operationsToolStripMenuItem.Text = "&Operations";
             // 
-            // serviceLogToolStripMenuItem
+            // menuInventory
             // 
-            serviceLogToolStripMenuItem.Name = "serviceLogToolStripMenuItem";
-            serviceLogToolStripMenuItem.Size = new Size(99, 24);
-            serviceLogToolStripMenuItem.Text = "Service Log";
+            menuInventory.Name = "menuInventory";
+            menuInventory.ShortcutKeys = Keys.Control | Keys.I;
+            menuInventory.Size = new Size(224, 26);
+            menuInventory.Text = "&Inventory";
+            // 
+            // menuSales
+            // 
+            menuSales.Name = "menuSales";
+            menuSales.ShortcutKeys = Keys.Control | Keys.S;
+            menuSales.Size = new Size(224, 26);
+            menuSales.Text = "&Sales";
+            // 
+            // menuService
+            // 
+            menuService.Name = "menuService";
+            menuService.ShortcutKeys = Keys.Control | Keys.E;
+            menuService.Size = new Size(224, 26);
+            menuService.Text = "S&ervice";
+            // 
+            // logsToolStripMenuItem
+            // 
+            logsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { menuTransactionLog, menuServiceLog });
+            logsToolStripMenuItem.Name = "logsToolStripMenuItem";
+            logsToolStripMenuItem.Size = new Size(54, 24);
+            logsToolStripMenuItem.Text = "&Logs";
+            // 
+            // menuTransactionLog
+            // 
+            menuTransactionLog.Name = "menuTransactionLog";
+            menuTransactionLog.ShortcutKeys = Keys.Control | Keys.T;
+            menuTransactionLog.Size = new Size(246, 26);
+            menuTransactionLog.Text = "&Transaction Log";
+            // 
+            // menuServiceLog
+            // 
+            menuServiceLog.Name = "menuServiceLog";
+            menuServiceLog.ShortcutKeys = Keys.Control | Keys.L;
+            menuServiceLog.Size = new Size(246, 26);
+            menuServiceLog.Text = "Ser&vice Log";
+            // 
+            // adminToolStripMenuItem
+            // 
+            adminToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { menuUserManagement });
+            adminToolStripMenuItem.Name = "adminToolStripMenuItem";
+            adminToolStripMenuItem.Size = new Size(67, 24);
+            adminToolStripMenuItem.Text = "&Admin";
+            // 
+            // menuUserManagement
+            // 
+            menuUserManagement.Name = "menuUserManagement";
+            menuUserManagement.Size = new Size(224, 26);
+            menuUserManagement.Text = "&User Management";
             // 
             // MainMenuControl
             // 
@@ -90,7 +139,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             Controls.Add(menuStrip1);
             Name = "MainMenuControl";
-            Size = new Size(504, 150);
+            Size = new Size(700, 30);
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             ResumeLayout(false);
@@ -100,11 +149,22 @@
         #endregion
 
         private MenuStrip menuStrip1;
-        private ToolStripMenuItem inventoryToolStripMenuItem;
-        private ToolStripMenuItem salesToolStripMenuItem;
-        private ToolStripMenuItem serviceToolStripMenuItem;
-        private ToolStripMenuItem exitToolStripMenuItem;
-        private ToolStripMenuItem transactionLogToolStripMenuItem;
-        private ToolStripMenuItem serviceLogToolStripMenuItem;
+
+        private ToolStripMenuItem fileToolStripMenuItem;
+        private ToolStripMenuItem menuLogout;
+        private ToolStripSeparator toolStripSeparator1;
+        private ToolStripMenuItem menuExit;
+
+        private ToolStripMenuItem operationsToolStripMenuItem;
+        private ToolStripMenuItem menuInventory;
+        private ToolStripMenuItem menuSales;
+        private ToolStripMenuItem menuService;
+
+        private ToolStripMenuItem logsToolStripMenuItem;
+        private ToolStripMenuItem menuTransactionLog;
+        private ToolStripMenuItem menuServiceLog;
+
+        private ToolStripMenuItem adminToolStripMenuItem;
+        private ToolStripMenuItem menuUserManagement;
     }
 }

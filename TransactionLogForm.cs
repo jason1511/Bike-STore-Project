@@ -50,18 +50,22 @@ namespace Bike_STore_Project
                 using var conn = Database.OpenConnection();
                 using var cmd = conn.CreateCommand();
 
-                cmd.CommandText = @"
-SELECT
+                cmd.CommandText = @"SELECT
     sl.stock_lot_id AS lot_id,
+    COALESCE(l.received_at, '') AS received_at,
+    COALESCE(l.notes, '') AS lot_notes,
     sl.qty_sold,
     sl.unit_cost,
     sl.unit_sell,
     (sl.qty_sold * sl.unit_cost) AS line_cost,
     (sl.qty_sold * sl.unit_sell) AS line_revenue,
-    (sl.qty_sold * (sl.unit_sell - sl.unit_cost)) AS line_profit
+    (sl.qty_sold * (sl.unit_sell - sl.unit_cost)) AS line_profit,
+    COALESCE(sl.created_by_username, '-') AS sold_by
 FROM sale_lines sl
+LEFT JOIN stock_lots l ON l.id = sl.stock_lot_id
 WHERE sl.sale_id = $saleId
-ORDER BY sl.stock_lot_id ASC;";
+ORDER BY datetime(l.received_at) ASC, sl.stock_lot_id ASC;
+";
                 cmd.Parameters.AddWithValue("$saleId", saleId);
 
                 using var reader = cmd.ExecuteReader();
@@ -78,6 +82,11 @@ ORDER BY sl.stock_lot_id ASC;";
                         col.DefaultCellStyle.Format = "C0";
                         col.DefaultCellStyle.FormatProvider = CultureInfo.GetCultureInfo("id-ID");
                     }
+                }
+
+                if (dgvSaleLines.Columns.Contains("sold_by"))
+                {
+                    dgvSaleLines.Columns["sold_by"].HeaderText = "Sold By";
                 }
             }
             catch (Exception ex)
@@ -117,10 +126,11 @@ SELECT
     COALESCE(SUM(sl.qty_sold), 0) AS qty_sold,
     COALESCE(SUM(sl.qty_sold * sl.unit_sell), 0) AS revenue,
     COALESCE(SUM(sl.qty_sold * sl.unit_cost), 0) AS cost,
-    COALESCE(SUM(sl.qty_sold * (sl.unit_sell - sl.unit_cost)), 0) AS profit
+    COALESCE(SUM(sl.qty_sold * (sl.unit_sell - sl.unit_cost)), 0) AS profit,
+    COALESCE(s.created_by_username, '-') AS sold_by
 FROM sales s
 LEFT JOIN sale_lines sl ON sl.sale_id = s.id
-GROUP BY s.id, s.brand, s.type, s.color, s.customer_name, s.date_time, s.voided
+GROUP BY s.id, s.brand, s.type, s.color, s.customer_name, s.date_time, s.voided, s.created_by_username
 ORDER BY datetime(s.date_time) DESC, s.id DESC;";
                 }
                 else
@@ -137,14 +147,16 @@ SELECT
     COALESCE(SUM(sl.qty_sold), 0) AS qty_sold,
     COALESCE(SUM(sl.qty_sold * sl.unit_sell), 0) AS revenue,
     COALESCE(SUM(sl.qty_sold * sl.unit_cost), 0) AS cost,
-    COALESCE(SUM(sl.qty_sold * (sl.unit_sell - sl.unit_cost)), 0) AS profit
+    COALESCE(SUM(sl.qty_sold * (sl.unit_sell - sl.unit_cost)), 0) AS profit,
+    COALESCE(s.created_by_username, '-') AS sold_by
 FROM sales s
 LEFT JOIN sale_lines sl ON sl.sale_id = s.id
 WHERE s.brand LIKE $q
    OR s.type LIKE $q
    OR COALESCE(s.color,'') LIKE $q
    OR COALESCE(s.customer_name,'') LIKE $q
-GROUP BY s.id, s.brand, s.type, s.color, s.customer_name, s.date_time, s.voided
+   OR COALESCE(s.created_by_username,'') LIKE $q
+GROUP BY s.id, s.brand, s.type, s.color, s.customer_name, s.date_time, s.voided, s.created_by_username
 ORDER BY datetime(s.date_time) DESC, s.id DESC;";
                     cmd.Parameters.AddWithValue("$q", $"%{search.Trim().ToUpperInvariant()}%");
                 }
@@ -191,6 +203,9 @@ ORDER BY datetime(s.date_time) DESC, s.id DESC;";
                 dgvSales.Columns["customer_name"].HeaderText = "Customer";
             if (dgvSales.Columns.Contains("date_time"))
                 dgvSales.Columns["date_time"].HeaderText = "Date/Time";
+
+            if (dgvSales.Columns.Contains("sold_by"))
+                dgvSales.Columns["sold_by"].HeaderText = "Sold By";
 
             // Currency formatting (IDR) for revenue/cost/profit
             foreach (var name in new[] { "revenue", "cost", "profit" })

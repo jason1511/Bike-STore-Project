@@ -12,7 +12,6 @@ namespace Bike_STore_Project
             InitializeComponent();
             SetupGrid();
 
-            // keep consistent input style
             txtSearch.CharacterCasing = CharacterCasing.Upper;
 
             Load += (s, e) => LoadData();
@@ -43,17 +42,25 @@ namespace Bike_STore_Project
                 if (string.IsNullOrWhiteSpace(search))
                 {
                     cmd.CommandText = @"
-SELECT id, brand, type, color, quantity, service_cost, notes, date_time
+SELECT
+    id, brand, type, color, quantity, service_cost, notes, date_time,
+    COALESCE(created_by_username, '') AS created_by_username
 FROM services
-ORDER BY date_time DESC;";
+ORDER BY datetime(date_time) DESC, id DESC;";
                 }
                 else
                 {
                     cmd.CommandText = @"
-SELECT id, brand, type, color, quantity, service_cost, notes, date_time
+SELECT
+    id, brand, type, color, quantity, service_cost, notes, date_time,
+    COALESCE(created_by_username, '') AS created_by_username
 FROM services
-WHERE brand LIKE $q OR type LIKE $q OR color LIKE $q OR notes LIKE $q
-ORDER BY date_time DESC;";
+WHERE brand LIKE $q
+   OR type LIKE $q
+   OR COALESCE(color,'') LIKE $q
+   OR COALESCE(notes,'') LIKE $q
+   OR COALESCE(created_by_username,'') LIKE $q
+ORDER BY datetime(date_time) DESC, id DESC;";
                     cmd.Parameters.AddWithValue("$q", $"%{search.Trim().ToUpperInvariant()}%");
                 }
 
@@ -76,17 +83,18 @@ ORDER BY date_time DESC;";
         {
             if (dgvServices.Columns.Count == 0) return;
 
-            // Hide ID
             if (dgvServices.Columns.Contains("id"))
                 dgvServices.Columns["id"].Visible = false;
 
-            // Friendly headers
             if (dgvServices.Columns.Contains("service_cost"))
                 dgvServices.Columns["service_cost"].HeaderText = "Cost";
+
             if (dgvServices.Columns.Contains("date_time"))
                 dgvServices.Columns["date_time"].HeaderText = "Date/Time";
 
-            // IDR formatting (no decimals)
+            if (dgvServices.Columns.Contains("created_by_username"))
+                dgvServices.Columns["created_by_username"].HeaderText = "By";
+
             if (dgvServices.Columns.Contains("service_cost"))
             {
                 var col = dgvServices.Columns["service_cost"];
@@ -94,17 +102,12 @@ ORDER BY date_time DESC;";
                 col.DefaultCellStyle.FormatProvider = CultureInfo.GetCultureInfo("id-ID");
             }
 
-            // Notes wider + wrap
             if (dgvServices.Columns.Contains("notes"))
             {
                 dgvServices.Columns["notes"].HeaderText = "Notes";
                 dgvServices.Columns["notes"].DefaultCellStyle.WrapMode = DataGridViewTriState.True;
                 dgvServices.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
             }
-
-            // Quantity is always 1 now, you can hide it if you want:
-            // if (dgvServices.Columns.Contains("quantity"))
-            //     dgvServices.Columns["quantity"].Visible = false;
         }
     }
 }

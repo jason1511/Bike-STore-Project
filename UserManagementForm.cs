@@ -13,6 +13,17 @@ namespace Bike_STore_Project
         {
             InitializeComponent();
 
+            // ✅ Admin-only guard
+            if (!AppSession.IsAdmin)
+            {
+                MessageBox.Show("Access denied. Admin only.",
+                    "Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+                // Make sure form doesn't keep showing
+                Shown += (_, __) => Close();
+                return;
+            }
+
             // Grid setup + events
             SetupGrid();
 
@@ -35,7 +46,6 @@ namespace Bike_STore_Project
             dataGridViewUsers.AllowUserToAddRows = false;
             dataGridViewUsers.AllowUserToDeleteRows = false;
 
-            // Build columns once (designer doesn't define them yet)
             dataGridViewUsers.Columns.Clear();
 
             dataGridViewUsers.Columns.Add(new DataGridViewTextBoxColumn
@@ -157,7 +167,6 @@ namespace Bike_STore_Project
                 return;
             }
 
-            // Optional: prevent disabling yourself
             if (u.Id == AppSession.UserId && u.IsActive)
             {
                 MessageBox.Show("You cannot disable the currently signed-in user.",
@@ -188,7 +197,6 @@ namespace Bike_STore_Project
 
             var newRole = u.Role == "ADMIN" ? "USER" : "ADMIN";
 
-            // Prevent demoting yourself while logged in
             if (u.Id == AppSession.UserId && u.Role == "ADMIN" && newRole == "USER")
             {
                 MessageBox.Show("You cannot demote yourself while logged in.",
@@ -244,7 +252,6 @@ namespace Bike_STore_Project
             }
         }
 
-        // Simple input prompt
         private static string? Prompt(string label, string defaultValue = "")
         {
             using var f = new Form
