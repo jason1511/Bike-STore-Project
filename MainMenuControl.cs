@@ -25,15 +25,50 @@ namespace Bike_STore_Project
             menuLogout.Click += (_, __) => Logout();
             menuExit.Click += (_, __) => Application.Exit();
 
+            // Update menu visibility + title when this control is shown/returns focus
+            HandleCreated += (_, __) => ApplySessionUi();
+            VisibleChanged += (_, __) => { if (Visible) ApplySessionUi(); };
+        }
+
+        private void ApplySessionUi()
+        {
             ApplyRoleVisibility();
+            UpdateParentTitle();
         }
 
         private void ApplyRoleVisibility()
         {
-            var isAdmin = AppSession.IsAdmin;
+            adminToolStripMenuItem.Visible = AppSession.IsAdmin;
+            menuUserManagement.Visible = AppSession.IsAdmin;
+        }
 
-            adminToolStripMenuItem.Visible = isAdmin;
-            menuUserManagement.Visible = isAdmin;
+        private void UpdateParentTitle()
+        {
+            var form = FindForm();
+            if (form == null) return;
+
+            // Extract clean form name (remove previous user suffix if any)
+            var title = form.Text;
+
+            // Remove anything after the second dash
+            // "Bike Store - Inventory - admin (ADMIN)" → "Inventory"
+            if (title.StartsWith("Bike Store - ", StringComparison.OrdinalIgnoreCase))
+            {
+                title = title.Substring("Bike Store - ".Length);
+                var dash = title.IndexOf(" - ");
+                if (dash >= 0)
+                    title = title.Substring(0, dash);
+            }
+
+            var formName = title.Trim();
+
+            if (!AppSession.IsSignedIn)
+            {
+                form.Text = $"Bike Store - {formName}";
+                return;
+            }
+
+            form.Text = $"Bike Store - {formName} - {AppSession.Username} ({AppSession.Role})";
         }
 
         private void SwitchTo(Func<Form> createForm)
@@ -44,31 +79,18 @@ namespace Bike_STore_Project
             var next = createForm();
             next.StartPosition = FormStartPosition.CenterScreen;
 
-            next.FormClosed += (_, __) => current.Close();
-
             current.Hide();
-            next.Show();
-        }
-        private void OpenUserManagement()
-        {
-            var current = FindForm();
-            if (current == null) return;
 
-            // extra safety (even though menu is hidden for non-admin)
-            if (!AppSession.IsAdmin)
+            next.FormClosed += (_, __) =>
             {
-                MessageBox.Show("Admin access required.", "Access denied",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            using var f = new UserManagementForm
-            {
-                StartPosition = FormStartPosition.CenterParent
+                if (!current.IsDisposed)
+                {
+                    current.Show();
+                    ApplySessionUi(); // ensure title/menu correct when coming back
+                }
             };
 
-            // modal: closing it returns you to the same screen
-            f.ShowDialog(current);
+            next.Show();
         }
 
         private void Logout()
@@ -82,29 +104,48 @@ namespace Bike_STore_Project
             if (confirm != DialogResult.Yes)
                 return;
 
-            // Clear session
-            AppSession.SignOut();
-
             var current = FindForm();
             if (current == null) return;
 
-            // Show login again
+            AppSession.SignOut();
+            ApplySessionUi(); // update title/menu immediately
+
+            current.Hide();
+
             using var login = new LoginForm();
             if (login.ShowDialog() == DialogResult.OK)
             {
-                // User logged in again → reopen main screen
-                var next = new InventoryForm();
-                next.StartPosition = FormStartPosition.CenterScreen;
-
-                current.Hide();
-                next.Show();
-                current.Close();
+                // logged in again (could be different user/role)
+                ApplySessionUi();
+                current.Show();
             }
             else
             {
-                // User cancelled login → exit app
                 Application.Exit();
             }
+        }
+
+        private void OpenUserManagement()
+        {
+            var current = FindForm();
+            if (current == null) return;
+
+            if (!AppSession.IsAdmin)
+            {
+                MessageBox.Show("Admin access required.", "Access denied",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            using var f = new UserManagementForm
+            {
+                StartPosition = FormStartPosition.CenterParent
+            };
+
+            f.ShowDialog(current);
+
+            // after closing admin form, refresh title/menu (role might have changed)
+            ApplySessionUi();
         }
     }
 }

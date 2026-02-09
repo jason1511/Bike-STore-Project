@@ -12,6 +12,11 @@ namespace Bike_STore_Project
         {
             InitializeComponent();
 
+            // ✅ Title updates (fix "stays as admin" after logout/login)
+            ApplyWindowTitle();
+            Shown += (_, __) => ApplyWindowTitle();
+            Activated += (_, __) => ApplyWindowTitle();
+
             // uppercase everywhere
             txtBrand.CharacterCasing = CharacterCasing.Upper;
             txtType.CharacterCasing = CharacterCasing.Upper;
@@ -36,6 +41,15 @@ namespace Bike_STore_Project
 
             btnAddService.Click += BtnAddService_Click;
             btnClear.Click += (s, e) => ClearInputs();
+        }
+
+        private void ApplyWindowTitle()
+        {
+            var who = AppSession.IsSignedIn
+                ? $"{AppSession.Username} ({AppSession.Role})"
+                : "Not signed in";
+
+            Text = $"Bike Store - Service - {who}";
         }
 
         private void SetupAutocomplete()
@@ -84,6 +98,13 @@ namespace Bike_STore_Project
 
         private void BtnAddService_Click(object? sender, EventArgs e)
         {
+            if (!AppSession.IsSignedIn)
+            {
+                MessageBox.Show("You must be signed in to record a service.", "Not signed in",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(txtBrand.Text))
             {
                 MessageBox.Show("Brand is required.");

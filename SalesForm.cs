@@ -14,6 +14,11 @@ namespace Bike_STore_Project
         {
             InitializeComponent();
 
+            // ✅ Title updates (fix "stays as admin" after logout/login)
+            ApplyWindowTitle();
+            Shown += (_, __) => ApplyWindowTitle();
+            Activated += (_, __) => ApplyWindowTitle();
+
             btnAddSale.Click += BtnAddSale_Click;
             btnClear.Click += (s, e) => ClearInputs();
 
@@ -25,6 +30,16 @@ namespace Bike_STore_Project
             numQuantity.Value = 1;
 
             LoadBrands();
+        }
+
+        private void ApplyWindowTitle()
+        {
+            // "Bike Store - Sales - cashier1 (USER)"
+            var who = AppSession.IsSignedIn
+                ? $"{AppSession.Username} ({AppSession.Role})"
+                : "Not signed in";
+
+            Text = $"Bike Store - Sales - {who}";
         }
 
         private void LoadBrands()
@@ -174,6 +189,13 @@ LIMIT 1;";
 
         private void BtnAddSale_Click(object? sender, EventArgs e)
         {
+            if (!AppSession.IsSignedIn)
+            {
+                MessageBox.Show("You must be signed in to record a sale.", "Not signed in",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             if (cmbBrand.SelectedItem == null || cmbType.SelectedItem == null || cmbColor.SelectedItem == null)
             {
                 MessageBox.Show("Select Brand, Type, and Color first.");
@@ -219,7 +241,6 @@ LIMIT 1;";
             txtCustomer.Clear();
             numQuantity.Value = 1;
 
-            // reset price safely (avoid Value < Minimum exceptions if you later set Minimum)
             if (numPrice.Minimum <= 0)
                 numPrice.Value = 0;
             else

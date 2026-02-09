@@ -14,9 +14,23 @@ namespace Bike_STore_Project
 
             txtSearch.CharacterCasing = CharacterCasing.Upper;
 
+            // ✅ Title updates after logout/login
+            ApplyWindowTitle();
+            Shown += (_, __) => ApplyWindowTitle();
+            Activated += (_, __) => ApplyWindowTitle();
+
             Load += (s, e) => LoadData();
             btnRefresh.Click += (s, e) => LoadData(txtSearch.Text);
             txtSearch.TextChanged += (s, e) => LoadData(txtSearch.Text);
+        }
+
+        private void ApplyWindowTitle()
+        {
+            var who = AppSession.IsSignedIn
+                ? $"{AppSession.Username} ({AppSession.Role})"
+                : "Not signed in";
+
+            Text = $"Bike Store - Service Log - {who}";
         }
 
         private void SetupGrid()
@@ -39,20 +53,36 @@ namespace Bike_STore_Project
                 using var conn = Database.OpenConnection();
                 using var cmd = conn.CreateCommand();
 
+                // ✅ Use created_at if present, otherwise fallback to legacy date_time
+                //    and expose it as "date_time" for your existing UI polish code
                 if (string.IsNullOrWhiteSpace(search))
                 {
                     cmd.CommandText = @"
 SELECT
-    id, brand, type, color, quantity, service_cost, notes, date_time,
+    id,
+    brand,
+    type,
+    color,
+    quantity,
+    service_cost,
+    notes,
+    COALESCE(created_at, date_time) AS date_time,
     COALESCE(created_by_username, '') AS created_by_username
 FROM services
-ORDER BY datetime(date_time) DESC, id DESC;";
+ORDER BY datetime(COALESCE(created_at, date_time)) DESC, id DESC;";
                 }
                 else
                 {
                     cmd.CommandText = @"
 SELECT
-    id, brand, type, color, quantity, service_cost, notes, date_time,
+    id,
+    brand,
+    type,
+    color,
+    quantity,
+    service_cost,
+    notes,
+    COALESCE(created_at, date_time) AS date_time,
     COALESCE(created_by_username, '') AS created_by_username
 FROM services
 WHERE brand LIKE $q
@@ -60,7 +90,7 @@ WHERE brand LIKE $q
    OR COALESCE(color,'') LIKE $q
    OR COALESCE(notes,'') LIKE $q
    OR COALESCE(created_by_username,'') LIKE $q
-ORDER BY datetime(date_time) DESC, id DESC;";
+ORDER BY datetime(COALESCE(created_at, date_time)) DESC, id DESC;";
                     cmd.Parameters.AddWithValue("$q", $"%{search.Trim().ToUpperInvariant()}%");
                 }
 
@@ -69,7 +99,6 @@ ORDER BY datetime(date_time) DESC, id DESC;";
                 table.Load(reader);
 
                 dgvServices.DataSource = table;
-
                 ApplyColumnPolish();
             }
             catch (Exception ex)
@@ -83,9 +112,11 @@ ORDER BY datetime(date_time) DESC, id DESC;";
         {
             if (dgvServices.Columns.Count == 0) return;
 
+            // Hide ID
             if (dgvServices.Columns.Contains("id"))
                 dgvServices.Columns["id"].Visible = false;
 
+            // Friendly headers
             if (dgvServices.Columns.Contains("service_cost"))
                 dgvServices.Columns["service_cost"].HeaderText = "Cost";
 
@@ -95,6 +126,7 @@ ORDER BY datetime(date_time) DESC, id DESC;";
             if (dgvServices.Columns.Contains("created_by_username"))
                 dgvServices.Columns["created_by_username"].HeaderText = "By";
 
+            // IDR formatting (no decimals)
             if (dgvServices.Columns.Contains("service_cost"))
             {
                 var col = dgvServices.Columns["service_cost"];
@@ -102,6 +134,7 @@ ORDER BY datetime(date_time) DESC, id DESC;";
                 col.DefaultCellStyle.FormatProvider = CultureInfo.GetCultureInfo("id-ID");
             }
 
+            // Notes wider + wrap
             if (dgvServices.Columns.Contains("notes"))
             {
                 dgvServices.Columns["notes"].HeaderText = "Notes";
