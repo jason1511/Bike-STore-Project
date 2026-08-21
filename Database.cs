@@ -116,6 +116,120 @@ ON sale_lines(stock_lot_id);
                 cmd.ExecuteNonQuery();
             }
 
+            // Local desktop equivalents of the website admin data model.
+            // These tables are additive so existing desktop databases continue to work.
+            using (var adminSchema = conn.CreateCommand())
+            {
+                adminSchema.CommandText = @"
+CREATE TABLE IF NOT EXISTS brands (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    name        TEXT NOT NULL UNIQUE COLLATE NOCASE,
+    is_active   INTEGER NOT NULL DEFAULT 1,
+    sort_order  INTEGER NOT NULL DEFAULT 0,
+    created_at  TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS invoice_sequences (
+    date_code     TEXT PRIMARY KEY,
+    last_sequence INTEGER NOT NULL DEFAULT 0,
+    updated_at    TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS invoices (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    invoice_number      TEXT NOT NULL UNIQUE,
+    customer_name       TEXT NOT NULL,
+    customer_phone      TEXT,
+    customer_address    TEXT,
+    payment_method      TEXT NOT NULL DEFAULT 'CASH',
+    payment_bank        TEXT,
+    notes               TEXT,
+    status              TEXT NOT NULL DEFAULT 'ACTIVE' CHECK(status IN ('ACTIVE','VOID')),
+    void_reason         TEXT,
+    voided_at           TEXT,
+    voided_by_user_id   INTEGER,
+    voided_by_username  TEXT,
+    created_by_user_id  INTEGER,
+    created_by_username TEXT,
+    created_at          TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS invoice_items (
+    id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    invoice_id     INTEGER NOT NULL,
+    sale_id        INTEGER,
+    product_id     INTEGER NOT NULL,
+    brand          TEXT NOT NULL,
+    type           TEXT NOT NULL,
+    color          TEXT,
+    quantity       INTEGER NOT NULL,
+    unit_price     REAL NOT NULL,
+    line_total     REAL NOT NULL,
+    frame_numbers  TEXT,
+    created_at     TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(invoice_id) REFERENCES invoices(id) ON DELETE CASCADE,
+    FOREIGN KEY(product_id) REFERENCES products(id),
+    FOREIGN KEY(sale_id) REFERENCES sales(id)
+);
+
+CREATE TABLE IF NOT EXISTS stock_movements (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    product_id          INTEGER NOT NULL,
+    stock_lot_id        INTEGER,
+    invoice_id          INTEGER,
+    movement_type       TEXT NOT NULL,
+    quantity_change     INTEGER NOT NULL,
+    quantity_before     INTEGER NOT NULL,
+    quantity_after      INTEGER NOT NULL,
+    note                TEXT,
+    created_by_user_id  INTEGER,
+    created_by_username TEXT,
+    created_at          TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(product_id) REFERENCES products(id),
+    FOREIGN KEY(stock_lot_id) REFERENCES stock_lots(id),
+    FOREIGN KEY(invoice_id) REFERENCES invoices(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_invoice_items_invoice ON invoice_items(invoice_id);
+CREATE INDEX IF NOT EXISTS idx_invoices_created_at ON invoices(created_at);
+CREATE INDEX IF NOT EXISTS idx_invoices_status ON invoices(status);
+CREATE INDEX IF NOT EXISTS idx_stock_movements_product ON stock_movements(product_id);
+CREATE INDEX IF NOT EXISTS idx_stock_movements_created_at ON stock_movements(created_at);
+";
+                adminSchema.ExecuteNonQuery();
+            }
+
+            EnsureColumn(conn, "services", "service_number", "TEXT");
+            EnsureColumn(conn, "services", "customer_name", "TEXT");
+            EnsureColumn(conn, "services", "customer_phone", "TEXT");
+            EnsureColumn(conn, "services", "customer_address", "TEXT");
+            EnsureColumn(conn, "services", "service_type", "TEXT");
+            EnsureColumn(conn, "services", "service_status", "TEXT NOT NULL DEFAULT 'RECEIVED'");
+            EnsureColumn(conn, "services", "completed_at", "TEXT");
+            EnsureColumn(conn, "products", "battery", "TEXT");
+            EnsureColumn(conn, "products", "motor", "TEXT");
+            EnsureColumn(conn, "products", "top_speed", "TEXT");
+            EnsureColumn(conn, "products", "range_text", "TEXT");
+            EnsureColumn(conn, "products", "max_weight", "TEXT");
+            EnsureColumn(conn, "products", "safety", "TEXT");
+            EnsureColumn(conn, "products", "image_path", "TEXT");
+            EnsureColumn(conn, "products", "description", "TEXT");
+            EnsureColumn(conn, "products", "featured", "INTEGER NOT NULL DEFAULT 0");
+            EnsureColumn(conn, "products", "is_active", "INTEGER NOT NULL DEFAULT 1");
+            EnsureColumn(conn, "products", "sell_price", "REAL NOT NULL DEFAULT 0");
+
+            using (var seedBrands = conn.CreateCommand())
+            {
+                seedBrands.CommandText = @"
+INSERT OR IGNORE INTO brands(name, sort_order)
+SELECT DISTINCT UPPER(TRIM(brand)), 0
+FROM products
+WHERE TRIM(COALESCE(brand,'')) <> '';
+";
+                seedBrands.ExecuteNonQuery();
+            }
+
             // One-time migration: convert existing products.quantity/price into initial stock lots
             using (var migrate = conn.CreateCommand())
             {
@@ -127,6 +241,23 @@ WHERE p.quantity > 0
   AND NOT EXISTS (SELECT 1 FROM stock_lots l WHERE l.product_id = p.id);
 ";
                 migrate.ExecuteNonQuery();
+            }
+
+            // Establish an idempotent opening movement history for pre-existing lots.
+            using (var openingMovements = conn.CreateCommand())
+            {
+                openingMovements.CommandText = @"
+INSERT INTO stock_movements
+(product_id, stock_lot_id, movement_type, quantity_change, quantity_before, quantity_after,
+ note, created_by_username, created_at)
+SELECT product_id, id, 'OPENING_STOCK', qty_remaining,
+       SUM(qty_remaining) OVER (PARTITION BY product_id ORDER BY datetime(received_at), id) - qty_remaining,
+       SUM(qty_remaining) OVER (PARTITION BY product_id ORDER BY datetime(received_at), id),
+       'Opening balance captured during local admin upgrade', 'SYSTEM', CURRENT_TIMESTAMP
+FROM stock_lots l
+WHERE NOT EXISTS (SELECT 1 FROM stock_movements sm WHERE sm.stock_lot_id=l.id);
+";
+                openingMovements.ExecuteNonQuery();
             }
 
             // Ensure audit fields exist on sales (for migrated DBs)
@@ -171,6 +302,9 @@ WHERE p.quantity > 0
         {
             var conn = new SqliteConnection(_connectionString);
             conn.Open();
+            using var pragma = conn.CreateCommand();
+            pragma.CommandText = "PRAGMA foreign_keys = ON;";
+            pragma.ExecuteNonQuery();
             return conn;
         }
     }

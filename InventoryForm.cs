@@ -38,23 +38,19 @@ namespace Bike_STore_Project
 
         private void ApplyPermissions()
         {
-            var isAdmin = AppSession.IsAdmin;
-
             // Everyone can view/search/refresh
             txtSearch.Enabled = true;
             btnRefresh.Enabled = true;
             dgvProducts.ReadOnly = true;
 
-            // Admin-only actions
-            btnAdd.Enabled = isAdmin;
-            btnEdit.Enabled = isAdmin;
-            btnDelete.Enabled = isAdmin;
+            btnAdd.Enabled = Permissions.CanReceiveInventory;
+            btnEdit.Enabled = Permissions.CanEditInventory;
+            btnDelete.Enabled = Permissions.CanDeleteInventory;
         }
 
         private void DgvProducts_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
         {
-            // Cashier: do nothing (no warning spam)
-            if (!AppSession.IsAdmin) return;
+            if (!Permissions.CanEditInventory) return;
 
             EditSelected();
         }
@@ -163,7 +159,7 @@ namespace Bike_STore_Project
 
         private void BtnAdd_Click(object? sender, EventArgs e)
         {
-            if (!AppSession.IsAdmin)
+            if (!Permissions.CanReceiveInventory)
             {
                 MessageBox.Show("You do not have permission to add stock.", "Access denied",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -201,7 +197,7 @@ namespace Bike_STore_Project
 
         private void EditSelected()
         {
-            if (!AppSession.IsAdmin)
+            if (!Permissions.CanEditInventory)
             {
                 MessageBox.Show("You do not have permission to edit stock.", "Access denied",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -238,7 +234,7 @@ namespace Bike_STore_Project
 
         private void BtnDelete_Click(object? sender, EventArgs e)
         {
-            if (!AppSession.IsAdmin)
+            if (!Permissions.CanDeleteInventory)
             {
                 MessageBox.Show("You do not have permission to delete stock.", "Access denied",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);

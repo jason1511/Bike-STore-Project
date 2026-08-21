@@ -14,9 +14,6 @@ namespace Bike_STore_Project
 
             // Database init (your existing logic)
             Database.Initialize();
-            new UserRepository().EnsureUsersSchemaAndSeed();
-
-            // Ensure users table + default admin
             var userRepo = new UserRepository();
             userRepo.EnsureUsersSchemaAndSeed();
 

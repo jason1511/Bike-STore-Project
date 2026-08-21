@@ -327,18 +327,58 @@ SELECT last_insert_rowid();";
             if (unitCost <= 0) throw new ArgumentException("Unit cost must be greater than 0.");
 
             using var conn = Database.OpenConnection();
-            using var cmd = conn.CreateCommand();
-            cmd.CommandText = @"
+            using var tx = conn.BeginTransaction();
+
+            int before;
+            using (var total = conn.CreateCommand())
+            {
+                total.Transaction = tx;
+                total.CommandText = "SELECT COALESCE(SUM(qty_remaining),0) FROM stock_lots WHERE product_id=$pid;";
+                total.Parameters.AddWithValue("$pid", productId);
+                before = Convert.ToInt32(total.ExecuteScalar() ?? 0);
+            }
+
+            long lotId;
+            using (var cmd = conn.CreateCommand())
+            {
+                cmd.Transaction = tx;
+                cmd.CommandText = @"
 INSERT INTO stock_lots (product_id, received_at, unit_cost, qty_received, qty_remaining, notes)
-VALUES ($pid, $dt, $cost, $qty, $qty, $notes);";
+VALUES ($pid, $dt, $cost, $qty, $qty, $notes);
+SELECT last_insert_rowid();";
 
-            cmd.Parameters.AddWithValue("$pid", productId);
-            cmd.Parameters.AddWithValue("$dt", (receivedAt ?? DateTime.Now).ToString("yyyy-MM-dd HH:mm:ss"));
-            cmd.Parameters.AddWithValue("$cost", (double)unitCost);
-            cmd.Parameters.AddWithValue("$qty", qtyReceived);
-            cmd.Parameters.AddWithValue("$notes", string.IsNullOrWhiteSpace(notes) ? (object)DBNull.Value : notes.Trim());
+                cmd.Parameters.AddWithValue("$pid", productId);
+                cmd.Parameters.AddWithValue("$dt", (receivedAt ?? DateTime.Now).ToString("yyyy-MM-dd HH:mm:ss"));
+                cmd.Parameters.AddWithValue("$cost", (double)unitCost);
+                cmd.Parameters.AddWithValue("$qty", qtyReceived);
+                cmd.Parameters.AddWithValue("$notes", string.IsNullOrWhiteSpace(notes) ? (object)DBNull.Value : notes.Trim());
+                lotId = Convert.ToInt64(cmd.ExecuteScalar() ?? 0L);
+            }
 
-            cmd.ExecuteNonQuery();
+            using (var movement = conn.CreateCommand())
+            {
+                movement.Transaction = tx;
+                movement.CommandText = @"
+INSERT INTO stock_movements
+(product_id, stock_lot_id, movement_type, quantity_change, quantity_before, quantity_after,
+ note, created_by_user_id, created_by_username, created_at)
+VALUES ($pid, $lot, 'STOCK_IN', $change, $before, $after, $note, $uid, $uname, $at);";
+                movement.Parameters.AddWithValue("$pid", productId);
+                movement.Parameters.AddWithValue("$lot", lotId);
+                movement.Parameters.AddWithValue("$change", qtyReceived);
+                movement.Parameters.AddWithValue("$before", before);
+                movement.Parameters.AddWithValue("$after", before + qtyReceived);
+                movement.Parameters.AddWithValue("$note", string.IsNullOrWhiteSpace(notes) ? "Stock batch received" : notes.Trim());
+                movement.Parameters.AddWithValue("$uid", AppSession.UserId > 0 ? AppSession.UserId : (object)DBNull.Value);
+                movement.Parameters.AddWithValue("$uname", string.IsNullOrWhiteSpace(AppSession.Username) ? (object)DBNull.Value : AppSession.Username);
+                movement.Parameters.AddWithValue("$at", DateTime.UtcNow.ToString("o"));
+                movement.ExecuteNonQuery();
+            }
+
+            LocalAdminRepository.WriteAudit(conn, tx, "RECEIVE_STOCK", "stock_lots", lotId,
+                $"product_id={productId}; qty={qtyReceived}; unit_cost={unitCost}");
+
+            tx.Commit();
         }
 
         public int Insert(Product p)
@@ -507,10 +547,31 @@ ORDER BY color;";
         public bool DeleteStockLot(int lotId)
         {
             using var conn = Database.OpenConnection();
-            using var cmd = conn.CreateCommand();
-            cmd.CommandText = "DELETE FROM stock_lots WHERE id = $id  AND qty_remaining = qty_received;";
-            cmd.Parameters.AddWithValue("$id", lotId);
-            return cmd.ExecuteNonQuery() > 0;
+            using var tx = conn.BeginTransaction();
+            int productId, qty;
+            using (var get = conn.CreateCommand())
+            {
+                get.Transaction = tx;
+                get.CommandText = "SELECT product_id,qty_remaining FROM stock_lots WHERE id=$id AND qty_remaining=qty_received;";
+                get.Parameters.AddWithValue("$id", lotId);
+                using var reader = get.ExecuteReader();
+                if (!reader.Read()) return false;
+                productId = reader.GetInt32(0); qty = reader.GetInt32(1);
+            }
+            var before = GetAvailableQuantity(conn, tx, productId);
+            using (var cmd = conn.CreateCommand())
+            {
+                cmd.Transaction = tx;
+                cmd.CommandText = "DELETE FROM stock_lots WHERE id=$id;";
+                cmd.Parameters.AddWithValue("$id", lotId);
+                if (cmd.ExecuteNonQuery() == 0) return false;
+            }
+            LocalAdminRepository.InsertMovement(conn, tx, productId, null, null, "ADJUSTMENT", -qty,
+                before, before - qty, "Untouched stock batch deleted");
+            LocalAdminRepository.WriteAudit(conn, tx, "DELETE_STOCK_BATCH", "stock_lots", lotId,
+                $"product_id={productId}; qty={qty}");
+            tx.Commit();
+            return true;
         }
 
         public decimal? GetExistingPrice(string brand, string type, string? color)
@@ -592,10 +653,12 @@ ORDER BY datetime(l.received_at) DESC, l.id DESC;";
         public bool UpdateStockLot(int lotId, int newQtyReceived, decimal newUnitCost)
         {
             using var conn = Database.OpenConnection();
+            using var tx = conn.BeginTransaction();
 
-            int oldQtyReceived, oldQtyRemaining;
+            int productId, oldQtyReceived, oldQtyRemaining;
             using (var get = conn.CreateCommand())
             {
+                get.Transaction = tx;
                 get.CommandText = @"SELECT qty_received, qty_remaining FROM stock_lots WHERE id=$id;";
                 get.Parameters.AddWithValue("$id", lotId);
 
@@ -606,6 +669,14 @@ ORDER BY datetime(l.received_at) DESC, l.id DESC;";
                 oldQtyRemaining = rdr.GetInt32(1);
             }
 
+            using (var getProduct = conn.CreateCommand())
+            {
+                getProduct.Transaction = tx;
+                getProduct.CommandText = "SELECT product_id FROM stock_lots WHERE id=$id;";
+                getProduct.Parameters.AddWithValue("$id", lotId);
+                productId = Convert.ToInt32(getProduct.ExecuteScalar() ?? 0);
+            }
+
             var sold = oldQtyReceived - oldQtyRemaining;
             if (newQtyReceived < sold)
                 throw new InvalidOperationException($"Cannot set received qty below already sold qty ({sold}).");
@@ -613,6 +684,7 @@ ORDER BY datetime(l.received_at) DESC, l.id DESC;";
             var newRemaining = newQtyReceived - sold;
 
             using var cmd = conn.CreateCommand();
+            cmd.Transaction = tx;
             cmd.CommandText = @"
 UPDATE stock_lots
 SET qty_received = $received,
@@ -624,7 +696,27 @@ WHERE id = $id;";
             cmd.Parameters.AddWithValue("$cost", (double)newUnitCost);
             cmd.Parameters.AddWithValue("$id", lotId);
 
-            return cmd.ExecuteNonQuery() > 0;
+            var updated = cmd.ExecuteNonQuery() > 0;
+            if (!updated) return false;
+
+            var change = newRemaining - oldQtyRemaining;
+            var after = GetAvailableQuantity(conn, tx, productId);
+            LocalAdminRepository.InsertMovement(conn, tx, productId, lotId, null, "ADJUSTMENT", change,
+                after - change, after, $"Stock batch updated; received {oldQtyReceived} -> {newQtyReceived}");
+            LocalAdminRepository.WriteAudit(conn, tx, "UPDATE_STOCK_BATCH", "stock_lots", lotId,
+                $"qty={oldQtyReceived}->{newQtyReceived}; unit_cost={newUnitCost}");
+            tx.Commit();
+            return true;
+        }
+
+        private static int GetAvailableQuantity(Microsoft.Data.Sqlite.SqliteConnection conn,
+            Microsoft.Data.Sqlite.SqliteTransaction tx, int productId)
+        {
+            using var cmd = conn.CreateCommand();
+            cmd.Transaction = tx;
+            cmd.CommandText = "SELECT COALESCE(SUM(qty_remaining),0) FROM stock_lots WHERE product_id=$id;";
+            cmd.Parameters.AddWithValue("$id", productId);
+            return Convert.ToInt32(cmd.ExecuteScalar() ?? 0);
         }
     }
 }

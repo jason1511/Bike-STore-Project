@@ -10,9 +10,13 @@ namespace Bike_STore_Project
             InitializeComponent();
 
             // Operations
+            var menuCatalogue = new ToolStripMenuItem("&Catalogue");
+            menuCatalogue.Click += (_, __) => SwitchTo(() => new CatalogueManagementForm());
+            operationsToolStripMenuItem.DropDownItems.Insert(0, menuCatalogue);
             menuInventory.Click += (_, __) => SwitchTo(() => new InventoryForm());
-            menuSales.Click += (_, __) => SwitchTo(() => new SalesForm());
-            menuService.Click += (_, __) => SwitchTo(() => new ServiceForm());
+            menuSales.Text = "&Invoices / Sales";
+            menuSales.Click += (_, __) => SwitchTo(() => new InvoiceManagementForm());
+            menuService.Click += (_, __) => SwitchTo(() => new ServiceManagementForm());
 
             // Logs
             menuTransactionLog.Click += (_, __) => SwitchTo(() => new TransactionLogForm());
@@ -20,6 +24,9 @@ namespace Bike_STore_Project
 
             // Admin
             menuUserManagement.Click += (_, __) => OpenUserManagement();
+            var menuLocalAdmin = new ToolStripMenuItem("&Local Admin Centre");
+            menuLocalAdmin.Click += (_, __) => OpenLocalAdminCenter();
+            adminToolStripMenuItem.DropDownItems.Insert(0, menuLocalAdmin);
 
             // File
             menuLogout.Click += (_, __) => Logout();
@@ -146,6 +153,18 @@ namespace Bike_STore_Project
 
             // after closing admin form, refresh title/menu (role might have changed)
             ApplySessionUi();
+        }
+
+        private void OpenLocalAdminCenter()
+        {
+            if (!AppSession.IsAdmin)
+            {
+                MessageBox.Show("Admin access required.", "Access denied",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            SwitchTo(() => new LocalAdminCenterForm());
         }
     }
 }
