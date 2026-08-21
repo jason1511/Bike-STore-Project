@@ -8,18 +8,27 @@ using System.Windows.Forms;
 
 namespace Bike_STore_Project
 {
+    public enum LocalAdminSection
+    {
+        Brands,
+        StockMovements,
+        Reports,
+        Activity
+    }
+
     public sealed class LocalAdminCenterForm : Form
     {
         private readonly DataGridView _brands = Grid();
         private readonly DataGridView _movements = Grid();
         private readonly DataGridView _activity = Grid();
         private readonly DataGridView _report = Grid();
+        private readonly DataGridView _breakdown = Grid();
         private readonly DateTimePicker _from = new() { Width = 130 };
         private readonly DateTimePicker _to = new() { Width = 130 };
         private readonly Label _summary = new() { AutoSize = true, Font = new Font("Segoe UI", 11, FontStyle.Bold) };
         private string _reportSummary = "";
 
-        public LocalAdminCenterForm()
+        public LocalAdminCenterForm(LocalAdminSection? singleSection = null)
         {
             if (!AppSession.IsAdmin)
                 throw new InvalidOperationException("Admin access required.");
@@ -31,12 +40,32 @@ namespace Bike_STore_Project
             _to.Value = DateTime.Today;
 
             var menu = new MainMenuControl { Dock = DockStyle.Top };
-            var tabs = new TabControl { Dock = DockStyle.Fill };
-            tabs.TabPages.Add(BuildBrands());
-            tabs.TabPages.Add(BuildMovements());
-            tabs.TabPages.Add(BuildReports());
-            tabs.TabPages.Add(BuildActivity());
-            Controls.Add(tabs);
+            if (singleSection == null)
+            {
+                var tabs = new TabControl { Dock = DockStyle.Fill };
+                tabs.TabPages.Add(BuildBrands());
+                tabs.TabPages.Add(BuildMovements());
+                tabs.TabPages.Add(BuildReports());
+                tabs.TabPages.Add(BuildActivity());
+                Controls.Add(tabs);
+            }
+            else
+            {
+                var page = singleSection.Value switch
+                {
+                    LocalAdminSection.Brands => BuildBrands(),
+                    LocalAdminSection.StockMovements => BuildMovements(),
+                    LocalAdminSection.Reports => BuildReports(),
+                    _ => BuildActivity()
+                };
+                if (page.Controls.Count > 0)
+                {
+                    var content = page.Controls[0];
+                    page.Controls.Remove(content);
+                    content.Dock = DockStyle.Fill;
+                    Controls.Add(content);
+                }
+            }
             Controls.Add(menu);
             Load += (_, __) => { LoadBrands(); LoadMovements(); LoadActivity(); GenerateReport(); };
         }
@@ -90,14 +119,23 @@ namespace Bike_STore_Project
             today.Click += (_, __) => { _from.Value = DateTime.Today; _to.Value = DateTime.Today; GenerateReport(); };
             var month = new Button { Text = "This month" };
             month.Click += (_, __) => { _from.Value = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1); _to.Value = DateTime.Today; GenerateReport(); };
+            var week = new Button { Text = "This week" };
+            week.Click += (_, __) =>
+            {
+                var offset = ((int)DateTime.Today.DayOfWeek + 6) % 7;
+                _from.Value = DateTime.Today.AddDays(-offset); _to.Value = DateTime.Today; GenerateReport();
+            };
             var generate = new Button { Text = "Generate" };
             generate.Click += (_, __) => GenerateReport();
             var print = new Button { Text = "Print report" };
             print.Click += (_, __) => PrintReport();
-            actions.Controls.AddRange(new Control[] { today, month, generate, print });
+            actions.Controls.AddRange(new Control[] { today, week, month, generate, print });
             root.Controls.Add(actions, 0, 0);
             root.Controls.Add(_summary, 0, 1);
-            root.Controls.Add(_report, 0, 2);
+            var detail = new SplitContainer { Dock = DockStyle.Fill, Orientation = Orientation.Vertical, SplitterDistance = 650, BackColor = UiTheme.Border };
+            detail.Panel1.Padding = new Padding(0, 6, 6, 0); detail.Panel2.Padding = new Padding(6, 6, 0, 0);
+            detail.Panel1.Controls.Add(_report); detail.Panel2.Controls.Add(_breakdown);
+            root.Controls.Add(detail, 0, 2);
             tab.Controls.Add(root);
             return tab;
         }
@@ -189,6 +227,27 @@ ORDER BY date DESC;";
                     _report.Columns[name].DefaultCellStyle.Format = "C0";
                     _report.Columns[name].DefaultCellStyle.FormatProvider = CultureInfo.GetCultureInfo("id-ID");
                 }
+
+            using var breakdown = conn.CreateCommand();
+            breakdown.CommandText = @"
+SELECT section,label,value FROM (
+ SELECT 'Payment' section,COALESCE(NULLIF(i.payment_method,''),'UNSPECIFIED') label,SUM(ii.line_total) value
+ FROM invoices i JOIN invoice_items ii ON ii.invoice_id=i.id
+ WHERE i.status='ACTIVE' AND datetime(i.created_at)>=datetime($from) AND datetime(i.created_at)<datetime($to)
+ GROUP BY i.payment_method
+ UNION ALL
+ SELECT 'Top brand',ii.brand,SUM(ii.line_total) FROM invoices i JOIN invoice_items ii ON ii.invoice_id=i.id
+ WHERE i.status='ACTIVE' AND datetime(i.created_at)>=datetime($from) AND datetime(i.created_at)<datetime($to) GROUP BY ii.brand
+ UNION ALL
+ SELECT 'Top model',ii.type,SUM(ii.quantity) FROM invoices i JOIN invoice_items ii ON ii.invoice_id=i.id
+ WHERE i.status='ACTIVE' AND datetime(i.created_at)>=datetime($from) AND datetime(i.created_at)<datetime($to) GROUP BY ii.type
+ UNION ALL
+ SELECT 'Top colour',COALESCE(NULLIF(ii.color,''),'NO COLOUR'),SUM(ii.quantity) FROM invoices i JOIN invoice_items ii ON ii.invoice_id=i.id
+ WHERE i.status='ACTIVE' AND datetime(i.created_at)>=datetime($from) AND datetime(i.created_at)<datetime($to) GROUP BY ii.color
+) ORDER BY section,value DESC;";
+            breakdown.Parameters.AddWithValue("$from", from); breakdown.Parameters.AddWithValue("$to", to);
+            using var breakdownReader = breakdown.ExecuteReader(); var breakdownTable = new DataTable(); breakdownTable.Load(breakdownReader); _breakdown.DataSource = breakdownTable;
+            if (_breakdown.Columns.Contains("value")) _breakdown.Columns["value"].DefaultCellStyle.Format = "N0";
         }
 
         private void AddBrand()

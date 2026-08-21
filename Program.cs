@@ -29,9 +29,7 @@ namespace Bike_STore_Project
                     return;
             }
 
-            // At this point AppSession is populated
-            // Start main app
-            Application.Run(new InventoryForm());
+            Application.Run(new AdminDashboardForm());
         }
     }
 }

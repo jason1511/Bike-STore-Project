@@ -20,6 +20,7 @@ namespace Bike_STore_Project
         private readonly TextBox _search = Box(220);
         private readonly NumericUpDown _cost = new() { Minimum = 0, Maximum = 1_000_000_000, ThousandsSeparator = true, Width = 140 };
         private readonly ComboBox _status = new() { Width = 130, DropDownStyle = ComboBoxStyle.DropDownList };
+        private readonly ComboBox _filter = new() { Width = 130, DropDownStyle = ComboBoxStyle.DropDownList };
         private readonly DataGridView _history = Grid();
         private DataRowView? _printRow;
 
@@ -30,6 +31,8 @@ namespace Bike_STore_Project
             MinimumSize = new Size(1050, 650);
             foreach (var value in new[] { "RECEIVED", "IN_PROGRESS", "COMPLETED", "CANCELLED" }) _status.Items.Add(value);
             _status.SelectedIndex = 0;
+            foreach (var value in new[] { "ALL", "RECEIVED", "IN_PROGRESS", "COMPLETED", "CANCELLED" }) _filter.Items.Add(value);
+            _filter.SelectedIndex = 0; _filter.SelectedIndexChanged += (_, __) => LoadHistory();
             _brand.CharacterCasing = CharacterCasing.Upper;
             _type.CharacterCasing = CharacterCasing.Upper;
             _color.CharacterCasing = CharacterCasing.Upper;
@@ -79,10 +82,14 @@ namespace Bike_STore_Project
             var actions = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true };
             actions.Controls.Add(new Label { Text = "Search", AutoSize = true, Padding = new Padding(0, 7, 0, 0) });
             actions.Controls.Add(_search);
+            actions.Controls.Add(new Label { Text = "Status", AutoSize = true, Padding = new Padding(8, 7, 0, 0) });
+            actions.Controls.Add(_filter);
             var refresh = new Button { Text = "Refresh" }; refresh.Click += (_, __) => LoadHistory();
             var print = new Button { Text = "Print selected" }; print.Click += (_, __) => PrintSelected();
             var status = new Button { Text = "Update status", Enabled = AppSession.IsAdmin }; status.Click += (_, __) => UpdateStatus();
-            actions.Controls.Add(refresh); actions.Controls.Add(print); actions.Controls.Add(status);
+            var edit = new Button { Text = "Edit details", Enabled = AppSession.IsAdmin }; edit.Click += (_, __) => EditSelected();
+            var delete = new Button { Text = "Delete record", Enabled = AppSession.IsAdmin }; delete.Click += (_, __) => DeleteSelected();
+            actions.Controls.Add(refresh); actions.Controls.Add(print); actions.Controls.Add(edit); actions.Controls.Add(status); actions.Controls.Add(delete);
             root.Controls.Add(actions, 0, 0); root.Controls.Add(_history, 0, 1); tab.Controls.Add(root); return tab;
         }
 
@@ -151,10 +158,12 @@ SELECT id,COALESCE(service_number,'LEGACY-'||id) AS service_number,
  COALESCE(service_status,'RECEIVED') AS service_status,service_cost,COALESCE(notes,'') AS notes,
  COALESCE(created_by_username,'') AS created_by,COALESCE(created_at,date_time) AS created_at
 FROM services
-WHERE $q='' OR UPPER(COALESCE(service_number,'')) LIKE $like OR UPPER(COALESCE(customer_name,'')) LIKE $like
- OR UPPER(brand) LIKE $like OR UPPER(type) LIKE $like
+WHERE ($status='ALL' OR UPPER(COALESCE(service_status,'RECEIVED'))=$status)
+AND ($q='' OR UPPER(COALESCE(service_number,'')) LIKE $like OR UPPER(COALESCE(customer_name,'')) LIKE $like
+ OR UPPER(brand) LIKE $like OR UPPER(type) LIKE $like)
 ORDER BY datetime(COALESCE(created_at,date_time)) DESC,id DESC;";
             var q = _search.Text.Trim().ToUpperInvariant(); cmd.Parameters.AddWithValue("$q", q); cmd.Parameters.AddWithValue("$like", $"%{q}%");
+            cmd.Parameters.AddWithValue("$status", string.IsNullOrWhiteSpace(_filter.Text) ? "ALL" : _filter.Text);
             using var reader = cmd.ExecuteReader(); var table = new DataTable(); table.Load(reader); _history.DataSource = table;
             if (_history.Columns.Contains("id")) _history.Columns["id"].Visible = false;
             if (_history.Columns.Contains("service_cost"))
@@ -179,6 +188,41 @@ ORDER BY datetime(COALESCE(created_at,date_time)) DESC,id DESC;";
                 LocalAdminRepository.WriteAudit(conn, tx, "UPDATE_SERVICE_STATUS", "services", id, $"status={next}"); tx.Commit(); LoadHistory();
             }
             catch (Exception ex) { try { tx.Rollback(); } catch { } MessageBox.Show(ex.Message); }
+        }
+
+        private void EditSelected()
+        {
+            if (_history.CurrentRow?.DataBoundItem is not DataRowView row) { MessageBox.Show("Select a service first."); return; }
+            using var dialog = new ServiceEditDialog(row);
+            if (dialog.ShowDialog(this) != DialogResult.OK) return;
+            var id = Convert.ToInt32(row["id"]); using var conn = Database.OpenConnection(); using var tx = conn.BeginTransaction();
+            try
+            {
+                using var cmd = conn.CreateCommand(); cmd.Transaction = tx;
+                cmd.CommandText = @"
+UPDATE services SET customer_name=$customer,customer_phone=$phone,brand=$brand,type=$type,color=$color,
+ service_type=$service,service_cost=$cost,notes=$notes WHERE id=$id;";
+                cmd.Parameters.AddWithValue("$customer", dialog.Customer); cmd.Parameters.AddWithValue("$phone", Db(dialog.Phone));
+                cmd.Parameters.AddWithValue("$brand", dialog.Brand); cmd.Parameters.AddWithValue("$type", dialog.BikeType);
+                cmd.Parameters.AddWithValue("$color", Db(dialog.Color)); cmd.Parameters.AddWithValue("$service", dialog.ServiceType);
+                cmd.Parameters.AddWithValue("$cost", (double)dialog.Cost); cmd.Parameters.AddWithValue("$notes", Db(dialog.Notes)); cmd.Parameters.AddWithValue("$id", id);
+                cmd.ExecuteNonQuery(); LocalAdminRepository.WriteAudit(conn, tx, "UPDATE_SERVICE", "services", id, $"customer={dialog.Customer}"); tx.Commit(); LoadHistory();
+            }
+            catch (Exception ex) { try { tx.Rollback(); } catch { } MessageBox.Show(ex.Message, "Service update failed"); }
+        }
+
+        private void DeleteSelected()
+        {
+            var id = SelectedId(); if (id == 0) return;
+            var reason = DialogPrompt.Show(this, "Delete service record", "Reason for deletion:", "Administrative correction");
+            if (string.IsNullOrWhiteSpace(reason) || MessageBox.Show("Permanently delete this service record?", "Delete service", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
+            using var conn = Database.OpenConnection(); using var tx = conn.BeginTransaction();
+            try
+            {
+                using var cmd = conn.CreateCommand(); cmd.Transaction = tx; cmd.CommandText = "DELETE FROM services WHERE id=$id;"; cmd.Parameters.AddWithValue("$id", id);
+                cmd.ExecuteNonQuery(); LocalAdminRepository.WriteAudit(conn, tx, "DELETE_SERVICE", "services", id, $"reason={reason}"); tx.Commit(); _printRow = null; LoadHistory();
+            }
+            catch (Exception ex) { try { tx.Rollback(); } catch { } MessageBox.Show(ex.Message, "Delete failed"); }
         }
 
         private void PrintSelected() { var id = SelectedId(); if (id != 0) PrintService(id); }
@@ -237,5 +281,36 @@ ORDER BY datetime(COALESCE(created_at,date_time)) DESC,id DESC;";
             MultiSelect = false, SelectionMode = DataGridViewSelectionMode.FullRowSelect,
             AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill, RowHeadersVisible = false
         };
+    }
+
+    internal sealed class ServiceEditDialog : Form
+    {
+        private readonly TextBox _customer = Box(); private readonly TextBox _phone = Box(); private readonly TextBox _brand = Box();
+        private readonly TextBox _type = Box(); private readonly TextBox _color = Box(); private readonly TextBox _service = Box();
+        private readonly TextBox _notes = new() { Width = 260, Multiline = true, Height = 60 };
+        private readonly NumericUpDown _cost = new() { Width = 160, Maximum = 1_000_000_000, ThousandsSeparator = true };
+        public string Customer => _customer.Text.Trim(); public string Phone => _phone.Text.Trim(); public string Brand => _brand.Text.Trim().ToUpperInvariant();
+        public string BikeType => _type.Text.Trim().ToUpperInvariant(); public string Color => _color.Text.Trim().ToUpperInvariant();
+        public string ServiceType => _service.Text.Trim(); public string Notes => _notes.Text.Trim(); public decimal Cost => _cost.Value;
+
+        public ServiceEditDialog(DataRowView row)
+        {
+            Text = "Edit service details"; StartPosition = FormStartPosition.CenterParent; ClientSize = new Size(520, 500);
+            FormBorderStyle = FormBorderStyle.FixedDialog; MaximizeBox = false; MinimizeBox = false;
+            _customer.Text = Convert.ToString(row["customer_name"]); _phone.Text = Convert.ToString(row["customer_phone"]);
+            _brand.Text = Convert.ToString(row["brand"]); _type.Text = Convert.ToString(row["type"]); _color.Text = Convert.ToString(row["color"]);
+            _service.Text = Convert.ToString(row["service_type"]); _notes.Text = Convert.ToString(row["notes"]); _cost.Value = Math.Min(_cost.Maximum, Convert.ToDecimal(row["service_cost"]));
+            var table = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, Padding = new Padding(20), AutoScroll = true };
+            table.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 145)); table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            Add(table, "Customer *", _customer); Add(table, "Phone", _phone); Add(table, "Brand *", _brand); Add(table, "Type/model *", _type);
+            Add(table, "Colour", _color); Add(table, "Service type *", _service); Add(table, "Cost", _cost); Add(table, "Notes", _notes);
+            var actions = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.RightToLeft };
+            var save = new Button { Text = "Save changes", Width = 120, DialogResult = DialogResult.OK }; var cancel = new Button { Text = "Cancel", Width = 90, DialogResult = DialogResult.Cancel };
+            save.Click += (_, __) => { if (string.IsNullOrWhiteSpace(Customer) || string.IsNullOrWhiteSpace(Brand) || string.IsNullOrWhiteSpace(BikeType) || string.IsNullOrWhiteSpace(ServiceType)) { MessageBox.Show("Customer, brand, model and service type are required."); DialogResult = DialogResult.None; } };
+            actions.Controls.Add(save); actions.Controls.Add(cancel); Add(table, "", actions); Controls.Add(table); AcceptButton = save; CancelButton = cancel; UiTheme.Apply(this);
+        }
+        private static TextBox Box() => new() { Width = 260 };
+        private static void Add(TableLayoutPanel table, string label, Control control)
+        { var row = table.RowCount++; table.RowStyles.Add(new RowStyle(SizeType.AutoSize)); table.Controls.Add(new Label { Text = label, AutoSize = true, Padding = new Padding(0, 7, 0, 0) }, 0, row); table.Controls.Add(control, 1, row); }
     }
 }

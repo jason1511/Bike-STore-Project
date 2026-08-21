@@ -28,6 +28,7 @@ namespace Bike_STore_Project
         private readonly ComboBox _payment = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 135 };
         private readonly ComboBox _bank = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 110 };
         private readonly Label _total = new() { AutoSize = true, Font = new Font("Segoe UI", 12, FontStyle.Bold) };
+        private readonly FlowLayoutPanel _historyMetrics = new() { Dock = DockStyle.Fill, AutoSize = true, WrapContents = false };
         private InvoiceHeader? _printInvoice;
 
         public InvoiceManagementForm()
@@ -123,8 +124,9 @@ namespace Bike_STore_Project
         private TabPage BuildHistoryTab()
         {
             var tab = new TabPage("Invoice History");
-            var root = new TableLayoutPanel { Dock = DockStyle.Fill, RowCount = 2, Padding = new Padding(12) };
+            var root = new TableLayoutPanel { Dock = DockStyle.Fill, RowCount = 3, Padding = new Padding(12) };
             root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 92));
             root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
             var actions = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true };
             actions.Controls.Add(new Label { Text = "Search", AutoSize = true, Padding = new Padding(0, 7, 0, 0) });
@@ -133,13 +135,20 @@ namespace Bike_STore_Project
             refresh.Click += (_, __) => LoadHistory();
             var print = new Button { Text = "Print selected" };
             print.Click += (_, __) => PrintSelected();
+            var edit = new Button { Text = "Edit details", Enabled = AppSession.IsAdmin };
+            edit.Click += (_, __) => EditSelected();
             var voidButton = new Button { Text = "Void & restore stock", Enabled = AppSession.IsAdmin, AutoSize = true };
             voidButton.Click += (_, __) => VoidSelected();
+            var delete = new Button { Text = "Delete record", Enabled = AppSession.IsAdmin };
+            delete.Click += (_, __) => DeleteSelected();
             actions.Controls.Add(refresh);
             actions.Controls.Add(print);
+            actions.Controls.Add(edit);
             actions.Controls.Add(voidButton);
+            actions.Controls.Add(delete);
             root.Controls.Add(actions, 0, 0);
-            root.Controls.Add(_history, 0, 1);
+            root.Controls.Add(_historyMetrics, 0, 1);
+            root.Controls.Add(_history, 0, 2);
             tab.Controls.Add(root);
             return tab;
         }
@@ -168,7 +177,44 @@ namespace Bike_STore_Project
                 _history.Columns["total"].DefaultCellStyle.Format = "C0";
                 _history.Columns["total"].DefaultCellStyle.FormatProvider = CultureInfo.GetCultureInfo("id-ID");
             }
+            using var conn = Database.OpenConnection();
+            decimal revenue = Metric(conn, "SELECT COALESCE(SUM(ii.line_total),0) FROM invoice_items ii JOIN invoices i ON i.id=ii.invoice_id WHERE i.status='ACTIVE';");
+            decimal today = Metric(conn, "SELECT COALESCE(SUM(ii.line_total),0) FROM invoice_items ii JOIN invoices i ON i.id=ii.invoice_id WHERE i.status='ACTIVE' AND date(i.created_at)=date('now','localtime');");
+            decimal active = Metric(conn, "SELECT COUNT(*) FROM invoices WHERE status='ACTIVE';");
+            decimal voided = Metric(conn, "SELECT COUNT(*) FROM invoices WHERE status='VOID';");
+            _historyMetrics.Controls.Clear();
+            _historyMetrics.Controls.Add(HistoryCard("Total revenue", $"Rp {revenue:N0}", UiTheme.Accent));
+            _historyMetrics.Controls.Add(HistoryCard("Today", $"Rp {today:N0}", UiTheme.Success));
+            _historyMetrics.Controls.Add(HistoryCard("Active invoices", active.ToString("N0"), UiTheme.Warning));
+            _historyMetrics.Controls.Add(HistoryCard("Voided", voided.ToString("N0"), UiTheme.Danger));
         }
+
+        private void EditSelected()
+        {
+            var id = SelectedInvoiceId(); if (id == 0) return;
+            try
+            {
+                var invoice = _repo.GetInvoice(id); using var dialog = new InvoiceMetadataDialog(invoice);
+                if (dialog.ShowDialog(this) != DialogResult.OK) return;
+                _repo.UpdateInvoiceDetails(invoice); LoadHistory();
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message, "Invoice update failed"); }
+        }
+
+        private void DeleteSelected()
+        {
+            var id = SelectedInvoiceId(); if (id == 0) return;
+            var reason = DialogPrompt.Show(this, "Delete invoice record", "Reason for permanent record deletion:", "Administrative correction");
+            if (string.IsNullOrWhiteSpace(reason)) return;
+            if (MessageBox.Show("This removes the invoice record after restoring stock. Continue?", "Delete invoice record", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
+            try { _repo.DeleteInvoiceRecord(id, reason); LoadHistory(); LoadProducts(); }
+            catch (Exception ex) { MessageBox.Show(ex.Message, "Delete failed"); }
+        }
+
+        private static decimal Metric(Microsoft.Data.Sqlite.SqliteConnection conn, string sql)
+        { using var cmd = conn.CreateCommand(); cmd.CommandText = sql; return Convert.ToDecimal(cmd.ExecuteScalar() ?? 0); }
+        private static MetricCard HistoryCard(string label, string value, Color colour)
+            => new(label, value, colour) { Width = 190, Height = 78, Margin = new Padding(0, 5, 10, 5) };
 
         private void AddItem()
         {
@@ -357,5 +403,50 @@ namespace Bike_STore_Project
             AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
             RowHeadersVisible = false
         };
+    }
+
+    internal sealed class InvoiceMetadataDialog : Form
+    {
+        private readonly InvoiceHeader _invoice;
+        private readonly TextBox _name = new() { Width = 290 };
+        private readonly TextBox _phone = new() { Width = 290 };
+        private readonly TextBox _address = new() { Width = 290 };
+        private readonly TextBox _notes = new() { Width = 290, Height = 60, Multiline = true };
+        private readonly ComboBox _payment = new() { Width = 180, DropDownStyle = ComboBoxStyle.DropDownList };
+        private readonly ComboBox _bank = new() { Width = 140, DropDownStyle = ComboBoxStyle.DropDownList };
+
+        public InvoiceMetadataDialog(InvoiceHeader invoice)
+        {
+            _invoice = invoice; Text = $"Edit {invoice.InvoiceNumber}"; StartPosition = FormStartPosition.CenterParent;
+            ClientSize = new Size(510, 430); FormBorderStyle = FormBorderStyle.FixedDialog; MaximizeBox = false; MinimizeBox = false;
+            _payment.Items.AddRange(new object[] { "CASH", "BANK TRANSFER" });
+            _bank.Items.AddRange(new object[] { "", "BRI", "BNI", "BCA", "OTHER" });
+            _name.Text = invoice.CustomerName; _phone.Text = invoice.CustomerPhone; _address.Text = invoice.CustomerAddress;
+            _notes.Text = invoice.Notes; _payment.SelectedItem = invoice.PaymentMethod; if (_payment.SelectedIndex < 0) _payment.SelectedIndex = 0;
+            _bank.SelectedItem = invoice.PaymentBank; if (_bank.SelectedIndex < 0) _bank.SelectedIndex = 0;
+
+            var table = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, Padding = new Padding(20), AutoScroll = true };
+            table.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 145)); table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            Add(table, "Customer *", _name); Add(table, "Phone", _phone); Add(table, "Address", _address);
+            Add(table, "Payment", _payment); Add(table, "Bank", _bank); Add(table, "Notes", _notes);
+            var actions = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.RightToLeft };
+            var save = new Button { Text = "Save changes", Width = 120, DialogResult = DialogResult.OK };
+            var cancel = new Button { Text = "Cancel", Width = 90, DialogResult = DialogResult.Cancel };
+            save.Click += (_, __) =>
+            {
+                if (string.IsNullOrWhiteSpace(_name.Text)) { MessageBox.Show("Customer name is required."); DialogResult = DialogResult.None; return; }
+                _invoice.CustomerName = _name.Text.Trim(); _invoice.CustomerPhone = _phone.Text.Trim(); _invoice.CustomerAddress = _address.Text.Trim();
+                _invoice.PaymentMethod = _payment.Text; _invoice.PaymentBank = _bank.Text; _invoice.Notes = _notes.Text.Trim();
+            };
+            actions.Controls.Add(save); actions.Controls.Add(cancel); Add(table, "", actions);
+            Controls.Add(table); AcceptButton = save; CancelButton = cancel; UiTheme.Apply(this);
+        }
+
+        private static void Add(TableLayoutPanel table, string label, Control control)
+        {
+            var row = table.RowCount++; table.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            table.Controls.Add(new Label { Text = label, AutoSize = true, Padding = new Padding(0, 7, 0, 0) }, 0, row);
+            table.Controls.Add(control, 1, row);
+        }
     }
 }

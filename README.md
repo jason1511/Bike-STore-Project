@@ -6,15 +6,17 @@ A Windows desktop management application for an electric bicycle retailer. It re
 
 - C# WinForms on .NET 8
 - Local SQLite database (`data.db`)
+- Unified single-window admin dashboard with role-aware navigation
+- Overview cards, recent activity, seven-day sales, and stock charts
 - Administrator and staff login with PBKDF2 password hashing
 - Catalogue and brand management
 - FIFO stock batches and automatic stock-movement history
 - Multi-item invoices with customer and payment details
 - Optional bicycle frame numbers per invoice line
 - Daily sequential invoice numbers and A5 print preview
-- Invoice history and administrator-only voiding with stock restoration
-- Service numbers, customer details, workflow status, cost, notes, and A4 print preview
-- Date-range sales, service, profit, and stock reports with landscape printing
+- Searchable invoice history with administrator-only editing, voiding, deletion, and stock restoration
+- Searchable service history with status filters, editing, deletion, workflow status, and A4 print preview
+- Date-range sales, service, profit, payment, top-product, and stock reports with landscape printing
 - User management and administrator-only audit activity
 
 ## Roles

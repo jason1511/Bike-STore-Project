@@ -183,6 +183,47 @@ UPDATE invoices SET status='VOID',void_reason=$reason,voided_at=$at,
             }
         }
 
+        public void UpdateInvoiceDetails(InvoiceHeader invoice)
+        {
+            if (!AppSession.IsAdmin) throw new InvalidOperationException("Admin access is required to edit an invoice.");
+            if (string.IsNullOrWhiteSpace(invoice.CustomerName)) throw new ArgumentException("Customer name is required.");
+            using var conn = Database.OpenConnection(); using var tx = conn.BeginTransaction();
+            try
+            {
+                using var cmd = conn.CreateCommand(); cmd.Transaction = tx;
+                cmd.CommandText = @"
+UPDATE invoices SET customer_name=$name,customer_phone=$phone,customer_address=$address,
+ payment_method=$method,payment_bank=$bank,notes=$notes WHERE id=$id;";
+                cmd.Parameters.AddWithValue("$name", invoice.CustomerName.Trim()); cmd.Parameters.AddWithValue("$phone", Db(invoice.CustomerPhone));
+                cmd.Parameters.AddWithValue("$address", Db(invoice.CustomerAddress)); cmd.Parameters.AddWithValue("$method", invoice.PaymentMethod.Trim().ToUpperInvariant());
+                cmd.Parameters.AddWithValue("$bank", Db(invoice.PaymentBank)); cmd.Parameters.AddWithValue("$notes", Db(invoice.Notes)); cmd.Parameters.AddWithValue("$id", invoice.Id);
+                if (cmd.ExecuteNonQuery() != 1) throw new InvalidOperationException("Invoice not found.");
+                WriteAudit(conn, tx, "UPDATE_INVOICE", "invoices", invoice.Id, $"{invoice.InvoiceNumber}; customer={invoice.CustomerName.Trim()}"); tx.Commit();
+            }
+            catch { try { tx.Rollback(); } catch { } throw; }
+        }
+
+        public void DeleteInvoiceRecord(int invoiceId, string reason)
+        {
+            if (!AppSession.IsAdmin) throw new InvalidOperationException("Admin access is required to delete an invoice record.");
+            var invoice = GetInvoice(invoiceId);
+            if (!invoice.Status.Equals("VOID", StringComparison.OrdinalIgnoreCase)) VoidInvoice(invoiceId, reason);
+            using var conn = Database.OpenConnection(); using var tx = conn.BeginTransaction();
+            try
+            {
+                using (var detach = conn.CreateCommand())
+                {
+                    detach.Transaction = tx; detach.CommandText = "UPDATE stock_movements SET invoice_id=NULL WHERE invoice_id=$id;";
+                    detach.Parameters.AddWithValue("$id", invoiceId); detach.ExecuteNonQuery();
+                }
+                using var cmd = conn.CreateCommand(); cmd.Transaction = tx;
+                cmd.CommandText = "DELETE FROM invoices WHERE id=$id;"; cmd.Parameters.AddWithValue("$id", invoiceId);
+                if (cmd.ExecuteNonQuery() != 1) throw new InvalidOperationException("Invoice not found.");
+                WriteAudit(conn, tx, "DELETE_INVOICE_RECORD", "invoices", invoiceId, $"{invoice.InvoiceNumber}; reason={reason}"); tx.Commit();
+            }
+            catch { try { tx.Rollback(); } catch { } throw; }
+        }
+
         public DataTable GetInvoices(string? search = null)
         {
             using var conn = Database.OpenConnection();
