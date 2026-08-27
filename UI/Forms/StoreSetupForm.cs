@@ -8,9 +8,9 @@ namespace Bike_STore_Project
 {
     public sealed class StoreSetupForm : Form
     {
-        private readonly RadioButton _demo = new() { Text = "Try the demo", AutoSize = true };
-        private readonly RadioButton _local = new() { Text = "Use a local database", AutoSize = true };
-        private readonly RadioButton _online = new() { Text = "Connect to an online store", AutoSize = true };
+        private readonly RadioButton _demo = new() { Text = "DEMO\nExplore with sample data" };
+        private readonly RadioButton _local = new() { Text = "LOCAL SQLITE\nKeep data on this computer" };
+        private readonly RadioButton _online = new() { Text = "ONLINE API\nConnect to a deployed store" };
         private readonly TextBox _profileName = Box();
         private readonly TextBox _storeName = Box();
         private readonly TextBox _shortName = Box(100);
@@ -19,10 +19,15 @@ namespace Bike_STore_Project
         private readonly TextBox _invoiceTitle = Box();
         private readonly NumericUpDown _lowStock = new() { Width = 100, Minimum = 0, Maximum = 1000, Value = 5 };
         private readonly ComboBox _culture = new() { Width = 170, DropDownStyle = ComboBoxStyle.DropDownList };
-        private readonly Label _modeHelp = new() { AutoSize = true, MaximumSize = new Size(550, 0), ForeColor = UiTheme.Muted };
-        private readonly Button _save = new() { Text = "Save and continue", Width = 145, Height = 36 };
-        private readonly Button _test = new() { Text = "Test connection", Width = 125, Height = 36 };
-        private readonly Button _resetDemo = new() { Text = "Reset demo data", Width = 125, Height = 36 };
+        private readonly Label _modeHelp = new() { AutoSize = true, Dock = DockStyle.Fill, Tag = "muted" };
+        private readonly Label _connectionTitle = new() { AutoSize = true, Font = new Font("Segoe UI Semibold", 11F) };
+        private readonly Label _securityNote = new() { AutoSize = true, Dock = DockStyle.Fill, Tag = "muted" };
+        private readonly Button _save = new() { Text = "Save and continue", Width = 160, Height = 40, Tag = "primary" };
+        private readonly Button _test = new() { Text = "Check connection", Width = 140, Height = 38 };
+        private readonly Button _resetDemo = new() { Text = "Reset demo database", Width = 155, Height = 38 };
+        private TableLayoutPanel _connectionFields = null!;
+        private int _sqliteRow;
+        private int _onlineRow;
         private readonly StoreProfile _initial;
         private bool _filling;
 
@@ -34,54 +39,129 @@ namespace Bike_STore_Project
             SelectedProfile = _initial;
             Text = current == null ? "Set up Bike Store Desktop" : "Store connection settings";
             StartPosition = FormStartPosition.CenterScreen;
-            ClientSize = new Size(720, 650);
-            MinimumSize = new Size(680, 610);
+            ClientSize = new Size(940, 720);
+            MinimumSize = new Size(760, 620);
             AutoScaleMode = AutoScaleMode.Dpi;
+            BackColor = UiTheme.Canvas;
+            _save.Text = current == null ? "Save and continue" : "Save changes";
             Build();
             _filling = true;
             Fill(_initial);
             _filling = false;
             UpdateMode();
             UiTheme.Apply(this);
+            StylePrimaryButton(_save);
+            StyleModeButtons();
         }
 
         private void Build()
         {
-            var root = new TableLayoutPanel { Dock = DockStyle.Fill, Padding = new Padding(34), ColumnCount = 1, AutoScroll = true };
-            root.Controls.Add(new Label { Text = "Choose how this app stores data", AutoSize = true, Font = new Font("Segoe UI Semibold", 18F), ForeColor = UiTheme.Text });
-            root.Controls.Add(new Label { Text = "Use safe sample data, keep a database on this computer, or connect to a store's Cloudflare API.", AutoSize = true, MaximumSize = new Size(610, 0), ForeColor = UiTheme.Muted, Margin = new Padding(0, 4, 0, 18) });
-
-            var modes = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.TopDown, WrapContents = false, Margin = new Padding(0, 0, 0, 8) };
-            modes.Controls.Add(_demo); modes.Controls.Add(_local); modes.Controls.Add(_online); root.Controls.Add(modes);
-            root.Controls.Add(_modeHelp);
-
-            var fields = new TableLayoutPanel { AutoSize = true, ColumnCount = 2, Margin = new Padding(0, 18, 0, 0) };
-            fields.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 155)); fields.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            Add(fields, "Profile name", _profileName);
-            Add(fields, "Store name", _storeName);
-            Add(fields, "Short name", _shortName);
-            Add(fields, "Language / currency", _culture);
-            Add(fields, "Invoice title", _invoiceTitle);
-            Add(fields, "Low-stock level", _lowStock);
-            var dbPanel = new FlowLayoutPanel { AutoSize = true, WrapContents = false };
-            var browse = new Button { Text = "Browse…", Width = 86, Height = 28 };
-            browse.Click += (_, __) => BrowseDatabase(); dbPanel.Controls.Add(_databasePath); dbPanel.Controls.Add(browse);
-            Add(fields, "SQLite file", dbPanel);
-            Add(fields, "Online store URL", _apiUrl);
-            root.Controls.Add(fields);
-
-            var note = new Label
+            var root = new TableLayoutPanel
             {
-                Text = "The desktop app only stores the server address. Cloudflare/D1 credentials are never placed in this file; online access uses the normal store login.",
-                AutoSize = true, MaximumSize = new Size(610, 0), ForeColor = UiTheme.Muted, Margin = new Padding(0, 18, 0, 12)
+                Dock = DockStyle.Fill,
+                Padding = new Padding(30, 26, 30, 22),
+                ColumnCount = 1,
+                RowCount = 4,
+                BackColor = UiTheme.Canvas
             };
-            root.Controls.Add(note);
+            root.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+            root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
-            var actions = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.RightToLeft, Dock = DockStyle.Top };
-            var cancel = new Button { Text = "Cancel", Width = 90, Height = 36, DialogResult = DialogResult.Cancel };
-            _save.Click += (_, __) => SaveProfile(); _test.Click += async (_, __) => await TestAsync(); _resetDemo.Click += (_, __) => ResetDemo();
-            actions.Controls.Add(_save); actions.Controls.Add(cancel); actions.Controls.Add(_test); actions.Controls.Add(_resetDemo); root.Controls.Add(actions);
-            Controls.Add(root); CancelButton = cancel;
+            var header = new TableLayoutPanel { Dock = DockStyle.Top, AutoSize = true, ColumnCount = 1, Margin = new Padding(0, 0, 0, 18) };
+            header.Controls.Add(new Label { Text = "STORE PROFILE", AutoSize = true, Tag = "accent", Font = new Font("Segoe UI Semibold", 8F) });
+            header.Controls.Add(new Label { Text = "Set up your Bike Store workspace", AutoSize = true, Font = new Font("Segoe UI Semibold", 20F), Margin = new Padding(0, 3, 0, 0) });
+            header.Controls.Add(new Label
+            {
+                Text = "Choose where this profile keeps its data. You can change the connection later from Store settings.",
+                AutoSize = true,
+                Dock = DockStyle.Fill,
+                Tag = "muted",
+                Margin = new Padding(0, 5, 0, 0)
+            });
+            root.Controls.Add(header, 0, 0);
+
+            var modeSection = new TableLayoutPanel { Dock = DockStyle.Top, AutoSize = true, ColumnCount = 1, Margin = new Padding(0, 0, 0, 18) };
+            modeSection.Controls.Add(new Label { Text = "1. Choose a data source", AutoSize = true, Font = new Font("Segoe UI Semibold", 11F), Margin = new Padding(0, 0, 0, 8) });
+            var modes = new TableLayoutPanel { Dock = DockStyle.Top, Height = 88, ColumnCount = 3, Margin = new Padding(0) };
+            modes.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.333F));
+            modes.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.333F));
+            modes.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.334F));
+            ConfigureModeButton(_demo, new Padding(0, 0, 7, 0));
+            ConfigureModeButton(_local, new Padding(7, 0, 7, 0));
+            ConfigureModeButton(_online, new Padding(7, 0, 0, 0));
+            modes.Controls.Add(_demo, 0, 0); modes.Controls.Add(_local, 1, 0); modes.Controls.Add(_online, 2, 0);
+            modeSection.Controls.Add(modes);
+            var helpPanel = new TableLayoutPanel { Dock = DockStyle.Top, AutoSize = true, ColumnCount = 1, BackColor = Color.FromArgb(235, 244, 248), Padding = new Padding(13, 10, 13, 8), Margin = new Padding(0, 8, 0, 0) };
+            helpPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            helpPanel.Controls.Add(_modeHelp, 0, 0);
+            modeSection.Controls.Add(helpPanel);
+            root.Controls.Add(modeSection, 0, 1);
+
+            var scroll = new Panel { Dock = DockStyle.Fill, AutoScroll = true, Margin = new Padding(0), Padding = new Padding(0, 0, 8, 0) };
+            var content = new TableLayoutPanel { Dock = DockStyle.Top, AutoSize = true, ColumnCount = 1, Margin = new Padding(0) };
+            content.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+
+            var identity = CreateCard();
+            var identityLayout = CreateCardLayout();
+            var identityTitle = new Label { Text = "2. Store details", AutoSize = true, Font = new Font("Segoe UI Semibold", 11F), Margin = new Padding(0, 0, 0, 5) };
+            var identityHelp = new Label { Text = "These names appear in the app and on printed documents.", AutoSize = true, Dock = DockStyle.Fill, Tag = "muted", Margin = new Padding(0, 0, 0, 14) };
+            identityLayout.Controls.Add(identityTitle, 0, 0);
+            identityLayout.SetColumnSpan(identityTitle, 2);
+            identityLayout.Controls.Add(identityHelp, 0, 1);
+            identityLayout.SetColumnSpan(identityHelp, 2);
+            Add(identityLayout, "Profile name", _profileName);
+            Add(identityLayout, "Store name", _storeName);
+            _shortName.Dock = DockStyle.Left;
+            Add(identityLayout, "Short name", _shortName);
+            _culture.Dock = DockStyle.Left;
+            Add(identityLayout, "Language / currency", _culture);
+            Add(identityLayout, "Invoice title", _invoiceTitle);
+            _lowStock.Dock = DockStyle.Left;
+            Add(identityLayout, "Low-stock warning", _lowStock);
+            identity.Controls.Add(identityLayout);
+            content.Controls.Add(identity);
+
+            var connection = CreateCard();
+            connection.Margin = new Padding(0, 14, 0, 0);
+            _connectionFields = CreateCardLayout();
+            _connectionFields.Controls.Add(_connectionTitle, 0, 0);
+            _connectionFields.SetColumnSpan(_connectionTitle, 2);
+            _connectionFields.Controls.Add(_securityNote, 0, 1);
+            _connectionFields.SetColumnSpan(_securityNote, 2);
+
+            var databaseEditor = new TableLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, ColumnCount = 2, Tag = "card", Margin = new Padding(0) };
+            databaseEditor.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            databaseEditor.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+            _databasePath.Dock = DockStyle.Fill;
+            var browse = new Button { Text = "Browse…", Width = 90, Height = 30, Margin = new Padding(8, 0, 0, 0) };
+            browse.Click += (_, __) => BrowseDatabase();
+            databaseEditor.Controls.Add(_databasePath, 0, 0); databaseEditor.Controls.Add(browse, 1, 0);
+            _sqliteRow = Add(_connectionFields, "SQLite file", databaseEditor);
+            _onlineRow = Add(_connectionFields, "Store API URL", _apiUrl);
+            connection.Controls.Add(_connectionFields);
+            content.Controls.Add(connection);
+            scroll.Controls.Add(content);
+            root.Controls.Add(scroll, 0, 2);
+
+            var footer = new TableLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, ColumnCount = 2, Margin = new Padding(0, 18, 0, 0) };
+            footer.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            footer.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+            var secondaryActions = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, WrapContents = false, Margin = new Padding(0) };
+            secondaryActions.Controls.Add(_resetDemo); secondaryActions.Controls.Add(_test);
+            var mainActions = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.LeftToRight, WrapContents = false, Margin = new Padding(0) };
+            var cancel = new Button { Text = "Cancel", Width = 92, Height = 40, DialogResult = DialogResult.Cancel, Margin = new Padding(0, 0, 8, 0) };
+            mainActions.Controls.Add(cancel); mainActions.Controls.Add(_save);
+            footer.Controls.Add(secondaryActions, 0, 0); footer.Controls.Add(mainActions, 1, 0);
+            root.Controls.Add(footer, 0, 3);
+
+            _save.Click += (_, __) => SaveProfile();
+            _test.Click += async (_, __) => await TestAsync();
+            _resetDemo.Click += (_, __) => ResetDemo();
+            Controls.Add(root);
+            CancelButton = cancel;
 
             _culture.Items.Add(new CultureChoice("Bahasa Indonesia / IDR", "id-ID", "IDR"));
             _culture.Items.Add(new CultureChoice("English (Australia) / AUD", "en-AU", "AUD"));
@@ -130,15 +210,22 @@ namespace Bike_STore_Project
                 _databasePath.Text = AppPaths.LocalDatabasePath;
             if (_demo.Checked) _databasePath.Text = AppPaths.DemoDatabasePath;
             if (_online.Checked && string.IsNullOrWhiteSpace(_apiUrl.Text)) _apiUrl.Text = StoreProfile.CreateCvNiaga().ApiBaseUrl;
-            _databasePath.Enabled = _local.Checked;
-            _apiUrl.Enabled = _online.Checked;
+            SetRowVisible(_connectionFields, _sqliteRow, _local.Checked);
+            SetRowVisible(_connectionFields, _onlineRow, _online.Checked);
             _test.Visible = _online.Checked;
             _resetDemo.Visible = _demo.Checked && File.Exists(AppPaths.DemoDatabasePath);
-            _modeHelp.Text = _demo.Checked
-                ? "A resettable, local SQLite playground. It never connects to real company data."
+            _connectionTitle.Text = _demo.Checked ? "3. Demo storage" : _local.Checked ? "3. Local database" : "3. Online connection";
+            _securityNote.Text = _demo.Checked
+                ? "No connection details are required. Demo data is stored separately and can be reset at any time."
                 : _local.Checked
-                    ? "A persistent SQLite file for a single computer or offline store."
-                    : "Uses the store's HTTPS API. For CV Niaga Bersama this API is backed by Cloudflare Workers and D1.";
+                    ? "Choose one SQLite file for this profile. The app verifies that the folder and database can be opened before saving."
+                    : "Only the HTTPS server address is saved here. Cloudflare/D1 credentials remain on the server; users sign in normally.";
+            _modeHelp.Text = _demo.Checked
+                ? "Best for exploring: safe sample data, stored locally, with no production connection."
+                : _local.Checked
+                    ? "Best for one computer or an offline store: persistent data in a SQLite file you control."
+                    : "Best for a deployed store: the desktop app uses an authenticated HTTPS API backed by Cloudflare Workers and D1.";
+            StyleModeButtons();
         }
 
         private StoreProfile BuildProfile()
@@ -187,7 +274,7 @@ namespace Bike_STore_Project
                 MessageBox.Show("The online store API is reachable.", "Connection successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex) { MessageBox.Show(ex.Message, "Connection failed", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
-            finally { _test.Enabled = true; _test.Text = "Test connection"; }
+            finally { _test.Enabled = true; _test.Text = "Check connection"; }
         }
 
         private void BrowseDatabase()
@@ -223,11 +310,77 @@ namespace Bike_STore_Project
             try { return Path.GetFullPath(left).Equals(Path.GetFullPath(right), StringComparison.OrdinalIgnoreCase); }
             catch { return false; }
         }
-        private static TextBox Box(int width = 360) => new() { Width = width };
-        private static void Add(TableLayoutPanel table, string label, Control control)
+        private static TextBox Box(int width = 360) => new() { Width = width, Dock = DockStyle.Fill };
+        private static int Add(TableLayoutPanel table, string label, Control control)
         {
             var row = table.RowCount++; table.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-            table.Controls.Add(new Label { Text = label, AutoSize = true, Padding = new Padding(0, 7, 0, 0) }, 0, row); table.Controls.Add(control, 1, row);
+            table.Controls.Add(new Label { Text = label, AutoSize = true, Padding = new Padding(0, 7, 0, 0), Margin = new Padding(0, 4, 12, 8) }, 0, row);
+            control.Margin = new Padding(0, 4, 0, 8);
+            table.Controls.Add(control, 1, row);
+            return row;
+        }
+        private static Panel CreateCard()
+        {
+            return new Panel
+            {
+                Dock = DockStyle.Top,
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                BackColor = UiTheme.Card,
+                BorderStyle = BorderStyle.FixedSingle,
+                Padding = new Padding(22),
+                Tag = "card",
+                Margin = new Padding(0)
+            };
+        }
+        private static TableLayoutPanel CreateCardLayout()
+        {
+            var table = new TableLayoutPanel { Dock = DockStyle.Top, AutoSize = true, ColumnCount = 2, RowCount = 2, Tag = "card", Margin = new Padding(0) };
+            table.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 175));
+            table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            table.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            table.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            return table;
+        }
+        private static void ConfigureModeButton(RadioButton button, Padding margin)
+        {
+            button.Appearance = Appearance.Button;
+            button.AutoSize = false;
+            button.Dock = DockStyle.Fill;
+            button.Margin = margin;
+            button.Padding = new Padding(18, 12, 12, 10);
+            button.TextAlign = ContentAlignment.MiddleLeft;
+            button.Font = new Font("Segoe UI Semibold", 9.5F);
+            button.FlatStyle = FlatStyle.Flat;
+            button.Cursor = Cursors.Hand;
+        }
+        private void StyleModeButtons()
+        {
+            foreach (var button in new[] { _demo, _local, _online })
+            {
+                var selected = button.Checked;
+                button.BackColor = selected ? Color.FromArgb(229, 241, 247) : UiTheme.Card;
+                button.ForeColor = selected ? UiTheme.Accent : UiTheme.Text;
+                button.FlatAppearance.BorderColor = selected ? UiTheme.Accent : UiTheme.Border;
+                button.FlatAppearance.BorderSize = selected ? 2 : 1;
+                button.FlatAppearance.CheckedBackColor = Color.FromArgb(229, 241, 247);
+            }
+        }
+        private static void StylePrimaryButton(Button button)
+        {
+            button.FlatStyle = FlatStyle.Flat;
+            button.FlatAppearance.BorderSize = 0;
+            button.BackColor = UiTheme.Sidebar;
+            button.ForeColor = Color.White;
+            button.Cursor = Cursors.Hand;
+            button.Padding = new Padding(10, 0, 10, 0);
+        }
+        private static void SetRowVisible(TableLayoutPanel table, int row, bool visible)
+        {
+            foreach (Control control in table.Controls)
+                if (table.GetRow(control) == row) control.Visible = visible;
+            table.RowStyles[row].SizeType = visible ? SizeType.AutoSize : SizeType.Absolute;
+            table.RowStyles[row].Height = 0;
         }
         private sealed record CultureChoice(string Label, string Culture, string Currency) { public override string ToString() => Label; }
     }
