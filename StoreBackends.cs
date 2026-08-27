@@ -202,7 +202,7 @@ namespace Bike_STore_Project
             return request;
         }
 
-        private async Task<T> GetAsync<T>(string path, CancellationToken cancellationToken)
+        private async Task<T> GetAsync<T>(string path, CancellationToken cancellationToken) where T : class
         {
             using var request = Authorized(HttpMethod.Get, path);
             using var response = await _http.SendAsync(request, cancellationToken);
