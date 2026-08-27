@@ -33,7 +33,7 @@
             // 
             tableRoot.ColumnCount = 2;
             tableRoot.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableRoot.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 220F));
+            tableRoot.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 210F));
             tableRoot.Controls.Add(dataGridViewUsers, 0, 0);
             tableRoot.Controls.Add(panelButtons, 1, 0);
             tableRoot.Dock = DockStyle.Fill;
@@ -85,7 +85,7 @@
             btnAddUser.Name = "btnAddUser";
             btnAddUser.Size = new Size(190, 36);
             btnAddUser.TabIndex = 0;
-            btnAddUser.Text = "Add User";
+            btnAddUser.Text = "Add user";
             btnAddUser.UseVisualStyleBackColor = true;
             // 
             // btnResetPassword
@@ -94,7 +94,7 @@
             btnResetPassword.Name = "btnResetPassword";
             btnResetPassword.Size = new Size(190, 36);
             btnResetPassword.TabIndex = 1;
-            btnResetPassword.Text = "Reset Password";
+            btnResetPassword.Text = "Reset password";
             btnResetPassword.UseVisualStyleBackColor = true;
             // 
             // btnToggleActive
@@ -103,7 +103,7 @@
             btnToggleActive.Name = "btnToggleActive";
             btnToggleActive.Size = new Size(190, 36);
             btnToggleActive.TabIndex = 2;
-            btnToggleActive.Text = "Enable / Disable";
+            btnToggleActive.Text = "Disable user";
             btnToggleActive.UseVisualStyleBackColor = true;
             // 
             // btnToggleRole
@@ -112,7 +112,7 @@
             btnToggleRole.Name = "btnToggleRole";
             btnToggleRole.Size = new Size(190, 36);
             btnToggleRole.TabIndex = 3;
-            btnToggleRole.Text = "Toggle Role";
+            btnToggleRole.Text = "Make administrator";
             btnToggleRole.UseVisualStyleBackColor = true;
             // 
             // btnDeleteUser
@@ -121,7 +121,7 @@
             btnDeleteUser.Name = "btnDeleteUser";
             btnDeleteUser.Size = new Size(190, 36);
             btnDeleteUser.TabIndex = 4;
-            btnDeleteUser.Text = "Delete User";
+            btnDeleteUser.Text = "Delete user";
             btnDeleteUser.UseVisualStyleBackColor = true;
             // 
             // btnClose
@@ -136,7 +136,7 @@
             // UserManagementForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
-            AutoScaleMode = AutoScaleMode.Font;
+            AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(1000, 600);
             Controls.Add(tableRoot);
             Name = "UserManagementForm";

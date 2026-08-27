@@ -97,17 +97,17 @@
             btnLogin.Name = "btnLogin";
             btnLogin.Size = new Size(260, 32);
             btnLogin.TabIndex = 4;
-            btnLogin.Text = "Login";
+            btnLogin.Text = "Sign in";
             // 
             // LoginForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
-            AutoScaleMode = AutoScaleMode.Font;
+            AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(900, 600);
             Controls.Add(tableRoot);
             Name = "LoginForm";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Login";
+            Text = "Sign in";
             tableRoot.ResumeLayout(false);
             panelLogin.ResumeLayout(false);
             panelLogin.PerformLayout();

@@ -26,7 +26,8 @@ namespace Bike_STore_Project
             var profile = AppServices.Profile;
             Text = $"{profile.StoreName} — Sign in";
             BackColor = UiTheme.Canvas;
-            MinimumSize = new Size(900, 620);
+            MinimumSize = new Size(620, 480);
+            AutoScaleMode = AutoScaleMode.Dpi;
             tableRoot.BackColor = UiTheme.Canvas;
             panelLogin.Size = new Size(430, 365);
             panelLogin.Padding = new Padding(40);
@@ -81,7 +82,7 @@ namespace Bike_STore_Project
             }
             finally
             {
-                btnLogin.Enabled = true; btnLogin.Text = "Login";
+                btnLogin.Enabled = true; btnLogin.Text = "Sign in";
             }
         }
     }

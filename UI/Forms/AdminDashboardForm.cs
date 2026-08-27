@@ -24,7 +24,7 @@ namespace Bike_STore_Project
         {
             Text = $"{AppServices.Profile.StoreName} — Desktop Admin";
             WindowState = FormWindowState.Maximized;
-            MinimumSize = new Size(1100, 700);
+            MinimumSize = new Size(900, 600);
             AutoScaleMode = AutoScaleMode.Dpi;
             BackColor = UiTheme.Canvas;
 
@@ -43,6 +43,7 @@ namespace Bike_STore_Project
             Controls.Add(_sidebar);
             RebuildNavigation();
             UpdateSessionLabels();
+            Resize += (_, __) => UpdateResponsiveShell();
             Shown += (_, __) => ShowPage("dashboard");
             FormClosed += (_, __) => _currentPage?.Dispose();
         }
@@ -162,9 +163,19 @@ namespace Bike_STore_Project
         private static Control Embed(Form form)
         {
             form.WindowState = FormWindowState.Normal; form.TopLevel = false; form.FormBorderStyle = FormBorderStyle.None;
+            form.MinimumSize = Size.Empty; form.MaximumSize = Size.Empty;
             form.Dock = DockStyle.Fill; form.AutoScaleMode = AutoScaleMode.Dpi;
             HideLegacyChrome(form);
             form.Show(); return form;
+        }
+
+        private void UpdateResponsiveShell()
+        {
+            var compact = ClientSize.Width < 1200;
+            _sidebar.Width = compact ? 190 : 230;
+            _nav.Padding = new Padding(compact ? 8 : 12);
+            var width = Math.Max(140, _sidebar.ClientSize.Width - _nav.Padding.Horizontal - 2);
+            foreach (Control control in _nav.Controls) control.Width = width;
         }
 
         private static void HideLegacyChrome(Control root)

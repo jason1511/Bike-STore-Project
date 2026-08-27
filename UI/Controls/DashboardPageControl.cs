@@ -22,7 +22,7 @@ namespace Bike_STore_Project
             Dock = DockStyle.Fill;
             BackColor = UiTheme.Canvas;
             Padding = new Padding(20);
-            var root = new TableLayoutPanel { Dock = DockStyle.Fill, RowCount = 4, ColumnCount = 1 };
+            var root = new TableLayoutPanel { Dock = DockStyle.Fill, RowCount = 4, ColumnCount = 1, AutoScroll = true };
             root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             root.RowStyles.Add(new RowStyle(SizeType.Absolute, 126));
             root.RowStyles.Add(new RowStyle(SizeType.Percent, 45));
@@ -40,21 +40,58 @@ namespace Bike_STore_Project
             var charts = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, Padding = new Padding(0, 8, 0, 8) };
             charts.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
             charts.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
-            charts.Controls.Add(CardWithTitle("Sales — last 7 days", _salesChart), 0, 0);
-            charts.Controls.Add(CardWithTitle("Stock movement — last 7 days", _stockChart), 1, 0);
+            var salesCard = CardWithTitle("Sales — last 7 days", _salesChart);
+            var stockCard = CardWithTitle("Stock movement — last 7 days", _stockChart);
+            charts.Controls.Add(salesCard, 0, 0);
+            charts.Controls.Add(stockCard, 1, 0);
 
             var recent = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, Padding = new Padding(0, 4, 0, 0) };
             recent.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 55));
             recent.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 45));
-            recent.Controls.Add(CardWithTitle("Recent invoices", _invoices), 0, 0);
-            recent.Controls.Add(CardWithTitle("Open services", _services), 1, 0);
+            var invoiceCard = CardWithTitle("Recent invoices", _invoices);
+            var serviceCard = CardWithTitle("Open services", _services);
+            recent.Controls.Add(invoiceCard, 0, 0);
+            recent.Controls.Add(serviceCard, 1, 0);
 
             root.Controls.Add(quick, 0, 0);
             root.Controls.Add(_metrics, 0, 1);
             root.Controls.Add(charts, 0, 2);
             root.Controls.Add(recent, 0, 3);
             Controls.Add(root);
+            void ArrangeResponsiveCards()
+            {
+                var stacked = ClientSize.Width < 820;
+                ConfigureCards(charts, salesCard, stockCard, stacked);
+                ConfigureCards(recent, invoiceCard, serviceCard, stacked);
+                root.AutoScrollMinSize = new Size(0, stacked ? 920 : 580);
+            }
+            SizeChanged += (_, __) => ArrangeResponsiveCards();
+            ArrangeResponsiveCards();
             Load += (_, __) => RefreshDashboard();
+        }
+
+        private static void ConfigureCards(TableLayoutPanel table, Control first, Control second, bool stacked)
+        {
+            table.SuspendLayout();
+            table.ColumnStyles.Clear(); table.RowStyles.Clear();
+            table.ColumnCount = stacked ? 1 : 2; table.RowCount = stacked ? 2 : 1;
+            if (stacked)
+            {
+                table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+                table.RowStyles.Add(new RowStyle(SizeType.Percent, 50));
+                table.RowStyles.Add(new RowStyle(SizeType.Percent, 50));
+                table.SetCellPosition(first, new TableLayoutPanelCellPosition(0, 0));
+                table.SetCellPosition(second, new TableLayoutPanelCellPosition(0, 1));
+            }
+            else
+            {
+                table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+                table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+                table.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+                table.SetCellPosition(first, new TableLayoutPanelCellPosition(0, 0));
+                table.SetCellPosition(second, new TableLayoutPanelCellPosition(1, 0));
+            }
+            table.ResumeLayout();
         }
 
         public void RefreshDashboard()

@@ -27,25 +27,26 @@ namespace Bike_STore_Project
         private readonly ComboBox _payment = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 135 };
         private readonly ComboBox _bank = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 110 };
         private readonly Label _total = new() { AutoSize = true, Font = new Font("Segoe UI", 12, FontStyle.Bold) };
-        private readonly FlowLayoutPanel _historyMetrics = new() { Dock = DockStyle.Fill, AutoSize = true, WrapContents = false };
+        private readonly FlowLayoutPanel _historyMetrics = new() { Dock = DockStyle.Fill, AutoSize = true, WrapContents = true };
         private InvoiceHeader? _printInvoice;
 
         public InvoiceManagementForm()
         {
             Text = $"Bike Store - Invoices - {AppSession.Username} ({AppSession.Role})";
             WindowState = FormWindowState.Maximized;
-            MinimumSize = new Size(1100, 700);
+            MinimumSize = new Size(700, 500);
+            AutoScaleMode = AutoScaleMode.Dpi;
 
             var tabs = new TabControl { Dock = DockStyle.Fill };
             tabs.TabPages.Add(BuildCreateTab());
             tabs.TabPages.Add(BuildHistoryTab());
             Controls.Add(tabs);
 
-            _payment.Items.AddRange(new object[] { "CASH", "BANK TRANSFER" });
+            _payment.Items.AddRange(new object[] { "Cash", "Bank transfer" });
             _payment.SelectedIndex = 0;
-            _bank.Items.AddRange(new object[] { "", "BRI", "BNI", "BCA", "OTHER" });
+            _bank.Items.AddRange(new object[] { "", "BRI", "BNI", "BCA", "Other" });
             _bank.SelectedIndex = 0;
-            _payment.SelectedIndexChanged += (_, __) => _bank.Enabled = _payment.Text == "BANK TRANSFER";
+            _payment.SelectedIndexChanged += (_, __) => _bank.Enabled = _payment.Text.Equals("Bank transfer", StringComparison.OrdinalIgnoreCase);
             _bank.Enabled = false;
 
             _items.AutoGenerateColumns = true;
@@ -58,14 +59,14 @@ namespace Bike_STore_Project
 
         private TabPage BuildCreateTab()
         {
-            var tab = new TabPage("New Invoice");
+            var tab = new TabPage("New invoice");
             var root = new TableLayoutPanel { Dock = DockStyle.Fill, RowCount = 4, ColumnCount = 1, Padding = new Padding(12) };
             root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             root.RowStyles.Add(new RowStyle(SizeType.Percent, 48));
             root.RowStyles.Add(new RowStyle(SizeType.Percent, 40));
             root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
-            var customerPanel = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, WrapContents = true };
+            var customerPanel = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, WrapContents = true, AutoScroll = true };
             AddField(customerPanel, "Customer *", _customer);
             AddField(customerPanel, "Phone", _phone);
             AddField(customerPanel, "Address", _address);
@@ -103,7 +104,7 @@ namespace Bike_STore_Project
             cartPanel.Controls.Add(cartActions, 0, 1);
 
             var savePanel = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, FlowDirection = FlowDirection.RightToLeft };
-            var save = new Button { Text = "Save & print invoice", Width = 180, Height = 40 };
+            var save = new Button { Text = "Save and print invoice", Width = 185, Height = 40 };
             save.Click += (_, __) => SaveInvoice(print: true);
             var saveOnly = new Button { Text = "Save invoice", Width = 130, Height = 40 };
             saveOnly.Click += (_, __) => SaveInvoice(print: false);
@@ -120,23 +121,23 @@ namespace Bike_STore_Project
 
         private TabPage BuildHistoryTab()
         {
-            var tab = new TabPage("Invoice History");
+            var tab = new TabPage("Invoice history");
             var root = new TableLayoutPanel { Dock = DockStyle.Fill, RowCount = 3, Padding = new Padding(12) };
             root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             root.RowStyles.Add(new RowStyle(SizeType.Absolute, 92));
             root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-            var actions = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true };
+            var actions = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, AutoScroll = true, WrapContents = true };
             actions.Controls.Add(new Label { Text = "Search", AutoSize = true, Padding = new Padding(0, 7, 0, 0) });
             actions.Controls.Add(_search);
             var refresh = new Button { Text = "Refresh" };
             refresh.Click += (_, __) => LoadHistory();
-            var print = new Button { Text = "Print selected" };
+            var print = new Button { Text = "Print invoice" };
             print.Click += (_, __) => PrintSelected();
             var edit = new Button { Text = "Edit details", Enabled = AppSession.IsAdmin };
             edit.Click += (_, __) => EditSelected();
-            var voidButton = new Button { Text = "Void & restore stock", Enabled = AppSession.IsAdmin, AutoSize = true };
+            var voidButton = new Button { Text = "Void and restore stock", Enabled = AppSession.IsAdmin, AutoSize = true };
             voidButton.Click += (_, __) => VoidSelected();
-            var delete = new Button { Text = "Delete record", Enabled = AppSession.IsAdmin };
+            var delete = new Button { Text = "Delete invoice", Enabled = AppSession.IsAdmin };
             delete.Click += (_, __) => DeleteSelected();
             actions.Controls.Add(refresh);
             actions.Controls.Add(print);
@@ -258,7 +259,7 @@ namespace Bike_STore_Project
             try
             {
                 var number = _repo.CreateInvoice(_customer.Text, _phone.Text, _address.Text,
-                    _payment.Text, _bank.Text, _notes.Text, _cart.ToList());
+                    _payment.Text.ToUpperInvariant(), _bank.Text.ToUpperInvariant(), _notes.Text, _cart.ToList());
                 MessageBox.Show($"Invoice {number} saved.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 _printInvoice = _repo.GetInvoice(FindInvoiceId(number));
                 if (print) ShowPrintPreview();
@@ -415,12 +416,14 @@ namespace Bike_STore_Project
         public InvoiceMetadataDialog(InvoiceHeader invoice)
         {
             _invoice = invoice; Text = $"Edit {invoice.InvoiceNumber}"; StartPosition = FormStartPosition.CenterParent;
-            ClientSize = new Size(510, 430); FormBorderStyle = FormBorderStyle.FixedDialog; MaximizeBox = false; MinimizeBox = false;
-            _payment.Items.AddRange(new object[] { "CASH", "BANK TRANSFER" });
-            _bank.Items.AddRange(new object[] { "", "BRI", "BNI", "BCA", "OTHER" });
+            ClientSize = new Size(510, 430); MinimumSize = new Size(460, 380); FormBorderStyle = FormBorderStyle.Sizable; MinimizeBox = false; AutoScaleMode = AutoScaleMode.Dpi;
+            _payment.Items.AddRange(new object[] { "Cash", "Bank transfer" });
+            _bank.Items.AddRange(new object[] { "", "BRI", "BNI", "BCA", "Other" });
             _name.Text = invoice.CustomerName; _phone.Text = invoice.CustomerPhone; _address.Text = invoice.CustomerAddress;
-            _notes.Text = invoice.Notes; _payment.SelectedItem = invoice.PaymentMethod; if (_payment.SelectedIndex < 0) _payment.SelectedIndex = 0;
-            _bank.SelectedItem = invoice.PaymentBank; if (_bank.SelectedIndex < 0) _bank.SelectedIndex = 0;
+            _notes.Text = invoice.Notes; SelectIgnoringCase(_payment, invoice.PaymentMethod); if (_payment.SelectedIndex < 0) _payment.SelectedIndex = 0;
+            SelectIgnoringCase(_bank, invoice.PaymentBank); if (_bank.SelectedIndex < 0) _bank.SelectedIndex = 0;
+            void UpdateBankState() => _bank.Enabled = _payment.Text.Equals("Bank transfer", StringComparison.OrdinalIgnoreCase);
+            _payment.SelectedIndexChanged += (_, __) => UpdateBankState(); UpdateBankState();
 
             var table = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, Padding = new Padding(20), AutoScroll = true };
             table.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 145)); table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
@@ -433,7 +436,7 @@ namespace Bike_STore_Project
             {
                 if (string.IsNullOrWhiteSpace(_name.Text)) { MessageBox.Show("Customer name is required."); DialogResult = DialogResult.None; return; }
                 _invoice.CustomerName = _name.Text.Trim(); _invoice.CustomerPhone = _phone.Text.Trim(); _invoice.CustomerAddress = _address.Text.Trim();
-                _invoice.PaymentMethod = _payment.Text; _invoice.PaymentBank = _bank.Text; _invoice.Notes = _notes.Text.Trim();
+                _invoice.PaymentMethod = _payment.Text.ToUpperInvariant(); _invoice.PaymentBank = _bank.Text.ToUpperInvariant(); _invoice.Notes = _notes.Text.Trim();
             };
             actions.Controls.Add(save); actions.Controls.Add(cancel); Add(table, "", actions);
             Controls.Add(table); AcceptButton = save; CancelButton = cancel; UiTheme.Apply(this);
@@ -444,6 +447,13 @@ namespace Bike_STore_Project
             var row = table.RowCount++; table.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             table.Controls.Add(new Label { Text = label, AutoSize = true, Padding = new Padding(0, 7, 0, 0) }, 0, row);
             table.Controls.Add(control, 1, row);
+        }
+
+        private static void SelectIgnoringCase(ComboBox combo, string value)
+        {
+            for (var i = 0; i < combo.Items.Count; i++)
+                if (string.Equals(combo.Items[i]?.ToString(), value, StringComparison.OrdinalIgnoreCase))
+                { combo.SelectedIndex = i; return; }
         }
     }
 }

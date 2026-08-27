@@ -14,20 +14,22 @@ namespace Bike_STore_Project
         public InventoryForm()
         {
             InitializeComponent(); SetupGrid();
-            btnAdd.Text = "ADD BIKE"; btnEdit.Text = "EDIT BIKE"; btnDelete.Text = "DEACTIVATE";
-            btnReceiveStock.Text = "TAMBAH STOK"; btnReceiveStock.Visible = true; btnReceiveStock.Width = 150;
+            btnAdd.Text = "Add bicycle"; btnEdit.Text = "Edit selected"; btnDelete.Text = "Deactivate";
+            btnReceiveStock.Text = "Receive stock"; btnReceiveStock.Visible = true; btnReceiveStock.Width = 145;
             Load += async (_, __) => { await LoadDataAsync(); ApplyPermissions(); };
             txtSearch.KeyDown += async (_, e) => { if (e.KeyCode == Keys.Enter) await LoadDataAsync(txtSearch.Text); };
             btnRefresh.Click += async (_, __) => await LoadDataAsync(txtSearch.Text);
             btnAdd.Click += async (_, __) => await AddBikeAsync(); btnEdit.Click += async (_, __) => await EditBikeAsync();
             btnReceiveStock.Click += async (_, __) => await ReceiveStockAsync(); btnDelete.Click += async (_, __) => await ToggleActiveAsync();
             dgvProducts.CellDoubleClick += async (_, __) => { if (Permissions.CanEditInventory) await EditBikeAsync(); };
+            dgvProducts.SelectionChanged += (_, __) => UpdateSelectionActions();
         }
 
         private void ApplyPermissions()
         {
             btnAdd.Enabled = Permissions.CanReceiveInventory; btnEdit.Enabled = Permissions.CanEditInventory;
             btnReceiveStock.Enabled = Permissions.CanReceiveInventory; btnDelete.Enabled = Permissions.CanDeleteInventory;
+            UpdateSelectionActions();
         }
 
         private void SetupGrid()
@@ -52,7 +54,7 @@ namespace Bike_STore_Project
             {
                 UseWaitCursor = true;
                 _bikes = new BindingList<WebsiteBike>((await _backend.GetBikesAsync(search)).ToList());
-                dgvProducts.DataSource = _bikes; UiTheme.StyleGrid(dgvProducts);
+                dgvProducts.DataSource = _bikes; UiTheme.StyleGrid(dgvProducts); UpdateSelectionActions();
             }
             catch(Exception ex){MessageBox.Show("Failed to load bike inventory: "+ex.Message,"Inventory",MessageBoxButtons.OK,MessageBoxIcon.Error);}
             finally { UseWaitCursor = false; }
@@ -95,7 +97,7 @@ namespace Bike_STore_Project
                 using var dialog=new WebsiteReceiveStockDialog(await _backend.GetBikesAsync(),Selected(false)?.Id,_backend.UsesFifoPurchaseCost);
                 if(dialog.ShowDialog(this)!=DialogResult.OK)return;
                 await _backend.ReceiveStockAsync(dialog.BikeId,dialog.ColorName,dialog.ColorHex,dialog.ColorImage,dialog.Quantity,dialog.UnitCost,dialog.ReceivedAt,dialog.Notes);
-                await LoadDataAsync(txtSearch.Text);MessageBox.Show("Stock received and movement recorded.","Tambah Stok",MessageBoxButtons.OK,MessageBoxIcon.Information);
+                await LoadDataAsync(txtSearch.Text);MessageBox.Show("Stock received and movement recorded.","Receive stock",MessageBoxButtons.OK,MessageBoxIcon.Information);
             }
             catch(Exception ex){MessageBox.Show(ex.Message,"Stock not received",MessageBoxButtons.OK,MessageBoxIcon.Warning);}
         }
@@ -105,6 +107,16 @@ namespace Bike_STore_Project
             var bike=Selected();if(bike==null)return;var next=!bike.InStock;
             if(MessageBox.Show($"{(next?"Reactivate":"Deactivate")} {bike.Brand} {bike.Name}?", "Catalogue status",MessageBoxButtons.YesNo,MessageBoxIcon.Question)!=DialogResult.Yes)return;
             try{await _backend.SetBikeActiveAsync(bike.Id,next);await LoadDataAsync(txtSearch.Text);}catch(Exception ex){MessageBox.Show(ex.Message,"Status update failed");}
+        }
+
+        private void UpdateSelectionActions()
+        {
+            var selected = Selected(false);
+            btnEdit.Enabled = Permissions.CanEditInventory && selected != null;
+            btnReceiveStock.Enabled = Permissions.CanReceiveInventory && selected != null;
+            btnDelete.Enabled = Permissions.CanDeleteInventory && selected != null;
+            btnDelete.Text = selected?.InStock == false ? "Reactivate" : "Deactivate";
+            UiTheme.StyleButton(btnDelete, selected?.InStock == true);
         }
     }
 }

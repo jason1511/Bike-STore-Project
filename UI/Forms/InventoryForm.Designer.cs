@@ -83,7 +83,7 @@
             btnAdd.Name = "btnAdd";
             btnAdd.Size = new Size(118, 36);
             btnAdd.TabIndex = 4;
-            btnAdd.Text = "ADD";
+            btnAdd.Text = "Add bicycle";
             btnAdd.UseVisualStyleBackColor = true;
             // 
             // btnEdit
@@ -93,7 +93,7 @@
             btnEdit.Name = "btnEdit";
             btnEdit.Size = new Size(118, 36);
             btnEdit.TabIndex = 5;
-            btnEdit.Text = "EDIT";
+            btnEdit.Text = "Edit selected";
             btnEdit.UseVisualStyleBackColor = true;
             // 
             // btnDelete
@@ -103,7 +103,7 @@
             btnDelete.Name = "btnDelete";
             btnDelete.Size = new Size(118, 36);
             btnDelete.TabIndex = 6;
-            btnDelete.Text = "DELETE";
+            btnDelete.Text = "Deactivate";
             btnDelete.UseVisualStyleBackColor = true;
             // 
             // btnReceiveStock
@@ -113,7 +113,7 @@
             btnReceiveStock.Name = "btnReceiveStock";
             btnReceiveStock.Size = new Size(149, 36);
             btnReceiveStock.TabIndex = 7;
-            btnReceiveStock.Text = "RECEIVE STOCK";
+            btnReceiveStock.Text = "Receive stock";
             btnReceiveStock.UseVisualStyleBackColor = true;
             // 
             // tableLayoutPanel1
@@ -145,6 +145,7 @@
             tlpSearchRow.Controls.Add(txtSearch, 1, 0);
             tlpSearchRow.Controls.Add(btnRefresh, 2, 0);
             tlpSearchRow.Dock = DockStyle.Fill;
+            tlpSearchRow.AutoSize = true;
             tlpSearchRow.Location = new Point(15, 15);
             tlpSearchRow.Name = "tlpSearchRow";
             tlpSearchRow.RowCount = 1;
@@ -155,11 +156,13 @@
             // flpActions
             // 
             flpActions.AutoSize = true;
+            flpActions.AutoScroll = true;
             flpActions.Controls.Add(btnAdd);
             flpActions.Controls.Add(btnEdit);
             flpActions.Controls.Add(btnDelete);
             flpActions.Controls.Add(btnReceiveStock);
             flpActions.Dock = DockStyle.Fill;
+            flpActions.WrapContents = true;
             flpActions.Location = new Point(12, 124);
             flpActions.Margin = new Padding(0, 6, 0, 6);
             flpActions.Name = "flpActions";
@@ -172,7 +175,7 @@
             AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(1000, 562);
             Controls.Add(tableLayoutPanel1);
-            MinimumSize = new Size(900, 520);
+            MinimumSize = new Size(700, 460);
             Name = "InventoryForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Inventory";

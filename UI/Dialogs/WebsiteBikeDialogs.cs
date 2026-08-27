@@ -18,15 +18,15 @@ namespace Bike_STore_Project
 
         public WebsiteBikeEditorDialog(WebsiteBike? bike=null, IReadOnlyList<StoreBrand>? brands=null)
         {
-            _editing=bike!=null;Bike=bike??new WebsiteBike();Text=_editing?$"Edit {bike!.Brand} {bike.Name}":"Tambah Sepeda";
-            StartPosition=FormStartPosition.CenterParent;ClientSize=new Size(900,680);MinimumSize=new Size(820,600);
+            _editing=bike!=null;Bike=bike??new WebsiteBike();Text=_editing?$"Edit {bike!.Brand} {bike.Name}":"Add bicycle";
+            StartPosition=FormStartPosition.CenterParent;ClientSize=new Size(900,680);MinimumSize=new Size(680,520);AutoScaleMode=AutoScaleMode.Dpi;
             _active.Enabled=AppSession.IsAdmin||!_editing;
             BuildColors();LoadBrands(brands ?? Array.Empty<StoreBrand>());BuildLayout();if(_editing)Fill(Bike);UiTheme.Apply(this);
         }
 
         private void BuildLayout()
         {
-            var tabs=new TabControl{Dock=DockStyle.Fill};var details=new TabPage("Bike details");var variants=new TabPage("Colour variants & stock");
+            var tabs=new TabControl{Dock=DockStyle.Fill};var details=new TabPage("Bicycle details");var variants=new TabPage("Colours and stock");
             var table=new TableLayoutPanel{Dock=DockStyle.Fill,ColumnCount=4,Padding=new Padding(18),AutoScroll=true};
             table.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,120));table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,50));table.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,120));table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,50));
             Add(table,"Bike ID",_id,0);Add(table,"Brand *",_brand,0);Add(table,"Model *",_name,0);Add(table,"Selling price",_price,0);
@@ -34,7 +34,7 @@ namespace Bike_STore_Project
             var flags=new FlowLayoutPanel{AutoSize=true};flags.Controls.Add(_featured);flags.Controls.Add(_active);Add(table,"Visibility",flags,2);details.Controls.Add(table);
             var variantRoot=new TableLayoutPanel{Dock=DockStyle.Fill,RowCount=3,Padding=new Padding(16)};variantRoot.RowStyles.Add(new RowStyle(SizeType.AutoSize));variantRoot.RowStyles.Add(new RowStyle(SizeType.Percent,100));variantRoot.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             variantRoot.Controls.Add(new Label{Text="Like the website editor: each colour has its own image and stock quantity. Changing a quantity creates a recorded stock movement.",AutoSize=true,Tag="muted"},0,0);variantRoot.Controls.Add(_colors,0,1);
-            var colorActions=new FlowLayoutPanel{Dock=DockStyle.Fill,AutoSize=true};var add=new Button{Text="+ Add colour",Width=120};var remove=new Button{Text="Remove selected",Width=135};add.Click+=(_,__)=>AddColor();remove.Click+=(_,__)=>RemoveColor();colorActions.Controls.Add(add);colorActions.Controls.Add(remove);variantRoot.Controls.Add(colorActions,0,2);variants.Controls.Add(variantRoot);
+            var colorActions=new FlowLayoutPanel{Dock=DockStyle.Fill,AutoSize=true,WrapContents=true};var add=new Button{Text="Add colour",Width=120};var remove=new Button{Text="Remove selected",Width=135};add.Click+=(_,__)=>AddColor();remove.Click+=(_,__)=>RemoveColor();colorActions.Controls.Add(add);colorActions.Controls.Add(remove);variantRoot.Controls.Add(colorActions,0,2);variants.Controls.Add(variantRoot);
             tabs.TabPages.Add(details);tabs.TabPages.Add(variants);
             var actions=new FlowLayoutPanel{Dock=DockStyle.Bottom,Height=58,FlowDirection=FlowDirection.RightToLeft,Padding=new Padding(12)};var save=new Button{Text="Save bicycle",Width=130,Height=34};var cancel=new Button{Text="Cancel",Width=90,Height=34,DialogResult=DialogResult.Cancel};save.Click+=(_,__)=>Save();actions.Controls.Add(save);actions.Controls.Add(cancel);Controls.Add(tabs);Controls.Add(actions);CancelButton=cancel;
         }
@@ -72,7 +72,7 @@ namespace Bike_STore_Project
         public WebsiteReceiveStockDialog(IReadOnlyList<WebsiteBike> bikes,string? selectedId=null,bool usesPurchaseCost=true)
         {
             _usesPurchaseCost=usesPurchaseCost;
-            Text="Tambah Stok";StartPosition=FormStartPosition.CenterParent;ClientSize=new Size(610,550);FormBorderStyle=FormBorderStyle.FixedDialog;MaximizeBox=false;MinimizeBox=false;
+            Text="Receive stock";StartPosition=FormStartPosition.CenterParent;ClientSize=new Size(610,550);MinimumSize=new Size(520,460);FormBorderStyle=FormBorderStyle.Sizable;MinimizeBox=false;AutoScaleMode=AutoScaleMode.Dpi;
             foreach(var b in bikes)_bike.Items.Add(new BikeChoice(b));if(_bike.Items.Count>0)_bike.SelectedIndex=0;if(!string.IsNullOrWhiteSpace(selectedId))for(var i=0;i<_bike.Items.Count;i++)if(_bike.Items[i] is BikeChoice x&&x.Bike.Id==selectedId)_bike.SelectedIndex=i;
             Build();_bike.SelectedIndexChanged+=(_,__)=>LoadColors();_color.SelectedIndexChanged+=(_,__)=>UpdateNewColourFields();_quantity.ValueChanged+=(_,__)=>UpdateSummary();LoadColors();UiTheme.Apply(this);
         }

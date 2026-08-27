@@ -35,6 +35,7 @@ namespace Bike_STore_Project
             btnToggleRole.Click += (_, __) => ToggleRole();
             btnDeleteUser.Click += (_, __) => DeleteUser();
             btnClose.Click += (_, __) => Close();
+            dataGridViewUsers.SelectionChanged += (_, __) => UpdateSelectionActions();
         }
 
         private void SetupGrid()
@@ -64,6 +65,7 @@ namespace Bike_STore_Project
 
             dataGridViewUsers.Columns.Add(new DataGridViewTextBoxColumn
             {
+                Name = "role",
                 DataPropertyName = "Role",
                 HeaderText = "Role",
                 Width = 90
@@ -71,6 +73,7 @@ namespace Bike_STore_Project
 
             dataGridViewUsers.Columns.Add(new DataGridViewCheckBoxColumn
             {
+                Name = "is_active",
                 DataPropertyName = "IsActive",
                 HeaderText = "Active",
                 Width = 70
@@ -92,6 +95,7 @@ namespace Bike_STore_Project
                 var list = _repo.GetUsers();
                 _bind = new BindingList<UserRow>(list);
                 dataGridViewUsers.DataSource = _bind;
+                UpdateSelectionActions();
             }
             catch (Exception ex)
             {
@@ -111,10 +115,16 @@ namespace Bike_STore_Project
             var password = Prompt("Password:");
             if (string.IsNullOrWhiteSpace(password)) return;
 
-            var role = Prompt("Role (ADMIN or USER):", "USER")?.Trim().ToUpperInvariant();
-            if (role != "ADMIN" && role != "USER")
+            var roleInput = Prompt("Role (Administrator or Staff):", "Staff")?.Trim();
+            var role = roleInput?.ToUpperInvariant() switch
             {
-                MessageBox.Show("Role must be ADMIN or USER.", "Invalid role",
+                "ADMIN" or "ADMINISTRATOR" => "ADMIN",
+                "USER" or "STAFF" => "USER",
+                _ => ""
+            };
+            if (role.Length == 0)
+            {
+                MessageBox.Show("Role must be Administrator or Staff.", "Invalid role",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
@@ -252,18 +262,36 @@ namespace Bike_STore_Project
             }
         }
 
+        private void UpdateSelectionActions()
+        {
+            var user = Selected();
+            var hasSelection = user != null;
+            btnResetPassword.Enabled = hasSelection;
+            btnToggleActive.Enabled = hasSelection;
+            btnToggleRole.Enabled = hasSelection;
+            btnDeleteUser.Enabled = hasSelection;
+            btnToggleActive.Text = user?.IsActive == false ? "Enable user" : "Disable user";
+            btnToggleRole.Text = user?.Role == "ADMIN" ? "Make staff" : "Make administrator";
+            UiTheme.StyleButton(btnToggleActive, user?.IsActive == true);
+        }
+
         private static string? Prompt(string label, string defaultValue = "")
         {
             using var f = new Form
             {
                 Width = 420,
                 Height = 160,
-                Text = "Input",
-                StartPosition = FormStartPosition.CenterParent
+                Text = "User details",
+                StartPosition = FormStartPosition.CenterParent,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                MaximizeBox = false,
+                MinimizeBox = false,
+                AutoScaleMode = AutoScaleMode.Dpi
             };
 
             var lbl = new Label { Left = 10, Top = 15, Width = 380, Text = label };
             var tb = new TextBox { Left = 10, Top = 40, Width = 380, Text = defaultValue };
+            tb.UseSystemPasswordChar = label.Contains("password", StringComparison.OrdinalIgnoreCase);
             var ok = new Button { Text = "OK", Left = 230, Width = 75, Top = 75, DialogResult = DialogResult.OK };
             var cancel = new Button { Text = "Cancel", Left = 315, Width = 75, Top = 75, DialogResult = DialogResult.Cancel };
 

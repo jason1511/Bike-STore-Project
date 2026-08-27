@@ -34,7 +34,8 @@ namespace Bike_STore_Project
 
             Text = $"Bike Store - Local Admin - {AppSession.Username} (ADMIN)";
             WindowState = FormWindowState.Maximized;
-            MinimumSize = new Size(1000, 650);
+            MinimumSize = new Size(700, 500);
+            AutoScaleMode = AutoScaleMode.Dpi;
             _from.Value = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
             _to.Value = DateTime.Today;
 
@@ -75,8 +76,15 @@ namespace Bike_STore_Project
             add.Click += (_, __) => AddBrand();
             var rename = new Button { Text = "Rename selected" };
             rename.Click += (_, __) => RenameBrand();
-            var toggle = new Button { Text = "Activate / deactivate" };
+            var toggle = new Button { Text = "Deactivate brand", AutoSize = true };
             toggle.Click += (_, __) => ToggleBrand();
+            void UpdateToggleText()
+            {
+                var active = _brands.CurrentRow?.DataBoundItem is DataRowView row && Convert.ToInt32(row["is_active"]) == 1;
+                toggle.Text = active ? "Deactivate brand" : "Activate brand";
+                UiTheme.StyleButton(toggle, active);
+            }
+            _brands.SelectionChanged += (_, __) => UpdateToggleText();
             actions.Controls.AddRange(new Control[] { add, rename, toggle });
             root.Controls.Add(_brands, 0, 1);
             tab.Controls.Add(root);
@@ -122,14 +130,18 @@ namespace Bike_STore_Project
                 var offset = ((int)DateTime.Today.DayOfWeek + 6) % 7;
                 _from.Value = DateTime.Today.AddDays(-offset); _to.Value = DateTime.Today; GenerateReport();
             };
-            var generate = new Button { Text = "Generate" };
+            var generate = new Button { Text = "Refresh report" };
             generate.Click += (_, __) => GenerateReport();
             var print = new Button { Text = "Print report" };
             print.Click += (_, __) => PrintReport();
             actions.Controls.AddRange(new Control[] { today, week, month, generate, print });
             root.Controls.Add(actions, 0, 0);
             root.Controls.Add(_summary, 0, 1);
-            var detail = new SplitContainer { Dock = DockStyle.Fill, Orientation = Orientation.Vertical, SplitterDistance = 650, BackColor = UiTheme.Border };
+            var detail = new SplitContainer { Dock = DockStyle.Fill, Orientation = Orientation.Vertical, BackColor = UiTheme.Border };
+            detail.SizeChanged += (_, __) =>
+            {
+                if (detail.Width > 360) detail.SplitterDistance = Math.Max(220, detail.Width * 2 / 3);
+            };
             detail.Panel1.Padding = new Padding(0, 6, 6, 0); detail.Panel2.Padding = new Padding(6, 6, 0, 0);
             detail.Panel1.Controls.Add(_report); detail.Panel2.Controls.Add(_breakdown);
             root.Controls.Add(detail, 0, 2);
@@ -362,7 +374,7 @@ SELECT section,label,value FROM (
         {
             var root = new TableLayoutPanel { Dock = DockStyle.Fill, RowCount = 2, Padding = new Padding(12) };
             root.RowStyles.Add(new RowStyle(SizeType.AutoSize)); root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-            actions = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true };
+            actions = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, AutoScroll = true, WrapContents = true };
             root.Controls.Add(actions, 0, 0); return root;
         }
 

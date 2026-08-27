@@ -33,7 +33,8 @@ namespace Bike_STore_Project
                     case Button button when button.Tag?.ToString() is not ("nav" or "primary"):
                         var destructive = button.Text.Contains("delete", System.StringComparison.OrdinalIgnoreCase) ||
                                           button.Text.Contains("void", System.StringComparison.OrdinalIgnoreCase) ||
-                                          button.Text.Contains("deactivate", System.StringComparison.OrdinalIgnoreCase);
+                                          button.Text.Contains("deactivate", System.StringComparison.OrdinalIgnoreCase) ||
+                                          button.Text.Contains("disable", System.StringComparison.OrdinalIgnoreCase);
                         StyleButton(button, destructive);
                         break;
                     case TextBox textBox:
@@ -120,11 +121,29 @@ namespace Bike_STore_Project
                 if (value is "ACTIVE" or "COMPLETED") SetBadge(e, Color.FromArgb(226, 246, 235), Success);
                 else if (value is "VOID" or "CANCELLED") SetBadge(e, Color.FromArgb(255, 232, 232), Danger);
                 else SetBadge(e, Color.FromArgb(255, 246, 224), Warning);
+                e.Value = FriendlyLabel(value);
+                e.FormattingApplied = true;
             }
             else if (name == "role")
+            {
                 SetBadge(e, value == "ADMIN" ? Color.FromArgb(229, 237, 251) : Color.FromArgb(237, 241, 240), value == "ADMIN" ? Accent : Muted);
+                e.Value = value == "ADMIN" ? "Administrator" : "Staff";
+                e.FormattingApplied = true;
+            }
+            else if (name.Contains("movement_type"))
+            {
+                e.Value = FriendlyLabel(value);
+                e.FormattingApplied = true;
+            }
             else if (name == "is_active")
                 SetBadge(e, value is "1" or "TRUE" ? Color.FromArgb(226, 246, 235) : Color.FromArgb(255, 232, 232), value is "1" or "TRUE" ? Success : Danger);
+        }
+
+        private static string FriendlyLabel(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return "";
+            var words = value.Replace('_', ' ').ToLowerInvariant();
+            return System.Globalization.CultureInfo.InvariantCulture.TextInfo.ToTitleCase(words);
         }
 
         private static void SetBadge(DataGridViewCellFormattingEventArgs e, Color background, Color foreground)
