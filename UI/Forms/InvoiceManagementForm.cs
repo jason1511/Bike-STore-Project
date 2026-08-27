@@ -33,7 +33,9 @@ namespace Bike_STore_Project
         public InvoiceManagementForm()
         {
             Text = $"Bike Store - Invoices - {AppSession.Username} ({AppSession.Role})";
-            WindowState = FormWindowState.Maximized;
+            StartPosition = FormStartPosition.CenterScreen;
+            ClientSize = new Size(1050, 650);
+            WindowState = FormWindowState.Normal;
             MinimumSize = new Size(700, 500);
             AutoScaleMode = AutoScaleMode.Dpi;
 
@@ -91,6 +93,8 @@ namespace Bike_STore_Project
             add.Click += (_, __) => AddItem();
             addPanel.Controls.Add(add);
             productPanel.Controls.Add(addPanel, 1, 0);
+            productPanel.SizeChanged += (_, __) => ConfigureProductLayout(productPanel, addPanel);
+            ConfigureProductLayout(productPanel, addPanel);
 
             var cartPanel = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 2 };
             cartPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
@@ -117,6 +121,31 @@ namespace Bike_STore_Project
             root.Controls.Add(savePanel, 0, 3);
             tab.Controls.Add(root);
             return tab;
+        }
+
+        private void ConfigureProductLayout(TableLayoutPanel panel, Control addPanel)
+        {
+            var stacked = panel.ClientSize.Width < 740;
+            if (stacked == (panel.ColumnCount == 1)) return;
+            panel.SuspendLayout(); panel.ColumnStyles.Clear(); panel.RowStyles.Clear();
+            panel.ColumnCount = stacked ? 1 : 2; panel.RowCount = stacked ? 2 : 1;
+            if (stacked)
+            {
+                panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+                panel.RowStyles.Add(new RowStyle(SizeType.Percent, 58));
+                panel.RowStyles.Add(new RowStyle(SizeType.Percent, 42));
+                panel.SetCellPosition(_products, new TableLayoutPanelCellPosition(0, 0));
+                panel.SetCellPosition(addPanel, new TableLayoutPanelCellPosition(0, 1));
+            }
+            else
+            {
+                panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 68));
+                panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 32));
+                panel.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+                panel.SetCellPosition(_products, new TableLayoutPanelCellPosition(0, 0));
+                panel.SetCellPosition(addPanel, new TableLayoutPanelCellPosition(1, 0));
+            }
+            panel.ResumeLayout();
         }
 
         private TabPage BuildHistoryTab()

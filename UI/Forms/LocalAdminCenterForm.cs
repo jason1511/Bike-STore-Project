@@ -33,7 +33,9 @@ namespace Bike_STore_Project
                 throw new InvalidOperationException("Admin access required.");
 
             Text = $"Bike Store - Local Admin - {AppSession.Username} (ADMIN)";
-            WindowState = FormWindowState.Maximized;
+            StartPosition = FormStartPosition.CenterScreen;
+            ClientSize = new Size(1000, 620);
+            WindowState = FormWindowState.Normal;
             MinimumSize = new Size(700, 500);
             AutoScaleMode = AutoScaleMode.Dpi;
             _from.Value = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
@@ -140,7 +142,10 @@ namespace Bike_STore_Project
             var detail = new SplitContainer { Dock = DockStyle.Fill, Orientation = Orientation.Vertical, BackColor = UiTheme.Border };
             detail.SizeChanged += (_, __) =>
             {
-                if (detail.Width > 360) detail.SplitterDistance = Math.Max(220, detail.Width * 2 / 3);
+                var stacked = detail.Width < 760;
+                detail.Orientation = stacked ? Orientation.Horizontal : Orientation.Vertical;
+                if (stacked && detail.Height > 280) detail.SplitterDistance = Math.Max(150, detail.Height / 2);
+                else if (!stacked && detail.Width > 360) detail.SplitterDistance = Math.Max(220, detail.Width * 2 / 3);
             };
             detail.Panel1.Padding = new Padding(0, 6, 6, 0); detail.Panel2.Padding = new Padding(6, 6, 0, 0);
             detail.Panel1.Controls.Add(_report); detail.Panel2.Controls.Add(_breakdown);

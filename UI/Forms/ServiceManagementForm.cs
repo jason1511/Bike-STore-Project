@@ -27,7 +27,9 @@ namespace Bike_STore_Project
         public ServiceManagementForm()
         {
             Text = $"Bike Store - Service - {AppSession.Username} ({AppSession.Role})";
-            WindowState = FormWindowState.Maximized;
+            StartPosition = FormStartPosition.CenterScreen;
+            ClientSize = new Size(1000, 620);
+            WindowState = FormWindowState.Normal;
             MinimumSize = new Size(700, 500);
             AutoScaleMode = AutoScaleMode.Dpi;
             foreach (var value in StatusChoices(false)) _status.Items.Add(value);

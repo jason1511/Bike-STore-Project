@@ -23,7 +23,9 @@ namespace Bike_STore_Project
         public AdminDashboardForm()
         {
             Text = $"{AppServices.Profile.StoreName} — Desktop Admin";
-            WindowState = FormWindowState.Maximized;
+            StartPosition = FormStartPosition.CenterScreen;
+            ClientSize = new Size(1180, 680);
+            WindowState = FormWindowState.Normal;
             MinimumSize = new Size(900, 600);
             AutoScaleMode = AutoScaleMode.Dpi;
             BackColor = UiTheme.Canvas;

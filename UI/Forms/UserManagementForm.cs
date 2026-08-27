@@ -36,6 +36,8 @@ namespace Bike_STore_Project
             btnDeleteUser.Click += (_, __) => DeleteUser();
             btnClose.Click += (_, __) => Close();
             dataGridViewUsers.SelectionChanged += (_, __) => UpdateSelectionActions();
+            Resize += (_, __) => UpdateResponsiveLayout();
+            Shown += (_, __) => UpdateResponsiveLayout();
         }
 
         private void SetupGrid()
@@ -273,6 +275,35 @@ namespace Bike_STore_Project
             btnToggleActive.Text = user?.IsActive == false ? "Enable user" : "Disable user";
             btnToggleRole.Text = user?.Role == "ADMIN" ? "Make staff" : "Make administrator";
             UiTheme.StyleButton(btnToggleActive, user?.IsActive == true);
+        }
+
+        private void UpdateResponsiveLayout()
+        {
+            var stacked = ClientSize.Width < 760;
+            if (stacked == (tableRoot.ColumnCount == 1)) return;
+            tableRoot.SuspendLayout(); tableRoot.ColumnStyles.Clear(); tableRoot.RowStyles.Clear();
+            tableRoot.ColumnCount = stacked ? 1 : 2; tableRoot.RowCount = stacked ? 2 : 1;
+            if (stacked)
+            {
+                tableRoot.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+                tableRoot.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+                tableRoot.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+                tableRoot.SetCellPosition(dataGridViewUsers, new TableLayoutPanelCellPosition(0, 0));
+                tableRoot.SetCellPosition(panelButtons, new TableLayoutPanelCellPosition(0, 1));
+                panelButtons.FlowDirection = FlowDirection.LeftToRight; panelButtons.WrapContents = true; panelButtons.AutoSize = true;
+                foreach (Control button in panelButtons.Controls) button.Width = 155;
+            }
+            else
+            {
+                tableRoot.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+                tableRoot.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 210));
+                tableRoot.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+                tableRoot.SetCellPosition(dataGridViewUsers, new TableLayoutPanelCellPosition(0, 0));
+                tableRoot.SetCellPosition(panelButtons, new TableLayoutPanelCellPosition(1, 0));
+                panelButtons.FlowDirection = FlowDirection.TopDown; panelButtons.WrapContents = false; panelButtons.AutoSize = false;
+                foreach (Control button in panelButtons.Controls) button.Width = 190;
+            }
+            tableRoot.ResumeLayout();
         }
 
         private static string? Prompt(string label, string defaultValue = "")
