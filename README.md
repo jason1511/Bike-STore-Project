@@ -1,93 +1,19 @@
 # Bike Store Desktop
 
-A generic Windows desktop management application for electric bicycle retailers. It can run as a safe, resettable playground, use a persistent local SQLite database, or connect to an authenticated Cloudflare API.
+[![Build](https://github.com/jason1511/Bike-STore-Project/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/jason1511/Bike-STore-Project/actions/workflows/build.yml)
+[![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4)](https://dotnet.microsoft.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## Data modes
+A configurable Windows desktop management system for electric bicycle retailers, built with C# WinForms and .NET 8.
 
-| Mode | Storage | Intended use |
-| --- | --- | --- |
-| Demo | Seeded SQLite database in the current Windows user's app-data folder | Public experimentation and portfolio demonstrations |
-| Local | User-selected SQLite file | A single offline computer or local store |
-| Online | HTTPS API; the server accesses Cloudflare D1 | A deployed store such as CV Niaga Bersama |
+The project began as a local tool for CV Niaga Bersama Abadi and has been redesigned so anyone can safely explore it. The same application can use seeded demonstration data, a persistent local SQLite database, or an authenticated online store API backed by Cloudflare Workers and D1.
 
-The first launch asks which mode to use. The choice can later be changed from **Store settings** in the sidebar. Demo mode displays its test login on the sign-in screen and provides a **Reset demo data** action.
-
-```mermaid
-flowchart LR
-    UI[WinForms UI] --> Backend[IStoreBackend]
-    Backend --> Demo[Demo SQLite]
-    Backend --> Local[Local SQLite]
-    Backend --> API[Cloudflare HTTPS API]
-    API --> Worker[Pages Functions / Worker]
-    Worker --> D1[(Cloudflare D1)]
-```
-
-The desktop application never connects directly to D1 and never stores a Cloudflare API credential. An online session uses the store's normal username/password login and keeps the returned bearer token in memory only for the lifetime of the session.
-
-## Generic store profiles
-
-Non-secret profile settings are stored in:
-
-```text
-%LOCALAPPDATA%\BikeStoreDesktop\store-profile.json
-```
-
-A profile controls:
-
-- Store and profile names
-- Short sidebar mark
-- Backend mode and local database path or HTTPS API base URL
-- Culture, currency formatting, invoice title, and low-stock threshold
-
-CV Niaga Bersama is an online profile rather than hard-coded application behaviour. Window titles, sidebar branding, printed invoice/report headings, and money formatting use the active profile.
-
-## Current workflow
-
-Demo and Local modes retain the complete desktop workflow:
-
-- Unified role-aware dashboard
-- Website-compatible bicycle catalogue with per-colour variants
-- Dedicated **Tambah Stok** workflow for existing and new colours
-- FIFO stock lots and movement history
-- Multi-item invoices, frame numbers, payments, A5 printing, editing and void restoration
-- Service intake, status workflow, history and A4 printing
-- Sales, service, gross-profit, payment, product and stock reports
-- User/role administration and audit activity
-
-Online mode currently routes authentication, catalogue, colour variants, stock changes and catalogue status through the existing website API. Local-only pages are hidden in this mode instead of silently reading or writing a different SQLite file. The backend contract is the extension point for moving the remaining desktop screens onto the website's existing invoice, service, report, user and audit endpoints.
-
-## Inventory model
-
-Local storage preserves FIFO costing. Every receipt creates a `stock_lots` row; invoice sales consume the oldest remaining lots first and record allocations in `sale_lines`. The website-compatible `bikes.colors` JSON shape remains the catalogue-facing stock representation.
-
-Main local tables:
-
-- `bikes`, `brands`, `products`
-- `stock_lots`, `stock_movements`
-- `invoices`, `invoice_items`, `invoice_sequences`
-- `sales`, `sale_lines`
-- `services`
-- `users`, `audit_log`
-
-Existing databases are upgraded additively during startup; legacy product, sales, service, stock-lot and user records are retained.
-
-## Test credentials
-
-New Demo and Local databases seed this administrator account:
-
-```text
-Username: admin
-Password: admin123
-```
-
-Change the password before using a Local profile operationally. Online profiles use accounts from the connected Cloudflare store.
-
-## Run
+## Try it quickly
 
 Requirements:
 
 - Windows 10 or later
-- .NET 8 SDK
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
 
 ```powershell
 git clone https://github.com/jason1511/Bike-STore-Project.git
@@ -96,4 +22,152 @@ dotnet restore
 dotnet run
 ```
 
-The repository includes a Windows GitHub Actions build for pushes and pull requests targeting `master`.
+On first launch, choose **Try the demo**. The application creates an isolated sample database in your Windows user profile.
+
+```text
+Username: admin
+Password: admin123
+```
+
+Demo data can be restored at any time from **Store settings → Reset demo data**. It never connects to CV Niaga Bersama or another production database.
+
+## Storage modes
+
+| Mode | Data location | Best for |
+| --- | --- | --- |
+| **Demo** | Resettable, seeded SQLite database | Exploring the application and portfolio demonstrations |
+| **Local** | User-selected persistent SQLite file | A single offline computer or small store |
+| **Online** | Authenticated HTTPS API | A deployed store using Cloudflare Workers and D1 |
+
+The selected mode is always visible in the application. Local-only screens are hidden while connected online, preventing the desktop client from accidentally mixing cloud records with a local database.
+
+## Features
+
+### Demo and Local
+
+- Unified dashboard with role-aware navigation
+- Bicycle catalogue organised by model and colour variant
+- Dedicated **Tambah Stok** workflow for existing or new colours
+- FIFO stock lots, purchase-cost snapshots and stock-movement history
+- Multi-item sales invoices with customer, payment and frame-number details
+- A5 invoice preview and printing
+- Invoice editing, voiding and automatic stock restoration
+- Service intake, status tracking, history and A4 printing
+- Sales, service, gross-profit, payment, product and stock reports
+- Administrator and staff accounts with PBKDF2 password hashing
+- User management and audit activity
+
+### Online
+
+- Login through the connected store's existing account system
+- Load, create and edit bicycle models through the Cloudflare API
+- Manage colour variants and their stock quantities
+- Add stock to an existing colour or introduce a new colour
+- Activate or deactivate catalogue entries according to role permissions
+
+Invoices, services, reports, users and audit activity remain complete in Demo/Local mode. Their desktop Online adapters are the next cloud-parity stage; the website already exposes the corresponding authenticated endpoints.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    UI[WinForms UI] --> Contract[IStoreBackend]
+    Contract --> Demo[Demo backend]
+    Contract --> Local[SQLite backend]
+    Contract --> Cloud[Cloudflare API backend]
+    Demo --> SQLite[(SQLite)]
+    Local --> SQLite
+    Cloud --> Worker[Pages Functions / Worker]
+    Worker --> D1[(Cloudflare D1)]
+```
+
+`IStoreBackend` describes application operations rather than exposing SQL. This allows local transactions to remain inside the SQLite implementation while online operations remain inside the server API.
+
+The desktop application does not connect directly to D1. In Online mode it sends authenticated HTTPS requests to the store's Worker/Pages Functions API; only that server can access the D1 binding.
+
+## Configurable store profiles
+
+The first-run setup and **Store settings** screen configure:
+
+- Profile and store names
+- Short sidebar mark
+- Demo, Local or Online backend
+- SQLite file location or HTTPS API base URL
+- Culture and currency formatting
+- Printed invoice title
+- Low-stock threshold
+
+Non-secret settings are saved to:
+
+```text
+%LOCALAPPDATA%\BikeStoreDesktop\store-profile.json
+```
+
+Online passwords are not saved. The API bearer token is held in memory only until sign-out or application exit. Cloudflare account credentials, D1 identifiers and API tokens are never required by the desktop client.
+
+## Inventory and database model
+
+The local workflow keeps the website-compatible bicycle and colour structure while preserving FIFO costing:
+
+1. A bicycle contains one or more colour variants.
+2. Each local stock receipt creates a `stock_lots` batch with quantity, purchase cost and receipt time.
+3. A sale consumes the oldest available lots first.
+4. `sale_lines` records each FIFO allocation and its cost snapshot.
+5. `stock_movements` records receipts, adjustments, sales and void restorations.
+
+Main local tables:
+
+| Area | Tables |
+| --- | --- |
+| Catalogue | `bikes`, `brands`, `products` |
+| Inventory | `stock_lots`, `stock_movements` |
+| Sales | `invoices`, `invoice_items`, `invoice_sequences`, `sales`, `sale_lines` |
+| Service | `services` |
+| Administration | `users`, `audit_log` |
+
+Database startup is additive: existing desktop records are retained while missing tables, columns and indexes are created automatically.
+
+## Roles
+
+| Capability | Staff | Administrator |
+| --- | :---: | :---: |
+| View and edit catalogue | Yes | Yes |
+| Receive stock | Yes | Yes |
+| Create and print invoices/services | Yes | Yes |
+| Deactivate catalogue entries | No | Yes |
+| Void invoices and restore stock | No | Yes |
+| Manage brands and users | No | Yes |
+| View reports and audit activity | No | Yes |
+
+New Demo and Local databases create the starter administrator shown above. Change its password before operational use. Online profiles use accounts and permissions from the connected server.
+
+## Technology
+
+- C# and .NET 8
+- Windows Forms
+- Microsoft.Data.Sqlite
+- SQLite for Demo and Local storage
+- `HttpClient` and JSON for the Cloudflare adapter
+- Cloudflare Workers/Pages Functions and D1 for the CV Niaga Bersama deployment
+- GitHub Actions using `windows-latest`
+
+## Project status
+
+- Demo mode: available
+- Complete local-store workflow: available
+- Cloudflare login and catalogue/stock workflow: available
+- Remaining desktop cloud adapters: planned
+- Hybrid/offline synchronisation: intentionally deferred until conflict and retry rules are defined
+
+## Build verification
+
+Every push and pull request targeting `master` restores and builds the solution on Windows:
+
+```powershell
+dotnet restore "Bike STore Project.sln"
+dotnet build "Bike STore Project.sln" --configuration Release --no-restore
+```
+
+## License
+
+This project is available under the [MIT License](LICENSE).
