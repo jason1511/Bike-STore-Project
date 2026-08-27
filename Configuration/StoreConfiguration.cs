@@ -90,17 +90,21 @@ namespace Bike_STore_Project
 
         public static bool Exists => File.Exists(AppPaths.SettingsPath);
 
-        public static StoreProfile Load()
+        public static StoreProfile Load() => Load(out _);
+
+        public static StoreProfile Load(out string? error)
         {
-            AppPaths.EnsureDataDirectory();
-            if (!File.Exists(AppPaths.SettingsPath)) return StoreProfile.CreateDemo();
+            error = null;
             try
             {
+                AppPaths.EnsureDataDirectory();
+                if (!File.Exists(AppPaths.SettingsPath)) return StoreProfile.CreateDemo();
                 return JsonSerializer.Deserialize<StoreProfile>(File.ReadAllText(AppPaths.SettingsPath), JsonOptions)
-                    ?? StoreProfile.CreateDemo();
+                    ?? throw new InvalidDataException("The settings file is empty or invalid.");
             }
-            catch
+            catch (Exception ex)
             {
+                error = ex.Message;
                 return StoreProfile.CreateDemo();
             }
         }

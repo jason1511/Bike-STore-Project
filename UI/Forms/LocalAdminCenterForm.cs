@@ -25,6 +25,7 @@ namespace Bike_STore_Project
         private readonly DateTimePicker _from = new() { Width = 130 };
         private readonly DateTimePicker _to = new() { Width = 130 };
         private readonly Label _summary = new() { AutoSize = true, Font = new Font("Segoe UI", 11, FontStyle.Bold) };
+        private readonly LocalAdminSection? _singleSection;
         private string _reportSummary = "";
 
         public LocalAdminCenterForm(LocalAdminSection? singleSection = null)
@@ -32,6 +33,7 @@ namespace Bike_STore_Project
             if (!AppSession.IsAdmin)
                 throw new InvalidOperationException("Admin access required.");
 
+            _singleSection = singleSection;
             Text = $"Bike Store - Local Admin - {AppSession.Username} (ADMIN)";
             StartPosition = FormStartPosition.CenterScreen;
             ClientSize = new Size(1000, 620);
@@ -67,7 +69,17 @@ namespace Bike_STore_Project
                     Controls.Add(content);
                 }
             }
-            Load += (_, __) => { LoadBrands(); LoadMovements(); LoadActivity(); GenerateReport(); };
+            Load += (_, __) =>
+            {
+                if (_singleSection == null) { LoadBrands(); LoadMovements(); GenerateReport(); LoadActivity(); return; }
+                switch (_singleSection.Value)
+                {
+                    case LocalAdminSection.Brands: LoadBrands(); break;
+                    case LocalAdminSection.StockMovements: LoadMovements(); break;
+                    case LocalAdminSection.Reports: GenerateReport(); break;
+                    case LocalAdminSection.Activity: LoadActivity(); break;
+                }
+            };
         }
 
         private TabPage BuildBrands()
@@ -75,11 +87,11 @@ namespace Bike_STore_Project
             var tab = new TabPage("Brands");
             var root = RootWithActions(out var actions);
             var add = new Button { Text = "Add brand" };
-            add.Click += (_, __) => AddBrand();
+            add.Click += (_, __) => RunSafely(AddBrand, "Brand could not be added");
             var rename = new Button { Text = "Rename selected" };
-            rename.Click += (_, __) => RenameBrand();
+            rename.Click += (_, __) => RunSafely(RenameBrand, "Brand could not be renamed");
             var toggle = new Button { Text = "Deactivate brand", AutoSize = true };
-            toggle.Click += (_, __) => ToggleBrand();
+            toggle.Click += (_, __) => RunSafely(ToggleBrand, "Brand status could not be changed");
             void UpdateToggleText()
             {
                 var active = _brands.CurrentRow?.DataBoundItem is DataRowView row && Convert.ToInt32(row["is_active"]) == 1;
@@ -166,13 +178,14 @@ namespace Bike_STore_Project
             return tab;
         }
 
-        private void LoadBrands() => _brands.DataSource = Query(@"
+        private void LoadBrands() => RunSafely(() => _brands.DataSource = Query(@"
 SELECT b.id,b.name,b.is_active,b.sort_order,b.created_at,
        COUNT(DISTINCT p.id) AS products
 FROM brands b LEFT JOIN products p ON UPPER(p.brand)=UPPER(b.name)
-GROUP BY b.id ORDER BY b.sort_order,b.name;");
+GROUP BY b.id ORDER BY b.sort_order,b.name;"), "Brands could not be loaded");
 
-        private void LoadMovements()
+        private void LoadMovements() => RunSafely(LoadMovementsCore, "Stock movements could not be loaded");
+        private void LoadMovementsCore()
         {
             _movements.DataSource = Query(@"
 SELECT sm.id,sm.created_at,sm.movement_type,p.brand,p.type,COALESCE(p.color,'') AS color,
@@ -183,7 +196,8 @@ ORDER BY datetime(sm.created_at) DESC,sm.id DESC;");
             if (_movements.Columns.Contains("id")) _movements.Columns["id"].Visible = false;
         }
 
-        private void LoadActivity()
+        private void LoadActivity() => RunSafely(LoadActivityCore, "Activity could not be loaded");
+        private void LoadActivityCore()
         {
             _activity.DataSource = Query(@"
 SELECT id,created_at,COALESCE(actor_username,'SYSTEM') AS actor,action,entity,
@@ -192,12 +206,18 @@ FROM audit_log ORDER BY datetime(created_at) DESC,id DESC;");
             if (_activity.Columns.Contains("id")) _activity.Columns["id"].Visible = false;
         }
 
-        private void GenerateReport()
+        private bool GenerateReport()
+        {
+            try { return GenerateReportCore(); }
+            catch (Exception ex) { MessageBox.Show(ex.Message, "Report could not be generated", MessageBoxButtons.OK, MessageBoxIcon.Warning); return false; }
+        }
+
+        private bool GenerateReportCore()
         {
             if (_to.Value.Date < _from.Value.Date)
             {
                 MessageBox.Show("The end date must be on or after the start date.");
-                return;
+                return false;
             }
             var from = _from.Value.Date.ToString("yyyy-MM-dd 00:00:00");
             var to = _to.Value.Date.AddDays(1).ToString("yyyy-MM-dd 00:00:00");
@@ -262,6 +282,7 @@ SELECT section,label,value FROM (
             breakdown.Parameters.AddWithValue("$from", from); breakdown.Parameters.AddWithValue("$to", to);
             using var breakdownReader = breakdown.ExecuteReader(); var breakdownTable = new DataTable(); breakdownTable.Load(breakdownReader); _breakdown.DataSource = breakdownTable;
             if (_breakdown.Columns.Contains("value")) _breakdown.Columns["value"].DefaultCellStyle.Format = "N0";
+            return true;
         }
 
         private void AddBrand()
@@ -336,29 +357,33 @@ SELECT section,label,value FROM (
 
         private void PrintReport()
         {
-            GenerateReport();
-            var doc = new PrintDocument { DocumentName = "Bike Store Report" };
-            doc.DefaultPageSettings.Landscape = true;
-            doc.PrintPage += (_, e) =>
+            if (!GenerateReport()) return;
+            try
             {
-                if (e.Graphics == null) return;
-                var y = e.MarginBounds.Top;
-                using var title = new Font("Segoe UI", 16, FontStyle.Bold);
-                using var body = new Font("Segoe UI", 9);
-                e.Graphics.DrawString(StoreFormat.ReportHeader, title, Brushes.Black, e.MarginBounds.Left, y);
-                y += 35;
-                e.Graphics.DrawString(_reportSummary, body, Brushes.Black, new RectangleF(e.MarginBounds.Left, y, e.MarginBounds.Width, 50));
-                y += 55;
-                foreach (DataGridViewRow row in _report.Rows)
+                var doc = new PrintDocument { DocumentName = "Bike Store Report" };
+                doc.DefaultPageSettings.Landscape = true;
+                doc.PrintPage += (_, e) =>
                 {
-                    if (row.IsNewRow) continue;
-                    var line = $"{row.Cells["date"].Value}    Sales: {StoreFormat.Money(Convert.ToDecimal(row.Cells["sales"].Value))}    Service: {StoreFormat.Money(Convert.ToDecimal(row.Cells["service"].Value))}    Total: {StoreFormat.Money(Convert.ToDecimal(row.Cells["total"].Value))}";
-                    e.Graphics.DrawString(line, body, Brushes.Black, e.MarginBounds.Left, y);
-                    y += 20;
-                }
-            };
-            using var preview = new PrintPreviewDialog { Document = doc, Width = 1050, Height = 750 };
-            preview.ShowDialog(this);
+                    if (e.Graphics == null) return;
+                    var y = e.MarginBounds.Top;
+                    using var title = new Font("Segoe UI", 16, FontStyle.Bold);
+                    using var body = new Font("Segoe UI", 9);
+                    e.Graphics.DrawString(StoreFormat.ReportHeader, title, Brushes.Black, e.MarginBounds.Left, y);
+                    y += 35;
+                    e.Graphics.DrawString(_reportSummary, body, Brushes.Black, new RectangleF(e.MarginBounds.Left, y, e.MarginBounds.Width, 50));
+                    y += 55;
+                    foreach (DataGridViewRow row in _report.Rows)
+                    {
+                        if (row.IsNewRow) continue;
+                        var line = $"{row.Cells["date"].Value}    Sales: {StoreFormat.Money(Convert.ToDecimal(row.Cells["sales"].Value))}    Service: {StoreFormat.Money(Convert.ToDecimal(row.Cells["service"].Value))}    Total: {StoreFormat.Money(Convert.ToDecimal(row.Cells["total"].Value))}";
+                        e.Graphics.DrawString(line, body, Brushes.Black, e.MarginBounds.Left, y);
+                        y += 20;
+                    }
+                };
+                using var preview = new PrintPreviewDialog { Document = doc, Width = 1050, Height = 750 };
+                preview.ShowDialog(this);
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message, "Report could not be printed", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
         }
 
         private static DataTable Query(string sql)
@@ -373,6 +398,12 @@ SELECT section,label,value FROM (
             using var cmd = conn.CreateCommand(); cmd.CommandText = sql;
             cmd.Parameters.AddWithValue("$from", from); cmd.Parameters.AddWithValue("$to", to);
             return Convert.ToDecimal(cmd.ExecuteScalar() ?? 0);
+        }
+
+        private static void RunSafely(Action action, string title)
+        {
+            try { action(); }
+            catch (Exception ex) { MessageBox.Show(ex.Message, title, MessageBoxButtons.OK, MessageBoxIcon.Warning); }
         }
 
         private static TableLayoutPanel RootWithActions(out FlowLayoutPanel actions)

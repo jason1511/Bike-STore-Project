@@ -1,12 +1,13 @@
 ﻿using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 
 namespace Bike_STore_Project
 {
     public sealed class UserRepository
     {
-        public void EnsureUsersSchemaAndSeed()
+        public string? EnsureUsersSchemaAndSeed()
         {
             using var conn = Database.OpenConnection();
 
@@ -32,10 +33,23 @@ CREATE TABLE IF NOT EXISTS users (
 
                 if (count == 0)
                 {
-                    // Seed admin (no actor user yet)
-                    CreateUser("admin", "admin123", "ADMIN", isActive: true);
+                    var initialPassword = GenerateInitialPassword();
+                    CreateUser("admin", initialPassword, "ADMIN", isActive: true);
+                    return initialPassword;
                 }
             }
+
+            return null;
+        }
+
+        private static string GenerateInitialPassword()
+        {
+            const string alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+            var bytes = RandomNumberGenerator.GetBytes(16);
+            var password = new char[16];
+            for (var i = 0; i < password.Length; i++)
+                password[i] = alphabet[bytes[i] % alphabet.Length];
+            return new string(password);
         }
 
         // ---------- AUDIT HELPERS ----------
@@ -357,13 +371,15 @@ ORDER BY role DESC, username ASC;";
             using var rdr = cmd.ExecuteReader();
             while (rdr.Read())
             {
+                var createdText = rdr.GetString(4);
+                DateTime? createdAt = DateTime.TryParse(createdText, out var parsed) ? parsed : null;
                 list.Add(new UserRow
                 {
                     Id = rdr.GetInt32(0),
                     Username = rdr.GetString(1),
                     Role = rdr.GetString(2),
                     IsActive = rdr.GetInt32(3) == 1,
-                    CreatedAt = DateTime.Parse(rdr.GetString(4))
+                    CreatedAt = createdAt
                 });
             }
 

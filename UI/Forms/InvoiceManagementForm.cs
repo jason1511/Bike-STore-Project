@@ -182,10 +182,14 @@ namespace Bike_STore_Project
 
         private void LoadProducts()
         {
-            _products.DataSource = _repo.GetAvailableProducts();
-            if (_products.Columns.Contains("id")) _products.Columns["id"].Visible = false;
-            if (_products.Columns.Contains("sell_price")) _products.Columns["sell_price"].DefaultCellStyle.Format = "N0";
-            ApplySelectedPrice();
+            try
+            {
+                _products.DataSource = _repo.GetAvailableProducts();
+                if (_products.Columns.Contains("id")) _products.Columns["id"].Visible = false;
+                if (_products.Columns.Contains("sell_price")) _products.Columns["sell_price"].DefaultCellStyle.Format = "N0";
+                ApplySelectedPrice();
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message, "Bicycles could not be loaded", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
         }
 
         private void ApplySelectedPrice()
@@ -197,23 +201,27 @@ namespace Bike_STore_Project
 
         private void LoadHistory()
         {
-            _history.DataSource = _repo.GetInvoices(_search.Text);
-            if (_history.Columns.Contains("id")) _history.Columns["id"].Visible = false;
-            if (_history.Columns.Contains("total"))
+            try
             {
-                _history.Columns["total"].DefaultCellStyle.Format = "C0";
-                _history.Columns["total"].DefaultCellStyle.FormatProvider = StoreFormat.Culture;
+                _history.DataSource = _repo.GetInvoices(_search.Text);
+                if (_history.Columns.Contains("id")) _history.Columns["id"].Visible = false;
+                if (_history.Columns.Contains("total"))
+                {
+                    _history.Columns["total"].DefaultCellStyle.Format = "C0";
+                    _history.Columns["total"].DefaultCellStyle.FormatProvider = StoreFormat.Culture;
+                }
+                using var conn = Database.OpenConnection();
+                decimal revenue = Metric(conn, "SELECT COALESCE(SUM(ii.line_total),0) FROM invoice_items ii JOIN invoices i ON i.id=ii.invoice_id WHERE i.status='ACTIVE';");
+                decimal today = Metric(conn, "SELECT COALESCE(SUM(ii.line_total),0) FROM invoice_items ii JOIN invoices i ON i.id=ii.invoice_id WHERE i.status='ACTIVE' AND date(i.created_at)=date('now','localtime');");
+                decimal active = Metric(conn, "SELECT COUNT(*) FROM invoices WHERE status='ACTIVE';");
+                decimal voided = Metric(conn, "SELECT COUNT(*) FROM invoices WHERE status='VOID';");
+                _historyMetrics.Controls.Clear();
+                _historyMetrics.Controls.Add(HistoryCard("Total revenue", StoreFormat.Money(revenue), UiTheme.Accent));
+                _historyMetrics.Controls.Add(HistoryCard("Today", StoreFormat.Money(today), UiTheme.Success));
+                _historyMetrics.Controls.Add(HistoryCard("Active invoices", active.ToString("N0"), UiTheme.Warning));
+                _historyMetrics.Controls.Add(HistoryCard("Voided", voided.ToString("N0"), UiTheme.Danger));
             }
-            using var conn = Database.OpenConnection();
-            decimal revenue = Metric(conn, "SELECT COALESCE(SUM(ii.line_total),0) FROM invoice_items ii JOIN invoices i ON i.id=ii.invoice_id WHERE i.status='ACTIVE';");
-            decimal today = Metric(conn, "SELECT COALESCE(SUM(ii.line_total),0) FROM invoice_items ii JOIN invoices i ON i.id=ii.invoice_id WHERE i.status='ACTIVE' AND date(i.created_at)=date('now','localtime');");
-            decimal active = Metric(conn, "SELECT COUNT(*) FROM invoices WHERE status='ACTIVE';");
-            decimal voided = Metric(conn, "SELECT COUNT(*) FROM invoices WHERE status='VOID';");
-            _historyMetrics.Controls.Clear();
-            _historyMetrics.Controls.Add(HistoryCard("Total revenue", StoreFormat.Money(revenue), UiTheme.Accent));
-            _historyMetrics.Controls.Add(HistoryCard("Today", StoreFormat.Money(today), UiTheme.Success));
-            _historyMetrics.Controls.Add(HistoryCard("Active invoices", active.ToString("N0"), UiTheme.Warning));
-            _historyMetrics.Controls.Add(HistoryCard("Voided", voided.ToString("N0"), UiTheme.Danger));
+            catch (Exception ex) { MessageBox.Show(ex.Message, "Invoice history could not be loaded", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
         }
 
         private void EditSelected()
@@ -285,21 +293,24 @@ namespace Bike_STore_Project
 
         private void SaveInvoice(bool print)
         {
+            string number;
             try
             {
-                var number = _repo.CreateInvoice(_customer.Text, _phone.Text, _address.Text,
+                number = _repo.CreateInvoice(_customer.Text, _phone.Text, _address.Text,
                     _payment.Text.ToUpperInvariant(), _bank.Text.ToUpperInvariant(), _notes.Text, _cart.ToList());
-                MessageBox.Show($"Invoice {number} saved.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                _printInvoice = _repo.GetInvoice(FindInvoiceId(number));
-                if (print) ShowPrintPreview();
-                ClearDraft();
-                LoadProducts();
-                LoadHistory();
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Invoice not saved", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
+            MessageBox.Show($"Invoice {number} saved.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            try { _printInvoice = _repo.GetInvoice(FindInvoiceId(number)); }
+            catch (Exception ex) { _printInvoice = null; MessageBox.Show("The invoice was saved, but it could not be reloaded.\n\n" + ex.Message, "Invoice saved", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+            ClearDraft(); LoadProducts(); LoadHistory();
+            if (print && _printInvoice != null)
+                try { ShowPrintPreview(); }
+                catch (Exception ex) { MessageBox.Show("The invoice was saved, but print preview could not be opened.\n\n" + ex.Message, "Print preview", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
         }
 
         private int FindInvoiceId(string number)
@@ -332,8 +343,8 @@ namespace Bike_STore_Project
         {
             var id = SelectedInvoiceId();
             if (id == 0) return;
-            _printInvoice = _repo.GetInvoice(id);
-            ShowPrintPreview();
+            try { _printInvoice = _repo.GetInvoice(id); ShowPrintPreview(); }
+            catch (Exception ex) { MessageBox.Show(ex.Message, "Invoice could not be printed", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
         }
 
         private int SelectedInvoiceId()

@@ -6,10 +6,10 @@ namespace Bike_STore_Project
 {
     public partial class LoginForm : Form
     {
-        public LoginForm()
+        public LoginForm(string? initialAdminPassword = null)
         {
             InitializeComponent();
-            ApplyLoginDesign();
+            ApplyLoginDesign(initialAdminPassword);
 
             // UX: Enter to login
             AcceptButton = btnLogin;
@@ -21,7 +21,7 @@ namespace Bike_STore_Project
             btnLogin.Click += BtnLogin_Click;
         }
 
-        private void ApplyLoginDesign()
+        private void ApplyLoginDesign(string? initialAdminPassword)
         {
             var profile = AppServices.Profile;
             Text = $"{profile.StoreName} — Sign in";
@@ -42,9 +42,9 @@ namespace Bike_STore_Project
             btnLogin.Location = new Point(40, 293); btnLogin.Size = new Size(345, 42); btnLogin.BackColor = UiTheme.Sidebar; btnLogin.ForeColor = Color.White;
             btnLogin.FlatStyle = FlatStyle.Flat; btnLogin.FlatAppearance.BorderSize = 0; btnLogin.Cursor = Cursors.Hand;
             panelLogin.Controls.Add(eyebrow); panelLogin.Controls.Add(title); panelLogin.Controls.Add(subtitle);
-            if (profile.IsDemo)
+            if (!string.IsNullOrWhiteSpace(initialAdminPassword))
             {
-                var demo = new Label { Text = "Demo login: admin / admin123", Left = 40, Top = 268, Width = 345, Height = 20, ForeColor = UiTheme.Accent, Font = new Font("Segoe UI Semibold", 8.5F) };
+                var demo = new Label { Text = $"First-run admin: admin / {initialAdminPassword}", Left = 40, Top = 268, Width = 345, Height = 20, ForeColor = UiTheme.Accent, Font = new Font("Segoe UI Semibold", 8.5F) };
                 panelLogin.Controls.Add(demo); demo.BringToFront();
             }
             eyebrow.BringToFront(); title.BringToFront(); subtitle.BringToFront();

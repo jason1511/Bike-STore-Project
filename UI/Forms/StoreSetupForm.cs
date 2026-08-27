@@ -167,6 +167,8 @@ namespace Bike_STore_Project
                 var profile = BuildProfile();
                 if (profile.Backend == StoreBackendMode.Local && string.IsNullOrWhiteSpace(profile.DatabasePath))
                     throw new InvalidOperationException("Choose a SQLite database file.");
+                if (profile.Backend == StoreBackendMode.Local)
+                    Database.ValidateDatabaseFile(profile.DatabasePath);
                 if (profile.IsOnline && (!Uri.TryCreate(profile.ApiBaseUrl, UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps))
                     throw new InvalidOperationException("Enter a valid HTTPS online store URL.");
                 StoreConfiguration.Save(profile); SelectedProfile = profile; DialogResult = DialogResult.OK; Close();
@@ -190,16 +192,24 @@ namespace Bike_STore_Project
 
         private void BrowseDatabase()
         {
-            using var dialog = new SaveFileDialog { Filter = "SQLite database (*.db)|*.db|All files (*.*)|*.*", FileName = Path.GetFileName(_databasePath.Text), InitialDirectory = Path.GetDirectoryName(_databasePath.Text) };
-            if (dialog.ShowDialog(this) == DialogResult.OK) _databasePath.Text = dialog.FileName;
+            try
+            {
+                using var dialog = new SaveFileDialog { Filter = "SQLite database (*.db)|*.db|All files (*.*)|*.*", FileName = Path.GetFileName(_databasePath.Text), InitialDirectory = Path.GetDirectoryName(_databasePath.Text) };
+                if (dialog.ShowDialog(this) == DialogResult.OK) _databasePath.Text = dialog.FileName;
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message, "Choose database file", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
         }
 
         private void ResetDemo()
         {
             if (MessageBox.Show("Reset the demo database to its original sample data?", "Reset demo", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
-            Database.DeleteDatabaseFile(AppPaths.DemoDatabasePath);
-            _resetDemo.Visible = false;
-            MessageBox.Show("Demo data will be recreated when you continue.", "Demo reset");
+            try
+            {
+                Database.DeleteDatabaseFile(AppPaths.DemoDatabasePath);
+                _resetDemo.Visible = false;
+                MessageBox.Show("Demo data will be recreated when you continue.", "Demo reset");
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message, "Demo reset failed", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
         }
 
         private static string Required(string value, string label) => string.IsNullOrWhiteSpace(value) ? throw new InvalidOperationException(label + " is required.") : value.Trim();

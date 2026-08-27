@@ -34,6 +34,19 @@ namespace Bike_STore_Project
             }
         }
 
+        public static void ValidateDatabaseFile(string filePath)
+        {
+            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentException("Database path is required.", nameof(filePath));
+            var fullPath = Path.GetFullPath(filePath);
+            var directory = Path.GetDirectoryName(fullPath);
+            if (!string.IsNullOrWhiteSpace(directory)) Directory.CreateDirectory(directory);
+            using var connection = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = fullPath }.ToString());
+            connection.Open();
+            using var command = connection.CreateCommand();
+            command.CommandText = "PRAGMA schema_version;";
+            command.ExecuteScalar();
+        }
+
         public static void Initialize()
         {
             using var conn = new SqliteConnection(_connectionString);

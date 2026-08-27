@@ -35,14 +35,10 @@ dotnet restore
 dotnet run
 ```
 
-On first launch, select **Try the demo**, save the profile, and sign in with:
-
-```text
-Username: admin
-Password: admin123
-```
-
-These credentials belong only to the resettable demo database stored on your computer. The demo does not connect to CV Niaga Bersama or any production data.
+On first launch, select **Try the demo** and save the profile. The app creates the
+`admin` account with a random one-time password and displays it on the first login
+screen. Resetting the demo database generates a new password. The demo does not
+connect to CV Niaga Bersama or any production data.
 
 ## Choose a storage mode
 

@@ -87,9 +87,9 @@ namespace Bike_STore_Project
             actions.Controls.Add(_filter);
             var refresh = new Button { Text = "Refresh" }; refresh.Click += (_, __) => LoadHistory();
             var print = new Button { Text = "Print service job" }; print.Click += (_, __) => PrintSelected();
-            var status = new Button { Text = "Update status", Enabled = AppSession.IsAdmin }; status.Click += (_, __) => UpdateStatus();
-            var edit = new Button { Text = "Edit details", Enabled = AppSession.IsAdmin }; edit.Click += (_, __) => EditSelected();
-            var delete = new Button { Text = "Delete service job", Enabled = AppSession.IsAdmin, AutoSize = true }; delete.Click += (_, __) => DeleteSelected();
+            var status = new Button { Text = "Update status", Enabled = AppSession.IsAdmin }; status.Click += (_, __) => RunSafely(UpdateStatus, "Service status could not be updated");
+            var edit = new Button { Text = "Edit details", Enabled = AppSession.IsAdmin }; edit.Click += (_, __) => RunSafely(EditSelected, "Service job could not be updated");
+            var delete = new Button { Text = "Delete service job", Enabled = AppSession.IsAdmin, AutoSize = true }; delete.Click += (_, __) => RunSafely(DeleteSelected, "Service job could not be deleted");
             actions.Controls.Add(refresh); actions.Controls.Add(print); actions.Controls.Add(edit); actions.Controls.Add(status); actions.Controls.Add(delete);
             root.Controls.Add(actions, 0, 0); root.Controls.Add(_history, 0, 1); tab.Controls.Add(root); return tab;
         }
@@ -101,58 +101,66 @@ namespace Bike_STore_Project
             {
                 MessageBox.Show("Customer, brand, model, and service type are required."); return;
             }
-            using var conn = Database.OpenConnection();
-            using var tx = conn.BeginTransaction();
+            long id;
+            string number;
             try
             {
-                long id;
+                using var conn = Database.OpenConnection();
+                using var tx = conn.BeginTransaction();
                 var now = DateTime.Now;
-                using (var cmd = conn.CreateCommand())
+                try
                 {
-                    cmd.Transaction = tx;
-                    cmd.CommandText = @"
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.Transaction = tx;
+                        cmd.CommandText = @"
 INSERT INTO services
 (brand,type,color,quantity,service_cost,notes,date_time,service_number,customer_name,customer_phone,
  customer_address,service_type,service_status,created_by_user_id,created_by_username,created_at)
 VALUES ($brand,$type,$color,1,$cost,$notes,$at,NULL,$customer,$phone,$address,$service,$status,$uid,$user,$at);
 SELECT last_insert_rowid();";
-                    cmd.Parameters.AddWithValue("$brand", _brand.Text.Trim().ToUpperInvariant());
-                    cmd.Parameters.AddWithValue("$type", _type.Text.Trim().ToUpperInvariant());
-                    cmd.Parameters.AddWithValue("$color", Db(_color.Text));
-                    cmd.Parameters.AddWithValue("$cost", (double)_cost.Value);
-                    cmd.Parameters.AddWithValue("$notes", Db(_notes.Text));
-                    cmd.Parameters.AddWithValue("$at", now.ToString("yyyy-MM-dd HH:mm:ss"));
-                    cmd.Parameters.AddWithValue("$customer", _customer.Text.Trim());
-                    cmd.Parameters.AddWithValue("$phone", Db(_phone.Text));
-                    cmd.Parameters.AddWithValue("$address", Db(_address.Text));
-                    cmd.Parameters.AddWithValue("$service", _serviceType.Text.Trim());
-                    cmd.Parameters.AddWithValue("$status", SelectedStatus(_status));
-                    cmd.Parameters.AddWithValue("$uid", AppSession.UserId);
-                    cmd.Parameters.AddWithValue("$user", AppSession.Username);
-                    id = Convert.ToInt64(cmd.ExecuteScalar() ?? 0L);
+                        cmd.Parameters.AddWithValue("$brand", _brand.Text.Trim().ToUpperInvariant());
+                        cmd.Parameters.AddWithValue("$type", _type.Text.Trim().ToUpperInvariant());
+                        cmd.Parameters.AddWithValue("$color", Db(_color.Text));
+                        cmd.Parameters.AddWithValue("$cost", (double)_cost.Value);
+                        cmd.Parameters.AddWithValue("$notes", Db(_notes.Text));
+                        cmd.Parameters.AddWithValue("$at", now.ToString("yyyy-MM-dd HH:mm:ss"));
+                        cmd.Parameters.AddWithValue("$customer", _customer.Text.Trim());
+                        cmd.Parameters.AddWithValue("$phone", Db(_phone.Text));
+                        cmd.Parameters.AddWithValue("$address", Db(_address.Text));
+                        cmd.Parameters.AddWithValue("$service", _serviceType.Text.Trim());
+                        cmd.Parameters.AddWithValue("$status", SelectedStatus(_status));
+                        cmd.Parameters.AddWithValue("$uid", AppSession.UserId);
+                        cmd.Parameters.AddWithValue("$user", AppSession.Username);
+                        id = Convert.ToInt64(cmd.ExecuteScalar() ?? 0L);
+                    }
+                    number = $"SRV-{now:yyyyMMdd}-{id:000}";
+                    using (var update = conn.CreateCommand())
+                    {
+                        update.Transaction = tx;
+                        update.CommandText = "UPDATE services SET service_number=$number WHERE id=$id;";
+                        update.Parameters.AddWithValue("$number", number); update.Parameters.AddWithValue("$id", id); update.ExecuteNonQuery();
+                    }
+                    LocalAdminRepository.WriteAudit(conn, tx, "CREATE_SERVICE", "services", id,
+                        $"{number}; customer={_customer.Text.Trim()}; status={SelectedStatus(_status)}");
+                    tx.Commit();
                 }
-                var number = $"SRV-{now:yyyyMMdd}-{id:000}";
-                using (var update = conn.CreateCommand())
-                {
-                    update.Transaction = tx;
-                    update.CommandText = "UPDATE services SET service_number=$number WHERE id=$id;";
-                    update.Parameters.AddWithValue("$number", number); update.Parameters.AddWithValue("$id", id); update.ExecuteNonQuery();
-                }
-                LocalAdminRepository.WriteAudit(conn, tx, "CREATE_SERVICE", "services", id,
-                    $"{number}; customer={_customer.Text.Trim()}; status={SelectedStatus(_status)}");
-                tx.Commit();
-                MessageBox.Show($"Service {number} saved.");
-                LoadHistory();
-                if (print) PrintService((int)id);
-                ClearEntry();
+                catch { try { tx.Rollback(); } catch { } throw; }
             }
-            catch (Exception ex) { try { tx.Rollback(); } catch { } MessageBox.Show(ex.Message, "Service not saved"); }
+            catch (Exception ex) { MessageBox.Show(ex.Message, "Service not saved"); return; }
+            MessageBox.Show($"Service {number} saved."); LoadHistory();
+            if (print)
+                try { PrintService((int)id); }
+                catch (Exception ex) { MessageBox.Show("The service job was saved, but print preview could not be opened.\n\n" + ex.Message, "Print preview", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+            ClearEntry();
         }
 
         private void LoadHistory()
         {
-            using var conn = Database.OpenConnection(); using var cmd = conn.CreateCommand();
-            cmd.CommandText = @"
+            try
+            {
+                using var conn = Database.OpenConnection(); using var cmd = conn.CreateCommand();
+                cmd.CommandText = @"
 SELECT id,COALESCE(service_number,'LEGACY-'||id) AS service_number,
  COALESCE(customer_name,'') AS customer_name,COALESCE(customer_phone,'') AS customer_phone,
  brand,type,COALESCE(color,'') AS color,COALESCE(service_type,'GENERAL') AS service_type,
@@ -163,15 +171,17 @@ WHERE ($status='ALL' OR UPPER(COALESCE(service_status,'RECEIVED'))=$status)
 AND ($q='' OR UPPER(COALESCE(service_number,'')) LIKE $like OR UPPER(COALESCE(customer_name,'')) LIKE $like
  OR UPPER(brand) LIKE $like OR UPPER(type) LIKE $like)
 ORDER BY datetime(COALESCE(created_at,date_time)) DESC,id DESC;";
-            var q = _search.Text.Trim().ToUpperInvariant(); cmd.Parameters.AddWithValue("$q", q); cmd.Parameters.AddWithValue("$like", $"%{q}%");
-            cmd.Parameters.AddWithValue("$status", SelectedStatus(_filter));
-            using var reader = cmd.ExecuteReader(); var table = new DataTable(); table.Load(reader); _history.DataSource = table;
-            if (_history.Columns.Contains("id")) _history.Columns["id"].Visible = false;
-            if (_history.Columns.Contains("service_cost"))
-            {
-                _history.Columns["service_cost"].DefaultCellStyle.Format = "C0";
-                _history.Columns["service_cost"].DefaultCellStyle.FormatProvider = StoreFormat.Culture;
+                var q = _search.Text.Trim().ToUpperInvariant(); cmd.Parameters.AddWithValue("$q", q); cmd.Parameters.AddWithValue("$like", $"%{q}%");
+                cmd.Parameters.AddWithValue("$status", SelectedStatus(_filter));
+                using var reader = cmd.ExecuteReader(); var table = new DataTable(); table.Load(reader); _history.DataSource = table;
+                if (_history.Columns.Contains("id")) _history.Columns["id"].Visible = false;
+                if (_history.Columns.Contains("service_cost"))
+                {
+                    _history.Columns["service_cost"].DefaultCellStyle.Format = "C0";
+                    _history.Columns["service_cost"].DefaultCellStyle.FormatProvider = StoreFormat.Culture;
+                }
             }
+            catch (Exception ex) { MessageBox.Show(ex.Message, "Service history could not be loaded", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
         }
 
         private void UpdateStatus()
@@ -227,7 +237,12 @@ UPDATE services SET customer_name=$customer,customer_phone=$phone,brand=$brand,t
             catch (Exception ex) { try { tx.Rollback(); } catch { } MessageBox.Show(ex.Message, "Delete failed"); }
         }
 
-        private void PrintSelected() { var id = SelectedId(); if (id != 0) PrintService(id); }
+        private void PrintSelected()
+        {
+            var id = SelectedId(); if (id == 0) return;
+            try { PrintService(id); }
+            catch (Exception ex) { MessageBox.Show(ex.Message, "Service job could not be printed", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+        }
         private int SelectedId()
         {
             if (_history.CurrentRow?.DataBoundItem is not DataRowView row) { MessageBox.Show("Select a service first."); return 0; }
@@ -238,6 +253,7 @@ UPDATE services SET customer_name=$customer,customer_phone=$phone,brand=$brand,t
         {
             if (_printRow == null || Convert.ToInt32(_printRow["id"]) != id)
             {
+                _printRow = null;
                 LoadHistory();
                 foreach (DataGridViewRow row in _history.Rows)
                     if (row.DataBoundItem is DataRowView view && Convert.ToInt32(view["id"]) == id) { _printRow = view; break; }
@@ -271,6 +287,11 @@ UPDATE services SET customer_name=$customer,customer_phone=$phone,brand=$brand,t
         }
 
         private static object Db(string value) => string.IsNullOrWhiteSpace(value) ? DBNull.Value : value.Trim();
+        private static void RunSafely(Action action, string title)
+        {
+            try { action(); }
+            catch (Exception ex) { MessageBox.Show(ex.Message, title, MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+        }
         private static TextBox Box(int width) => new() { Width = width };
         private static IEnumerable<StatusChoice> StatusChoices(bool includeAll)
         {
