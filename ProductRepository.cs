@@ -355,25 +355,8 @@ SELECT last_insert_rowid();";
                 lotId = Convert.ToInt64(cmd.ExecuteScalar() ?? 0L);
             }
 
-            using (var movement = conn.CreateCommand())
-            {
-                movement.Transaction = tx;
-                movement.CommandText = @"
-INSERT INTO stock_movements
-(product_id, stock_lot_id, movement_type, quantity_change, quantity_before, quantity_after,
- note, created_by_user_id, created_by_username, created_at)
-VALUES ($pid, $lot, 'STOCK_IN', $change, $before, $after, $note, $uid, $uname, $at);";
-                movement.Parameters.AddWithValue("$pid", productId);
-                movement.Parameters.AddWithValue("$lot", lotId);
-                movement.Parameters.AddWithValue("$change", qtyReceived);
-                movement.Parameters.AddWithValue("$before", before);
-                movement.Parameters.AddWithValue("$after", before + qtyReceived);
-                movement.Parameters.AddWithValue("$note", string.IsNullOrWhiteSpace(notes) ? "Stock batch received" : notes.Trim());
-                movement.Parameters.AddWithValue("$uid", AppSession.UserId > 0 ? AppSession.UserId : (object)DBNull.Value);
-                movement.Parameters.AddWithValue("$uname", string.IsNullOrWhiteSpace(AppSession.Username) ? (object)DBNull.Value : AppSession.Username);
-                movement.Parameters.AddWithValue("$at", DateTime.UtcNow.ToString("o"));
-                movement.ExecuteNonQuery();
-            }
+            LocalAdminRepository.InsertMovement(conn, tx, productId, checked((int)lotId), null, "STOCK_IN", qtyReceived,
+                before, before + qtyReceived, string.IsNullOrWhiteSpace(notes) ? "Stock batch received" : notes.Trim());
 
             LocalAdminRepository.WriteAudit(conn, tx, "RECEIVE_STOCK", "stock_lots", lotId,
                 $"product_id={productId}; qty={qtyReceived}; unit_cost={unitCost}");

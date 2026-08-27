@@ -109,7 +109,7 @@ ORDER BY datetime(COALESCE(created_at,date_time)) DESC LIMIT 8;");
             {
                 var key = day.ToString("yyyy-MM-dd");
                 var revenue = Scalar(conn, "SELECT COALESCE(SUM(ii.line_total),0) FROM invoice_items ii JOIN invoices i ON i.id=ii.invoice_id WHERE i.status='ACTIVE' AND date(i.created_at)=$date;", key);
-                var stockIn = Scalar(conn, "SELECT COALESCE(SUM(CASE WHEN quantity_change>0 THEN quantity_change ELSE 0 END),0) FROM stock_movements WHERE date(created_at)=$date AND movement_type IN ('STOCK_IN','OPENING_STOCK');", key);
+                var stockIn = Scalar(conn, "SELECT COALESCE(SUM(CASE WHEN quantity_change>0 THEN quantity_change ELSE 0 END),0) FROM stock_movements WHERE date(created_at)=$date AND LOWER(movement_type)='stock_in';", key);
                 var stockOut = Scalar(conn, "SELECT COALESCE(ABS(SUM(CASE WHEN quantity_change<0 THEN quantity_change ELSE 0 END)),0) FROM stock_movements WHERE date(created_at)=$date;", key);
                 sales.Add(new ChartValue(day.ToString("ddd"), revenue, 0));
                 stock.Add(new ChartValue(day.ToString("ddd"), stockIn, stockOut));

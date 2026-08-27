@@ -90,8 +90,7 @@ namespace Bike_STore_Project
             _nav.Controls.Clear(); _navButtons.Clear();
             AddNav("dashboard", "Overview", "Daily operations and key figures");
             AddSection("OPERATIONS");
-            AddNav("catalogue", "Catalogue", "Bicycles, specifications and prices");
-            AddNav("inventory", "Inventory", "FIFO stock batches");
+            AddNav("inventory", "Bicycles & stock", "Website-style bicycle, colour and stock management");
             AddNav("sales", "Sales & invoices", "Create, print and review invoices");
             AddNav("service", "Service", "Service jobs and status");
             if (AppSession.IsAdmin)
@@ -130,8 +129,7 @@ namespace Bike_STore_Project
             string title, subtitle;
             switch (key.ToLowerInvariant())
             {
-                case "catalogue": page = Embed(new CatalogueManagementForm()); title = "Catalogue"; subtitle = "Manage bicycle identity, specifications, colours, pricing and visibility."; break;
-                case "inventory": page = Embed(new InventoryForm()); title = "Inventory"; subtitle = "Receive and adjust FIFO stock batches while preserving cost history."; break;
+                case "inventory": page = Embed(new InventoryForm()); title = "Bicycles & stock"; subtitle = "Manage website-style bike models, colour variants and local stock."; break;
                 case "sales": page = Embed(new InvoiceManagementForm()); title = "Sales & invoices"; subtitle = "Create multi-item invoices, record payments and print customer documents."; break;
                 case "service": page = Embed(new ServiceManagementForm()); title = "Service"; subtitle = "Create service jobs, follow progress and print service documents."; break;
                 case "brands": page = Embed(new LocalAdminCenterForm(LocalAdminSection.Brands)); title = "Brands"; subtitle = "Maintain the brand directory used by the catalogue."; break;

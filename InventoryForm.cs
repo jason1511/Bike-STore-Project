@@ -1,278 +1,95 @@
-﻿using System;
+using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.Windows.Forms;
 
 namespace Bike_STore_Project
 {
     public partial class InventoryForm : Form
     {
-        private readonly ProductRepository _repo = new();
-        private BindingList<StockLotRow> _bindingList = new();
+        private readonly WebsiteBikeRepository _repo = new();
+        private BindingList<WebsiteBike> _bikes = new();
 
         public InventoryForm()
         {
-            InitializeComponent();
-            SetupGrid();
-
-            // wire events ONCE
-            Load += InventoryForm_Load;
-            Shown += (_, __) => ApplyPermissions();
-
-            txtSearch.TextChanged += (s, e) => LoadData(txtSearch.Text);
-            btnRefresh.Click += (s, e) => LoadData();
-
-            btnAdd.Click += BtnAdd_Click;
-            btnEdit.Click += (s, e) => EditSelected();
-            btnDelete.Click += BtnDelete_Click;
-
-            btnReceiveStock.Visible = false; // keep hidden for now
-
-            dgvProducts.CellDoubleClick += DgvProducts_CellDoubleClick;
-        }
-
-        private void InventoryForm_Load(object? sender, EventArgs e)
-        {
-            LoadData();
-            ApplyPermissions();
+            InitializeComponent(); SetupGrid();
+            btnAdd.Text = "ADD BIKE"; btnEdit.Text = "EDIT BIKE"; btnDelete.Text = "DEACTIVATE";
+            btnReceiveStock.Text = "TAMBAH STOK"; btnReceiveStock.Visible = true; btnReceiveStock.Width = 150;
+            Load += (_, __) => { LoadData(); ApplyPermissions(); };
+            txtSearch.TextChanged += (_, __) => LoadData(txtSearch.Text);
+            btnRefresh.Click += (_, __) => LoadData(txtSearch.Text);
+            btnAdd.Click += (_, __) => AddBike(); btnEdit.Click += (_, __) => EditBike();
+            btnReceiveStock.Click += (_, __) => ReceiveStock(); btnDelete.Click += (_, __) => ToggleActive();
+            dgvProducts.CellDoubleClick += (_, __) => { if (Permissions.CanEditInventory) EditBike(); };
         }
 
         private void ApplyPermissions()
         {
-            // Everyone can view/search/refresh
-            txtSearch.Enabled = true;
-            btnRefresh.Enabled = true;
-            dgvProducts.ReadOnly = true;
-
-            btnAdd.Enabled = Permissions.CanReceiveInventory;
-            btnEdit.Enabled = Permissions.CanEditInventory;
-            btnDelete.Enabled = Permissions.CanDeleteInventory;
-        }
-
-        private void DgvProducts_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
-        {
-            if (!Permissions.CanEditInventory) return;
-
-            EditSelected();
+            btnAdd.Enabled = Permissions.CanReceiveInventory; btnEdit.Enabled = Permissions.CanEditInventory;
+            btnReceiveStock.Enabled = Permissions.CanReceiveInventory; btnDelete.Enabled = Permissions.CanDeleteInventory;
         }
 
         private void SetupGrid()
         {
-            dgvProducts.AutoGenerateColumns = false;
-            dgvProducts.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvProducts.MultiSelect = false;
-            dgvProducts.AllowUserToAddRows = false;
-            dgvProducts.AllowUserToDeleteRows = false;
-            dgvProducts.ReadOnly = true;
-
-            dgvProducts.Columns.Clear();
-
-            dgvProducts.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "LotId",
-                HeaderText = "Lot ID",
-                Visible = false
-            });
-
-            dgvProducts.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "ProductId",
-                HeaderText = "Product ID",
-                Visible = false
-            });
-
-            dgvProducts.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Brand",
-                HeaderText = "Brand",
-                Width = 140
-            });
-
-            dgvProducts.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Type",
-                HeaderText = "Type",
-                Width = 180
-            });
-
-            dgvProducts.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Color",
-                HeaderText = "Color",
-                Width = 120
-            });
-
-            dgvProducts.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "QtyReceived",
-                HeaderText = "Received",
-                Width = 80
-            });
-
-            dgvProducts.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "QtyRemaining",
-                HeaderText = "Remaining",
-                Width = 90
-            });
-
-            dgvProducts.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "UnitCost",
-                HeaderText = "Unit Cost",
-                Width = 100,
-                DefaultCellStyle = { Format = "C2" }
-            });
-
-            dgvProducts.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "ReceivedAt",
-                HeaderText = "Received At",
-                Width = 140,
-                DefaultCellStyle = { Format = "yyyy-MM-dd HH:mm" }
-            });
-
-            dgvProducts.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Notes",
-                HeaderText = "Notes",
-                Width = 220
-            });
+            dgvProducts.AutoGenerateColumns = false; dgvProducts.Columns.Clear(); dgvProducts.ReadOnly = true;
+            dgvProducts.MultiSelect = false; dgvProducts.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvProducts.AllowUserToAddRows = false; dgvProducts.AllowUserToDeleteRows = false;
+            dgvProducts.Columns.Add(Column("Brand", "Brand", 130));
+            dgvProducts.Columns.Add(Column("Name", "Model", 170));
+            dgvProducts.Columns.Add(Column("ColorSummary", "Colour variants", 310));
+            dgvProducts.Columns.Add(Column("StockQty", "Total stock", 90));
+            dgvProducts.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName="Price", Name="Price", HeaderText="Selling price", Width=120, DefaultCellStyle={Format="C0",FormatProvider=CultureInfo.GetCultureInfo("id-ID")} });
+            dgvProducts.Columns.Add(new DataGridViewCheckBoxColumn { DataPropertyName="InStock", Name="InStock", HeaderText="Active", Width=70 });
         }
 
-        private void LoadData(string? filter = null)
+        private static DataGridViewTextBoxColumn Column(string property,string title,int width)
+            => new() { DataPropertyName=property, Name=property, HeaderText=title, Width=width };
+
+        private void LoadData(string? search=null)
         {
-            try
-            {
-                var list = _repo.GetStockLots(filter);
-                _bindingList = new BindingList<StockLotRow>(list);
-                dgvProducts.DataSource = _bindingList;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to load products: " + ex.Message,
-                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            try { _bikes=new BindingList<WebsiteBike>(_repo.GetAll(search)); dgvProducts.DataSource=_bikes; UiTheme.StyleGrid(dgvProducts); }
+            catch(Exception ex){MessageBox.Show("Failed to load bike inventory: "+ex.Message,"Inventory",MessageBoxButtons.OK,MessageBoxIcon.Error);}
         }
 
-        private StockLotRow? GetSelected()
-            => dgvProducts.CurrentRow?.DataBoundItem as StockLotRow;
-
-        private void BtnAdd_Click(object? sender, EventArgs e)
+        private WebsiteBike? Selected(bool showMessage=true)
         {
-            if (!Permissions.CanReceiveInventory)
-            {
-                MessageBox.Show("You do not have permission to add stock.", "Access denied",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            using var dlg = new ProductEditForm(ProductEditMode.ReceiveStock);
-            if (dlg.ShowDialog(this) != DialogResult.OK) return;
-
-            try
-            {
-                var productId = _repo.GetOrCreateProductId(
-                    dlg.Product.Brand,
-                    dlg.Product.Type,
-                    dlg.Product.Color
-                );
-
-                _repo.ReceiveBatch(
-                    productId: productId,
-                    qtyReceived: dlg.QuantityReceived,
-                    unitCost: dlg.UnitCost,
-                    receivedAt: DateTime.Now,
-                    notes: null
-                );
-
-                LoadData(txtSearch.Text);
-                MessageBox.Show("Stock batch added!");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Add stock failed: " + ex.Message, "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            var bike=dgvProducts.CurrentRow?.DataBoundItem as WebsiteBike;
+            if(bike==null&&showMessage)MessageBox.Show("Select a bicycle first."); return bike;
         }
 
-        private void EditSelected()
+        private void AddBike()
         {
-            if (!Permissions.CanEditInventory)
-            {
-                MessageBox.Show("You do not have permission to edit stock.", "Access denied",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            var selected = GetSelected();
-            if (selected == null)
-            {
-                MessageBox.Show("Select a batch first.");
-                return;
-            }
-
-            using var dlg = new ProductEditForm(selected, ProductEditMode.ReceiveStock);
-            if (dlg.ShowDialog(this) != DialogResult.OK) return;
-
-            try
-            {
-                _repo.UpdateStockLot(
-                    lotId: selected.LotId,
-                    newQtyReceived: dlg.QuantityReceived,
-                    newUnitCost: dlg.UnitCost
-                );
-
-                LoadData(txtSearch.Text);
-                MessageBox.Show("Batch updated!");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Update batch failed: " + ex.Message, "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            using var dialog=new WebsiteBikeEditorDialog(); if(dialog.ShowDialog(this)!=DialogResult.OK)return;
+            try{_repo.SaveBike(dialog.Bike,true);LoadData(txtSearch.Text);MessageBox.Show("Bicycle added with its colour stock.","Inventory");}
+            catch(Exception ex){MessageBox.Show(ex.Message,"Bicycle not saved",MessageBoxButtons.OK,MessageBoxIcon.Warning);}
         }
 
-        private void BtnDelete_Click(object? sender, EventArgs e)
+        private void EditBike()
         {
-            if (!Permissions.CanDeleteInventory)
-            {
-                MessageBox.Show("You do not have permission to delete stock.", "Access denied",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+            var selected=Selected();if(selected==null)return;
+            var fresh=_repo.GetById(selected.Id);if(fresh==null)return;
+            using var dialog=new WebsiteBikeEditorDialog(fresh);if(dialog.ShowDialog(this)!=DialogResult.OK)return;
+            try{_repo.SaveBike(dialog.Bike,false);LoadData(txtSearch.Text);MessageBox.Show("Bicycle and colour variants updated.","Inventory");}
+            catch(Exception ex){MessageBox.Show(ex.Message,"Bicycle not updated",MessageBoxButtons.OK,MessageBoxIcon.Warning);}
+        }
 
-            var selected = GetSelected();
-            if (selected == null)
-            {
-                MessageBox.Show("Select a Batch first.");
-                return;
-            }
-
-            if (selected.QtyRemaining != selected.QtyReceived)
-            {
-                MessageBox.Show("Can't delete this batch because some items were already sold from it.");
-                return;
-            }
-
-            var label = $"{selected.Brand} {selected.Type} - {selected.ReceivedAt:yyyy-MM-dd HH:mm}";
-            var confirm = MessageBox.Show(
-                $"Delete batch: {label}?",
-                "Confirm delete",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning);
-
-            if (confirm != DialogResult.Yes) return;
-
+        private void ReceiveStock()
+        {
+            using var dialog=new WebsiteReceiveStockDialog(_repo.GetAll(),Selected(false)?.Id);
+            if(dialog.ShowDialog(this)!=DialogResult.OK)return;
             try
             {
-                _repo.DeleteStockLot(selected.LotId);
-                LoadData(txtSearch.Text);
+                _repo.ReceiveStock(dialog.BikeId,dialog.ColorName,dialog.ColorHex,dialog.ColorImage,dialog.Quantity,dialog.UnitCost,dialog.ReceivedAt,dialog.Notes);
+                LoadData(txtSearch.Text);MessageBox.Show("Stock received and movement recorded.","Tambah Stok",MessageBoxButtons.OK,MessageBoxIcon.Information);
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Delete failed: " + ex.Message, "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            catch(Exception ex){MessageBox.Show(ex.Message,"Stock not received",MessageBoxButtons.OK,MessageBoxIcon.Warning);}
+        }
+
+        private void ToggleActive()
+        {
+            var bike=Selected();if(bike==null)return;var next=!bike.InStock;
+            if(MessageBox.Show($"{(next?"Reactivate":"Deactivate")} {bike.Brand} {bike.Name}?", "Catalogue status",MessageBoxButtons.YesNo,MessageBoxIcon.Question)!=DialogResult.Yes)return;
+            try{_repo.SetActive(bike.Id,next);LoadData(txtSearch.Text);}catch(Exception ex){MessageBox.Show(ex.Message,"Status update failed");}
         }
     }
 }

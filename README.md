@@ -9,7 +9,8 @@ A Windows desktop management application for an electric bicycle retailer. It re
 - Unified single-window admin dashboard with role-aware navigation
 - Overview cards, recent activity, seven-day sales, and stock charts
 - Administrator and staff login with PBKDF2 password hashing
-- Catalogue and brand management
+- Website-compatible bicycle catalogue with per-colour stock variants
+- Dedicated Tambah Stok flow for existing or new colours
 - FIFO stock batches and automatic stock-movement history
 - Multi-item invoices with customer and payment details
 - Optional bicycle frame numbers per invoice line

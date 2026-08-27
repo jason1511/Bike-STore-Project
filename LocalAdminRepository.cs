@@ -414,17 +414,35 @@ ON CONFLICT(date_code) DO UPDATE SET last_sequence=last_sequence+1,updated_at=$a
         internal static void InsertMovement(SqliteConnection conn, SqliteTransaction tx, int productId,
             int? lotId, long? invoiceId, string type, int change, int before, int after, string note)
         {
+            string brand = "", bikeName = "", color = "", bikeId = "";
+            using (var product = conn.CreateCommand())
+            {
+                product.Transaction = tx;
+                product.CommandText = @"
+SELECT p.brand,p.type,COALESCE(p.color,''),COALESCE((
+ SELECT b.id FROM bikes b WHERE UPPER(b.brand)=UPPER(p.brand) AND UPPER(b.name)=UPPER(p.type) LIMIT 1
+),'') FROM products p WHERE p.id=$id;";
+                product.Parameters.AddWithValue("$id", productId);
+                using var reader = product.ExecuteReader();
+                if (reader.Read()) { brand=reader.GetString(0); bikeName=reader.GetString(1); color=reader.GetString(2); bikeId=reader.GetString(3); }
+            }
+            var websiteType = type.ToUpperInvariant() switch
+            {
+                "SALE" => "sale",
+                "STOCK_IN" or "OPENING_STOCK" => "stock_in",
+                _ => "adjustment"
+            };
             using var cmd = conn.CreateCommand();
             cmd.Transaction = tx;
             cmd.CommandText = @"
 INSERT INTO stock_movements
 (product_id,stock_lot_id,invoice_id,movement_type,quantity_change,quantity_before,quantity_after,
- note,created_by_user_id,created_by_username,created_at)
-VALUES ($product,$lot,$invoice,$type,$change,$before,$after,$note,$uid,$user,$at);";
+ note,created_by_user_id,created_by_username,created_at,bike_id,bike_brand,bike_name,bike_color_name,created_by_role)
+VALUES ($product,$lot,$invoice,$type,$change,$before,$after,$note,$uid,$user,$at,$bike,$brand,$name,$color,$role);";
             cmd.Parameters.AddWithValue("$product", productId);
             cmd.Parameters.AddWithValue("$lot", (object?)lotId ?? DBNull.Value);
             cmd.Parameters.AddWithValue("$invoice", (object?)invoiceId ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("$type", type);
+            cmd.Parameters.AddWithValue("$type", websiteType);
             cmd.Parameters.AddWithValue("$change", change);
             cmd.Parameters.AddWithValue("$before", before);
             cmd.Parameters.AddWithValue("$after", after);
@@ -432,7 +450,13 @@ VALUES ($product,$lot,$invoice,$type,$change,$before,$after,$note,$uid,$user,$at
             cmd.Parameters.AddWithValue("$uid", AppSession.UserId > 0 ? AppSession.UserId : (object)DBNull.Value);
             cmd.Parameters.AddWithValue("$user", Db(AppSession.Username));
             cmd.Parameters.AddWithValue("$at", DateTime.UtcNow.ToString("o"));
+            cmd.Parameters.AddWithValue("$bike", Db(bikeId));
+            cmd.Parameters.AddWithValue("$brand", brand);
+            cmd.Parameters.AddWithValue("$name", bikeName);
+            cmd.Parameters.AddWithValue("$color", color);
+            cmd.Parameters.AddWithValue("$role", Db(AppSession.Role));
             cmd.ExecuteNonQuery();
+            WebsiteBikeRepository.RefreshBikeStockForProduct(conn, tx, productId);
         }
 
         internal static void WriteAudit(SqliteConnection conn, SqliteTransaction tx, string action,

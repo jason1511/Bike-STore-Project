@@ -130,6 +130,40 @@ CREATE TABLE IF NOT EXISTS brands (
     updated_at  TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Local SQLite copy of the website admin catalogue model. The JSON colours
+-- payload deliberately matches the Cloudflare D1 `bikes.colors` shape.
+CREATE TABLE IF NOT EXISTS bikes (
+    id          TEXT PRIMARY KEY,
+    brand_id    TEXT NOT NULL DEFAULT '',
+    brand       TEXT NOT NULL,
+    name        TEXT NOT NULL,
+    battery     TEXT DEFAULT '',
+    motor       TEXT DEFAULT '',
+    topSpeed    TEXT DEFAULT '',
+    range       TEXT DEFAULT '',
+    maxWeight   TEXT DEFAULT '',
+    safety      TEXT DEFAULT '',
+    image       TEXT DEFAULT '',
+    alt         TEXT DEFAULT '',
+    comfort     TEXT DEFAULT 'medium',
+    themeColor  TEXT DEFAULT '',
+    themeColorSecond TEXT DEFAULT '',
+    colorName   TEXT DEFAULT '',
+    colors      TEXT NOT NULL DEFAULT '[]',
+    description TEXT DEFAULT '',
+    price       REAL DEFAULT 0,
+    featured    INTEGER DEFAULT 0,
+    inStock     INTEGER DEFAULT 1,
+    stockQty    INTEGER DEFAULT 0,
+    createdAt   TEXT DEFAULT CURRENT_TIMESTAMP,
+    updatedAt   TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_bikes_brand ON bikes(brand);
+CREATE INDEX IF NOT EXISTS idx_bikes_brand_id ON bikes(brand_id);
+CREATE INDEX IF NOT EXISTS idx_bikes_stock ON bikes(inStock, stockQty);
+CREATE INDEX IF NOT EXISTS idx_bikes_featured ON bikes(featured);
+
 CREATE TABLE IF NOT EXISTS invoice_sequences (
     date_code     TEXT PRIMARY KEY,
     last_sequence INTEGER NOT NULL DEFAULT 0,
@@ -218,6 +252,11 @@ CREATE INDEX IF NOT EXISTS idx_stock_movements_created_at ON stock_movements(cre
             EnsureColumn(conn, "products", "featured", "INTEGER NOT NULL DEFAULT 0");
             EnsureColumn(conn, "products", "is_active", "INTEGER NOT NULL DEFAULT 1");
             EnsureColumn(conn, "products", "sell_price", "REAL NOT NULL DEFAULT 0");
+            EnsureColumn(conn, "stock_movements", "bike_id", "TEXT");
+            EnsureColumn(conn, "stock_movements", "bike_brand", "TEXT");
+            EnsureColumn(conn, "stock_movements", "bike_name", "TEXT");
+            EnsureColumn(conn, "stock_movements", "bike_color_name", "TEXT NOT NULL DEFAULT ''");
+            EnsureColumn(conn, "stock_movements", "created_by_role", "TEXT");
 
             using (var seedBrands = conn.CreateCommand())
             {
@@ -259,6 +298,10 @@ WHERE NOT EXISTS (SELECT 1 FROM stock_movements sm WHERE sm.stock_lot_id=l.id);
 ";
                 openingMovements.ExecuteNonQuery();
             }
+
+            // Build the website-compatible bike/colour JSON model after legacy
+            // quantities have been converted into FIFO lots.
+            WebsiteBikeRepository.MigrateLegacyProducts(conn);
 
             // Ensure audit fields exist on sales (for migrated DBs)
             EnsureColumn(conn, "sales", "created_by_user_id", "INTEGER");
