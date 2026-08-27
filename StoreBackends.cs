@@ -209,7 +209,7 @@ namespace Bike_STore_Project
             return await ReadAsync<T>(response, cancellationToken);
         }
 
-        private static async Task<T> ReadAsync<T>(HttpResponseMessage response, CancellationToken cancellationToken)
+        private static async Task<T> ReadAsync<T>(HttpResponseMessage response, CancellationToken cancellationToken) where T : class
         {
             var text = await response.Content.ReadAsStringAsync(cancellationToken);
             T? result = null;
