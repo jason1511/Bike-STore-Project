@@ -175,7 +175,7 @@ namespace Bike_STore_Project
             if (_history.Columns.Contains("total"))
             {
                 _history.Columns["total"].DefaultCellStyle.Format = "C0";
-                _history.Columns["total"].DefaultCellStyle.FormatProvider = CultureInfo.GetCultureInfo("id-ID");
+                _history.Columns["total"].DefaultCellStyle.FormatProvider = StoreFormat.Culture;
             }
             using var conn = Database.OpenConnection();
             decimal revenue = Metric(conn, "SELECT COALESCE(SUM(ii.line_total),0) FROM invoice_items ii JOIN invoices i ON i.id=ii.invoice_id WHERE i.status='ACTIVE';");
@@ -183,8 +183,8 @@ namespace Bike_STore_Project
             decimal active = Metric(conn, "SELECT COUNT(*) FROM invoices WHERE status='ACTIVE';");
             decimal voided = Metric(conn, "SELECT COUNT(*) FROM invoices WHERE status='VOID';");
             _historyMetrics.Controls.Clear();
-            _historyMetrics.Controls.Add(HistoryCard("Total revenue", $"Rp {revenue:N0}", UiTheme.Accent));
-            _historyMetrics.Controls.Add(HistoryCard("Today", $"Rp {today:N0}", UiTheme.Success));
+            _historyMetrics.Controls.Add(HistoryCard("Total revenue", StoreFormat.Money(revenue), UiTheme.Accent));
+            _historyMetrics.Controls.Add(HistoryCard("Today", StoreFormat.Money(today), UiTheme.Success));
             _historyMetrics.Controls.Add(HistoryCard("Active invoices", active.ToString("N0"), UiTheme.Warning));
             _historyMetrics.Controls.Add(HistoryCard("Voided", voided.ToString("N0"), UiTheme.Danger));
         }
@@ -339,9 +339,9 @@ namespace Bike_STore_Project
             using var title = new Font("Segoe UI", 15, FontStyle.Bold);
             using var heading = new Font("Segoe UI", 9, FontStyle.Bold);
             using var body = new Font("Segoe UI", 8.5f);
-            g.DrawString("CV NIAGA BERSAMA ABADI", title, Brushes.Black, left, y);
+            g.DrawString(AppServices.Profile.StoreName.ToUpperInvariant(), title, Brushes.Black, left, y);
             y += 28;
-            g.DrawString("FAKTUR PENJUALAN", heading, Brushes.Black, left, y);
+            g.DrawString(AppServices.Profile.InvoiceTitle, heading, Brushes.Black, left, y);
             g.DrawString(_printInvoice.InvoiceNumber, heading, Brushes.Black, right - 140, y);
             y += 24;
             g.DrawString($"Tanggal: {_printInvoice.CreatedAt:dd MMM yyyy HH:mm}", body, Brushes.Black, left, y);
@@ -360,7 +360,7 @@ namespace Bike_STore_Project
                 g.DrawString($"{item.Brand} {item.Type} {item.Color}", heading, Brushes.Black, left, y);
                 y += 17;
                 g.DrawString($"{item.Quantity} x {item.UnitPrice:N0}", body, Brushes.Black, left + 12, y);
-                g.DrawString($"Rp {item.LineTotal:N0}", body, Brushes.Black, right - 110, y);
+                g.DrawString(StoreFormat.Money(item.LineTotal), body, Brushes.Black, right - 110, y);
                 y += 17;
                 if (!string.IsNullOrWhiteSpace(item.FrameNumbers))
                 {
@@ -371,7 +371,7 @@ namespace Bike_STore_Project
             g.DrawLine(Pens.Black, left, y, right, y);
             y += 8;
             g.DrawString("TOTAL", heading, Brushes.Black, left, y);
-            g.DrawString($"Rp {_printInvoice.Total:N0}", title, Brushes.Black, right - 150, y);
+            g.DrawString(StoreFormat.Money(_printInvoice.Total), title, Brushes.Black, right - 150, y);
             y += 28;
             g.DrawString($"Pembayaran: {_printInvoice.PaymentMethod} {_printInvoice.PaymentBank}".Trim(), body, Brushes.Black, left, y);
             y += 18;
@@ -385,7 +385,7 @@ namespace Bike_STore_Project
             _payment.SelectedIndex = 0; _bank.SelectedIndex = 0; _qty.Value = 1; _price.Value = 1;
         }
 
-        private void UpdateTotal() => _total.Text = $"Total: Rp {_cart.Sum(x => x.LineTotal):N0}";
+        private void UpdateTotal() => _total.Text = $"Total: {StoreFormat.Money(_cart.Sum(x => x.LineTotal))}";
 
         private static void AddField(FlowLayoutPanel panel, string label, Control control)
         {

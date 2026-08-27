@@ -12,14 +12,28 @@ namespace Bike_STore_Project
         {
             ApplicationConfiguration.Initialize();
 
-            // Database init (your existing logic)
-            Database.Initialize();
-            var userRepo = new UserRepository();
-            userRepo.EnsureUsersSchemaAndSeed();
+            var hadSettings = StoreConfiguration.Exists;
+            var profile = StoreConfiguration.Load();
+            if (!hadSettings)
+            {
+                using var setup = new StoreSetupForm();
+                if (setup.ShowDialog() != DialogResult.OK) return;
+                profile = setup.SelectedProfile;
+            }
 
-            // Culture (keep as-is)
-            Thread.CurrentThread.CurrentCulture = new CultureInfo("id-ID");
-            Thread.CurrentThread.CurrentUICulture = new CultureInfo("id-ID");
+            try
+            {
+                Configure(profile);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("The selected store profile could not be opened.\n\n" + ex.Message,
+                    "Bike Store Desktop", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                using var setup = new StoreSetupForm(profile);
+                if (setup.ShowDialog() != DialogResult.OK) return;
+                profile = setup.SelectedProfile;
+                Configure(profile);
+            }
 
             // --- LOGIN FLOW ---
             using (var login = new LoginForm())
@@ -30,6 +44,24 @@ namespace Bike_STore_Project
             }
 
             Application.Run(new AdminDashboardForm());
+            AppServices.Backend.Dispose();
+        }
+
+        private static void Configure(StoreProfile profile)
+        {
+            var culture = CultureInfo.GetCultureInfo(profile.Culture);
+            Thread.CurrentThread.CurrentCulture = culture;
+            Thread.CurrentThread.CurrentUICulture = culture;
+
+            if (!profile.IsOnline)
+            {
+                Database.UseDatabaseFile(profile.DatabasePath);
+                Database.Initialize();
+                var userRepo = new UserRepository();
+                userRepo.EnsureUsersSchemaAndSeed();
+                if (profile.IsDemo) DemoDataSeeder.SeedIfEmpty();
+            }
+            AppServices.Configure(profile);
         }
     }
 }

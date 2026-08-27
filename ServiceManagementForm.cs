@@ -169,7 +169,7 @@ ORDER BY datetime(COALESCE(created_at,date_time)) DESC,id DESC;";
             if (_history.Columns.Contains("service_cost"))
             {
                 _history.Columns["service_cost"].DefaultCellStyle.Format = "C0";
-                _history.Columns["service_cost"].DefaultCellStyle.FormatProvider = CultureInfo.GetCultureInfo("id-ID");
+                _history.Columns["service_cost"].DefaultCellStyle.FormatProvider = StoreFormat.Culture;
             }
         }
 
@@ -247,7 +247,7 @@ UPDATE services SET customer_name=$customer,customer_phone=$phone,brand=$brand,t
                 if (e.Graphics == null || _printRow == null) return;
                 var g = e.Graphics; var x = e.MarginBounds.Left; var y = e.MarginBounds.Top;
                 using var title = new Font("Segoe UI", 18, FontStyle.Bold); using var heading = new Font("Segoe UI", 11, FontStyle.Bold); using var body = new Font("Segoe UI", 10);
-                g.DrawString("CV NIAGA BERSAMA ABADI", title, Brushes.Black, x, y); y += 40;
+                g.DrawString(AppServices.Profile.StoreName.ToUpperInvariant(), title, Brushes.Black, x, y); y += 40;
                 g.DrawString("FORM SERVICE SEPEDA LISTRIK", heading, Brushes.Black, x, y); y += 30;
                 foreach (var line in new[]
                 {
@@ -255,7 +255,7 @@ UPDATE services SET customer_name=$customer,customer_phone=$phone,brand=$brand,t
                     $"Pelanggan: {_printRow["customer_name"]}", $"Telepon: {_printRow["customer_phone"]}",
                     $"Sepeda: {_printRow["brand"]} {_printRow["type"]} {_printRow["color"]}",
                     $"Jenis service: {_printRow["service_type"]}", $"Status: {_printRow["service_status"]}",
-                    $"Biaya: Rp {Convert.ToDecimal(_printRow["service_cost"]):N0}", $"Catatan: {_printRow["notes"]}"
+                    $"Biaya: {StoreFormat.Money(Convert.ToDecimal(_printRow["service_cost"]))}", $"Catatan: {_printRow["notes"]}"
                 }) { g.DrawString(line, body, Brushes.Black, x, y); y += 24; }
                 y += 50; g.DrawString("Teknisi / Staff", body, Brushes.Black, x, y); g.DrawString("Pelanggan", body, Brushes.Black, e.MarginBounds.Right - 160, y);
             };

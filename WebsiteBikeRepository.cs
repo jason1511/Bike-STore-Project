@@ -32,6 +32,7 @@ namespace Bike_STore_Project
         public string Image { get; set; } = "";
         public string Alt { get; set; } = "";
         public string Comfort { get; set; } = "medium";
+        public string ColorName { get; set; } = "";
         public string Description { get; set; } = "";
         public decimal Price { get; set; }
         public bool Featured { get; set; }

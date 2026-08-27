@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Data.Sqlite;
+using System.IO;
 
 namespace Bike_STore_Project
 {
@@ -14,7 +15,25 @@ namespace Bike_STore_Project
         /// </summary>
         public static void UseDatabaseFile(string filePath)
         {
-            _connectionString = $"Data Source={filePath}";
+            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentException("Database path is required.", nameof(filePath));
+            var fullPath = Path.GetFullPath(filePath);
+            var directory = Path.GetDirectoryName(fullPath);
+            if (!string.IsNullOrWhiteSpace(directory)) Directory.CreateDirectory(directory);
+            _connectionString = new SqliteConnectionStringBuilder { DataSource = fullPath }.ToString();
+        }
+
+        public static string CurrentDataSource => new SqliteConnectionStringBuilder(_connectionString).DataSource;
+
+        public static void DeleteDatabaseFile(string filePath)
+        {
+            var fullPath = Path.GetFullPath(filePath);
+            SqliteConnection.ClearAllPools();
+            if (File.Exists(fullPath)) File.Delete(fullPath);
+            foreach (var suffix in new[] { "-wal", "-shm" })
+            {
+                var sidecar = fullPath + suffix;
+                if (File.Exists(sidecar)) File.Delete(sidecar);
+            }
         }
 
         public static void Initialize()

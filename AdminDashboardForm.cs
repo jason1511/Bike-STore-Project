@@ -22,7 +22,7 @@ namespace Bike_STore_Project
 
         public AdminDashboardForm()
         {
-            Text = "CV Niaga Bersama Abadi — Desktop Admin";
+            Text = $"{AppServices.Profile.StoreName} — Desktop Admin";
             WindowState = FormWindowState.Maximized;
             MinimumSize = new Size(1100, 700);
             AutoScaleMode = AutoScaleMode.Dpi;
@@ -52,16 +52,17 @@ namespace Bike_STore_Project
             var panel = new Panel { Dock = DockStyle.Top, Height = 96, BackColor = UiTheme.Sidebar, Padding = new Padding(16, 18, 10, 10) };
             var mark = new Label
             {
-                Text = "NBA", Width = 48, Height = 48, TextAlign = ContentAlignment.MiddleCenter,
+                Text = AppServices.Profile.ShortName, Width = 48, Height = 48, TextAlign = ContentAlignment.MiddleCenter,
                 BackColor = Color.White, ForeColor = UiTheme.Sidebar, Font = new Font("Segoe UI", 11F, FontStyle.Bold), Dock = DockStyle.Left
             };
-            var title = new Label { Text = "NIAGA BERSAMA\nDesktop Admin", ForeColor = Color.White, Font = new Font("Segoe UI Semibold", 10F), Dock = DockStyle.Fill, Padding = new Padding(12, 5, 0, 0) };
+            var displayName = AppServices.Profile.StoreName.Length > 22 ? AppServices.Profile.ProfileName : AppServices.Profile.StoreName;
+            var title = new Label { Text = $"{displayName.ToUpperInvariant()}\n{AppServices.Profile.BackendLabel}", ForeColor = Color.White, Font = new Font("Segoe UI Semibold", 9F), Dock = DockStyle.Fill, Padding = new Padding(12, 3, 0, 0) };
             panel.Controls.Add(title); panel.Controls.Add(mark); return panel;
         }
 
         private Panel BuildSidebarFooter()
         {
-            var panel = new Panel { Dock = DockStyle.Bottom, Height = 116, BackColor = UiTheme.Sidebar, Padding = new Padding(14, 10, 14, 14) };
+            var panel = new Panel { Dock = DockStyle.Bottom, Height = 152, BackColor = UiTheme.Sidebar, Padding = new Padding(14, 10, 14, 14) };
             var line = new Panel { Dock = DockStyle.Top, Height = 1, BackColor = Color.FromArgb(70, 95, 94) };
             var user = new Label { Name = "sidebarUser", Dock = DockStyle.Top, Height = 28, ForeColor = Color.White, Font = new Font("Segoe UI Semibold", 9.5F), Padding = new Padding(0, 8, 0, 0) };
             var role = new Label { Name = "sidebarRole", Dock = DockStyle.Top, Height = 25, ForeColor = Color.FromArgb(180, 199, 196), Font = new Font("Segoe UI", 8F) };
@@ -70,8 +71,14 @@ namespace Bike_STore_Project
                 Text = "Sign out", Dock = DockStyle.Bottom, Height = 34, FlatStyle = FlatStyle.Flat,
                 BackColor = UiTheme.SidebarHover, ForeColor = Color.White, Cursor = Cursors.Hand, Tag = "nav"
             };
+            var settings = new Button
+            {
+                Text = "Store settings", Dock = DockStyle.Bottom, Height = 32, FlatStyle = FlatStyle.Flat,
+                BackColor = UiTheme.Sidebar, ForeColor = Color.FromArgb(210, 223, 220), Cursor = Cursors.Hand, Tag = "nav"
+            };
+            settings.FlatAppearance.BorderColor = Color.FromArgb(90, 115, 112); settings.Click += (_, __) => OpenStoreSettings();
             logout.FlatAppearance.BorderColor = Color.FromArgb(90, 115, 112); logout.Click += (_, __) => Logout();
-            panel.Controls.Add(logout); panel.Controls.Add(role); panel.Controls.Add(user); panel.Controls.Add(line); return panel;
+            panel.Controls.Add(logout); panel.Controls.Add(settings); panel.Controls.Add(role); panel.Controls.Add(user); panel.Controls.Add(line); return panel;
         }
 
         private Panel BuildTopHeader()
@@ -91,6 +98,7 @@ namespace Bike_STore_Project
             AddNav("dashboard", "Overview", "Daily operations and key figures");
             AddSection("OPERATIONS");
             AddNav("inventory", "Bicycles & stock", "Website-style bicycle, colour and stock management");
+            if (!AppServices.Backend.SupportsFullDesktopWorkflow) return;
             AddNav("sales", "Sales & invoices", "Create, print and review invoices");
             AddNav("service", "Service", "Service jobs and status");
             if (AppSession.IsAdmin)
@@ -138,8 +146,12 @@ namespace Bike_STore_Project
                 case "users": page = Embed(new UserManagementForm()); title = "Users"; subtitle = "Manage staff access, roles, status and password resets."; break;
                 case "activity": page = Embed(new LocalAdminCenterForm(LocalAdminSection.Activity)); title = "Activity"; subtitle = "Trace important actions back to the signed-in user."; break;
                 default:
-                    var dashboard = new DashboardPageControl(); dashboard.NavigateRequested += ShowPage;
-                    page = dashboard; title = "Overview"; subtitle = $"Welcome back, {AppSession.Username}. Here is what is happening in the store today."; key = "dashboard"; break;
+                    if (AppServices.Backend.SupportsFullDesktopWorkflow)
+                    {
+                        var dashboard = new DashboardPageControl(); dashboard.NavigateRequested += ShowPage; page = dashboard;
+                    }
+                    else page = new OnlineOverviewControl();
+                    title = "Overview"; subtitle = $"{AppServices.Profile.StoreName} · {AppServices.Profile.BackendLabel}"; key = "dashboard"; break;
             }
 
             _currentPage?.Dispose(); _host.Controls.Clear(); _currentPage = page; page.Dock = DockStyle.Fill; _host.Controls.Add(page);
@@ -191,9 +203,19 @@ namespace Bike_STore_Project
         {
             if (MessageBox.Show("Sign out of the desktop admin?", "Sign out", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
             AppSession.SignOut(); Hide();
+            AppServices.Backend.SignOut();
             using var login = new LoginForm();
             if (login.ShowDialog() != DialogResult.OK) { Close(); return; }
             RebuildNavigation(); UpdateSessionLabels(); _currentKey = ""; Show(); ShowPage("dashboard");
+        }
+
+        private void OpenStoreSettings()
+        {
+            using var setup = new StoreSetupForm(AppServices.Profile);
+            if (setup.ShowDialog(this) != DialogResult.OK) return;
+            MessageBox.Show("The app will restart to apply the new store profile.", "Store settings", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            Application.Restart();
+            Close();
         }
 
         private static Control? FindControl(Control root, string name)

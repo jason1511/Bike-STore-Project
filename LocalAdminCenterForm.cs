@@ -193,7 +193,7 @@ FROM audit_log ORDER BY datetime(created_at) DESC,id DESC;");
             decimal cost = Scalar(conn, @"SELECT COALESCE(SUM(sl.qty_sold*sl.unit_cost),0) FROM sale_lines sl JOIN sales s ON s.id=sl.sale_id WHERE s.voided=0 AND datetime(s.date_time)>=datetime($from) AND datetime(s.date_time)<datetime($to);", from, to);
             decimal stockIn = Scalar(conn, @"SELECT COALESCE(SUM(CASE WHEN quantity_change>0 THEN quantity_change ELSE 0 END),0) FROM stock_movements WHERE LOWER(movement_type)='stock_in' AND datetime(created_at)>=datetime($from) AND datetime(created_at)<datetime($to);", from, to);
             decimal stockOut = Scalar(conn, @"SELECT COALESCE(ABS(SUM(CASE WHEN quantity_change<0 THEN quantity_change ELSE 0 END)),0) FROM stock_movements WHERE datetime(created_at)>=datetime($from) AND datetime(created_at)<datetime($to);", from, to);
-            _reportSummary = $"Period: {_from.Value:dd MMM yyyy} – {_to.Value:dd MMM yyyy}    Sales: Rp {revenue:N0}    Service: Rp {service:N0}    Gross profit: Rp {revenue - cost:N0}    Stock in/out: {stockIn:N0}/{stockOut:N0}";
+            _reportSummary = $"Period: {_from.Value:dd MMM yyyy} – {_to.Value:dd MMM yyyy}    Sales: {StoreFormat.Money(revenue)}    Service: {StoreFormat.Money(service)}    Gross profit: {StoreFormat.Money(revenue - cost)}    Stock in/out: {stockIn:N0}/{stockOut:N0}";
             _summary.Text = _reportSummary;
 
             using var cmd = conn.CreateCommand();
@@ -225,7 +225,7 @@ ORDER BY date DESC;";
                 if (_report.Columns.Contains(name))
                 {
                     _report.Columns[name].DefaultCellStyle.Format = "C0";
-                    _report.Columns[name].DefaultCellStyle.FormatProvider = CultureInfo.GetCultureInfo("id-ID");
+                    _report.Columns[name].DefaultCellStyle.FormatProvider = StoreFormat.Culture;
                 }
 
             using var breakdown = conn.CreateCommand();
@@ -331,14 +331,14 @@ SELECT section,label,value FROM (
                 var y = e.MarginBounds.Top;
                 using var title = new Font("Segoe UI", 16, FontStyle.Bold);
                 using var body = new Font("Segoe UI", 9);
-                e.Graphics.DrawString("CV NIAGA BERSAMA ABADI — BUSINESS REPORT", title, Brushes.Black, e.MarginBounds.Left, y);
+                e.Graphics.DrawString(StoreFormat.ReportHeader, title, Brushes.Black, e.MarginBounds.Left, y);
                 y += 35;
                 e.Graphics.DrawString(_reportSummary, body, Brushes.Black, new RectangleF(e.MarginBounds.Left, y, e.MarginBounds.Width, 50));
                 y += 55;
                 foreach (DataGridViewRow row in _report.Rows)
                 {
                     if (row.IsNewRow) continue;
-                    var line = $"{row.Cells["date"].Value}    Sales: Rp {Convert.ToDecimal(row.Cells["sales"].Value):N0}    Service: Rp {Convert.ToDecimal(row.Cells["service"].Value):N0}    Total: Rp {Convert.ToDecimal(row.Cells["total"].Value):N0}";
+                    var line = $"{row.Cells["date"].Value}    Sales: {StoreFormat.Money(Convert.ToDecimal(row.Cells["sales"].Value))}    Service: {StoreFormat.Money(Convert.ToDecimal(row.Cells["service"].Value))}    Total: {StoreFormat.Money(Convert.ToDecimal(row.Cells["total"].Value))}";
                     e.Graphics.DrawString(line, body, Brushes.Black, e.MarginBounds.Left, y);
                     y += 20;
                 }

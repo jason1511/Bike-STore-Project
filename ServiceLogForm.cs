@@ -131,7 +131,7 @@ ORDER BY datetime(COALESCE(created_at, date_time)) DESC, id DESC;";
             {
                 var col = dgvServices.Columns["service_cost"];
                 col.DefaultCellStyle.Format = "C0";
-                col.DefaultCellStyle.FormatProvider = CultureInfo.GetCultureInfo("id-ID");
+                col.DefaultCellStyle.FormatProvider = StoreFormat.Culture;
             }
 
             // Notes wider + wrap

@@ -80,7 +80,7 @@ ORDER BY datetime(l.received_at) ASC, sl.stock_lot_id ASC;
                     {
                         var col = dgvSaleLines.Columns[name];
                         col.DefaultCellStyle.Format = "C0";
-                        col.DefaultCellStyle.FormatProvider = CultureInfo.GetCultureInfo("id-ID");
+                        col.DefaultCellStyle.FormatProvider = StoreFormat.Culture;
                     }
                 }
 
@@ -214,7 +214,7 @@ ORDER BY datetime(s.date_time) DESC, s.id DESC;";
                 {
                     var col = dgvSales.Columns[name];
                     col.DefaultCellStyle.Format = "C0";
-                    col.DefaultCellStyle.FormatProvider = CultureInfo.GetCultureInfo("id-ID");
+                    col.DefaultCellStyle.FormatProvider = StoreFormat.Culture;
                 }
             }
 

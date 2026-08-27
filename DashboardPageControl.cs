@@ -69,15 +69,21 @@ namespace Bike_STore_Project
                 var invoiceCount = Scalar(conn, "SELECT COUNT(*) FROM invoices WHERE status='ACTIVE' AND date(created_at)=$date;", today);
                 var serviceCount = Scalar(conn, "SELECT COUNT(*) FROM services WHERE UPPER(COALESCE(service_status,'RECEIVED')) IN ('RECEIVED','IN_PROGRESS');", today, false);
                 var stock = Scalar(conn, "SELECT COALESCE(SUM(qty_remaining),0) FROM stock_lots;", today, false);
-                var lowStock = Scalar(conn, @"SELECT COUNT(*) FROM (SELECT p.id,COALESCE(SUM(l.qty_remaining),0) qty FROM products p LEFT JOIN stock_lots l ON l.product_id=p.id WHERE COALESCE(p.is_active,1)=1 GROUP BY p.id HAVING qty<=2);", today, false);
+                decimal lowStock;
+                using (var lowStockCommand = conn.CreateCommand())
+                {
+                    lowStockCommand.CommandText = @"SELECT COUNT(*) FROM (SELECT p.id,COALESCE(SUM(l.qty_remaining),0) qty FROM products p LEFT JOIN stock_lots l ON l.product_id=p.id WHERE COALESCE(p.is_active,1)=1 GROUP BY p.id HAVING qty<=$threshold);";
+                    lowStockCommand.Parameters.AddWithValue("$threshold", AppServices.Profile.LowStockThreshold);
+                    lowStock = Convert.ToDecimal(lowStockCommand.ExecuteScalar() ?? 0);
+                }
                 var cost = Scalar(conn, "SELECT COALESCE(SUM(sl.qty_sold*sl.unit_cost),0) FROM sale_lines sl JOIN sales s ON s.id=sl.sale_id WHERE s.voided=0 AND date(s.date_time)=$date;", today);
 
-                AddMetric("Today's sales", $"Rp {sales:N0}", UiTheme.Accent);
+                AddMetric("Today's sales", StoreFormat.Money(sales), UiTheme.Accent);
                 AddMetric("Invoices", invoiceCount.ToString("N0"), Color.FromArgb(77, 105, 160));
                 AddMetric("Open services", serviceCount.ToString("N0"), UiTheme.Warning);
                 AddMetric("Stock units", stock.ToString("N0"), UiTheme.Success);
                 AddMetric("Low stock", lowStock.ToString("N0"), UiTheme.Danger);
-                AddMetric("Gross profit", $"Rp {sales - cost:N0}", Color.FromArgb(105, 88, 155));
+                AddMetric("Gross profit", StoreFormat.Money(sales - cost), Color.FromArgb(105, 88, 155));
 
                 _invoices.DataSource = Query(conn, @"
 SELECT i.invoice_number AS invoice,i.customer_name AS customer,i.payment_method AS payment,
@@ -161,7 +167,7 @@ ORDER BY datetime(COALESCE(created_at,date_time)) DESC LIMIT 8;");
         }
         private static void FormatMoney(DataGridViewColumn column)
         {
-            column.DefaultCellStyle.Format = "C0"; column.DefaultCellStyle.FormatProvider = CultureInfo.GetCultureInfo("id-ID");
+            column.DefaultCellStyle.Format = "C0"; column.DefaultCellStyle.FormatProvider = StoreFormat.Culture;
         }
     }
 
