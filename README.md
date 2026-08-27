@@ -4,22 +4,24 @@
 [![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4)](https://dotnet.microsoft.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A configurable Windows desktop application for running an electric bicycle store. It combines catalogue and colour-variant management, FIFO inventory, sales invoices, service jobs, reporting, users and an audit trail in one C# WinForms application.
+Bike Store Desktop is a configurable C# WinForms application for managing an electric bicycle store. It can run as a resettable demo, use a persistent local SQLite database, or connect its catalogue and stock screens to an online store API.
 
-The project began as an internal tool for CV Niaga Bersama Abadi. It now has three selectable store profiles so the repository can also be used as a safe demo, a standalone offline system, or a desktop client for an online store.
+The application follows the Bike Store Website catalogue model: a bicycle is the parent record and each bicycle contains one or more colour variants. Local mode extends that model with FIFO purchase lots, invoicing, service jobs, reporting, users, and an audit trail.
 
-## What the application does
+## Current status
 
-The normal Demo or Local workflow is:
+| Workflow | Demo | Local SQLite | Online API |
+| --- | :---: | :---: | :---: |
+| Login | Yes | Yes | Yes |
+| Bicycle catalogue and search | Yes | Yes | Yes |
+| Bicycle and colour editing | Yes | Yes | Yes |
+| Receive stock or add a colour | Yes | Yes | Yes |
+| FIFO purchase-cost lots | Yes | Yes | No |
+| Sales invoices and stock allocation | Yes | Yes | Not implemented |
+| Service jobs | Yes | Yes | Not implemented |
+| Dashboard, reports, users, and audit | Yes | Yes | Not implemented |
 
-1. Configure a store profile and sign in.
-2. Create bicycle models and their available colour variants.
-3. Use **Tambah Stok** to receive a new batch for an existing colour or add a new colour to a bicycle.
-4. Create a multi-item sales invoice. Stock is allocated from the oldest available purchase lots first.
-5. Print the A5 customer invoice, or manage service jobs and print an A4 service document.
-6. Review stock movements, revenue, service income, gross profit and user activity from the administration screens.
-
-The application uses the same bicycle → colour → stock flow as the Bike Store Website while retaining desktop-specific FIFO purchase-cost tracking for local accounting.
+Online mode deliberately hides local-only screens. The application never falls back to a local database for an unsupported online operation, so cloud and local records cannot be mixed accidentally.
 
 ## Quick start
 
@@ -31,206 +33,262 @@ The application uses the same bicycle → colour → stock flow as the Bike Stor
 ```powershell
 git clone https://github.com/jason1511/Bike-STore-Project.git
 cd Bike-STore-Project
-dotnet restore
-dotnet run
+dotnet restore "Bike STore Project.sln"
+dotnet run --project "Bike STore Project.csproj"
 ```
 
-On first launch, select **Try the demo** and save the profile. The app creates the
-`admin` account with a random one-time password and displays it on the first login
-screen. Resetting the demo database generates a new password. The demo does not
-connect to CV Niaga Bersama or any production data.
+### First launch
 
-## Choose a storage mode
+1. Select **Demo**, **Local SQLite**, or **Online API**.
+2. Enter the store profile and display details.
+3. For Local mode, choose a SQLite file. For Online mode, enter a valid HTTPS store URL and optionally check the connection.
+4. Select **Save and continue**.
+5. Sign in.
 
-| Mode | Storage | Available workflow | Intended use |
-| --- | --- | --- | --- |
-| **Demo** | Seeded SQLite database | Complete desktop workflow | Evaluation, screenshots and experimentation |
-| **Local** | Persistent SQLite file | Complete desktop workflow | One offline computer or a small store |
-| **Online** | Authenticated HTTPS API | Catalogue, colour variants and stock quantity | A deployed store backed by Cloudflare |
+For a new Demo or Local database, the app creates the `admin` account with a random first-run password. The password is shown on the first login screen for that database; copy it before closing the application. After signing in, an administrator can reset passwords from **Users**.
 
-The current profile and backend mode remain visible in the application. In Online mode, local-only screens are hidden so cloud records cannot be mixed accidentally with a SQLite database.
+Resetting Demo data deletes only the isolated demo database. The sample data and a new administrator password are generated on the next start.
 
-You can change modes from **Store settings**. The application restarts after applying a different profile.
+## Store profiles
+
+### Demo
+
+- Uses `%LOCALAPPDATA%\BikeStoreDesktop\demo.db`.
+- Seeds safe sample bicycles and stock.
+- Supports the complete local workflow.
+- Can be reset from **Store settings**.
+- Never connects to the production website or Cloudflare.
+
+### Local SQLite
+
+- Uses `%LOCALAPPDATA%\BikeStoreDesktop\store.db` by default.
+- Can point to another SQLite file selected during setup.
+- Supports the complete desktop workflow.
+- Validates the database path and opens the file before saving the profile.
+- Intended for one computer, an offline store, or development against local data.
+
+### Online API
+
+- Stores only the HTTPS base URL as part of the profile.
+- Authenticates through the connected store server.
+- Supports catalogue, colour variants, active status, and stock quantity.
+- Keeps the bearer token in memory until sign-out or application exit.
+- Does not store the user's password, bearer token, Cloudflare token, D1 ID, or D1 credentials in the profile file.
+
+The CV Niaga Bersama preset currently uses `https://niagabersama.com`. The desktop app talks to the server API; it never connects directly to D1.
 
 ## Application workflow
 
-### 1. Store setup and login
+### 1. Set up and sign in
 
-The first-run setup collects the store name, sidebar abbreviation, language/currency, invoice title and low-stock threshold. Depending on the selected mode, it also stores either a SQLite file path or an HTTPS API base URL.
+The Store Setup screen collects:
 
-Demo and Local users are authenticated against the local `users` table. Passwords are stored as PBKDF2 hashes. Online users sign in through the connected store's `/api/admin/login` endpoint; the returned bearer token is kept in memory only until sign-out or application exit.
+- Profile name
+- Store name and short sidebar name
+- Language and currency
+- Invoice title
+- Low-stock warning level
+- SQLite path or online API URL, when required
 
-### 2. Catalogue and colour variants
+Saved settings are loaded at startup. If the settings file is missing or unreadable, the app opens Store Setup instead of silently continuing with the wrong database. If a selected profile cannot be opened, the user can correct it and retry.
 
-A bicycle is the parent catalogue record. Each bicycle can contain multiple colour variants, with each colour carrying its own display details and available quantity.
+Demo and Local accounts are stored in SQLite with PBKDF2 password hashes. Online login uses `POST /api/admin/login`, and the returned server role is mapped to Administrator or Staff.
 
-From **Bicycles & stock**, users can:
+### 2. Manage bicycles and colours
 
-- Search the catalogue by brand, model or colour
-- Add a bicycle with its initial colour variant
-- Edit bicycle and colour information
-- Activate or deactivate catalogue entries according to permissions
-- Open the dedicated **Tambah Stok** workflow
+Open **Bicycles & stock** to:
 
-### 3. Receiving stock
+- Search by brand, model, or colour
+- Add a bicycle and its initial colour variants
+- Edit specifications, selling price, visibility, images, and colours
+- View total stock across all colours
+- Deactivate or reactivate a bicycle as an administrator
 
-**Tambah Stok** handles both stock scenarios without forcing users through the general bicycle editor:
+The bicycle editor matches the website-shaped catalogue fields, including brand, model, battery, motor, speed, range, safety, images, description, featured state, and a list of colour objects.
 
-- Select an existing colour to increase its stock.
-- Enter a new colour to add that variant and its first stock quantity.
+### 3. Receive stock
 
-In Demo and Local modes, every receipt creates a FIFO `stock_lots` record containing the received quantity, remaining quantity, purchase cost and receipt time. A corresponding `stock_movements` entry provides an auditable stock history.
+Select **Receive stock** from **Bicycles & stock**.
 
-Online mode sends the colour and quantity update through the authenticated Cloudflare API. FIFO purchase-cost lots are currently a local desktop capability and are not claimed by the Online adapter.
+1. Choose a bicycle.
+2. Select an existing colour or add a new colour.
+3. Enter the received quantity.
+4. In Demo or Local mode, enter the unit purchase cost, receipt time, and optional reference notes.
+5. Confirm the receipt.
 
-### 4. Sales and invoices
+In Demo and Local modes, the receipt creates a `stock_lots` batch and a `stock_movements` entry. The lot retains its purchase cost and remaining quantity for FIFO allocation. Online mode sends the updated colour quantity through the authenticated API and does not claim local FIFO cost support.
 
-The local invoice workflow supports multiple bicycles in one transaction. For each line, the user selects a bicycle/colour, quantity, selling price and optional frame numbers. Customer and payment details are stored on the invoice.
+### 4. Create and manage invoices
 
-When an invoice is saved:
+Invoices are available in Demo and Local modes.
 
-1. Available stock is validated.
-2. The oldest stock lots are consumed first.
-3. Each allocation and its purchase-cost snapshot is recorded in `sale_lines`.
-4. Invoice items and stock movements are written in the same database transaction.
-5. The invoice can be previewed and printed in A5 format.
+1. Add one or more bicycle/colour items.
+2. Enter quantity, selling price, and optional frame numbers for each line.
+3. Enter customer, payment, and invoice details.
+4. Select **Save invoice** or **Save and print invoice**.
 
-Administrators can edit invoice details, void an invoice and restore its stock, or delete an obsolete record. Voiding preserves the history and records the stock restoration.
+Saving an invoice runs in one SQLite transaction:
 
-### 5. Service jobs
+1. Available stock is checked.
+2. The oldest available stock lots are consumed first.
+3. Cost and selling-price snapshots are written to `sale_lines`.
+4. Invoice items and outgoing stock movements are recorded.
+5. The invoice becomes available in history and can be printed in A5 format.
 
-Service intake records the customer, bicycle, complaint/work details, cost and status. Staff can create and print service documents; administrators can update status, edit details or remove records. Open jobs appear on the dashboard until completed or cancelled.
+Administrators can edit invoice metadata, void an invoice and restore its allocated stock, or delete an obsolete invoice record. A print-preview failure does not turn a successfully saved invoice into a failed sale.
 
-### 6. Dashboard and administration
+### 5. Manage service jobs
 
-The local dashboard provides:
+The Service screen records customer and bicycle details, the requested work, notes, cost, and job status. Staff can create and print service documents. Administrators can edit service history, update status, or delete a record.
+
+Supported statuses are **Received**, **In progress**, **Completed**, and **Cancelled**. Open service jobs appear on the local dashboard.
+
+### 6. Review operations
+
+The Demo and Local dashboard shows:
 
 - Today's sales and invoice count
 - Open service jobs
 - Total and low-stock units
-- Estimated gross profit from recorded FIFO costs
+- Estimated gross profit from FIFO costs
 - Seven-day sales and stock-movement charts
 - Recent invoices and active service jobs
 
-Administrator-only screens cover brands, stock movements, date-range reports, user accounts and the audit trail. Staff retain day-to-day catalogue, stock receipt, invoice and service access without destructive or account-management permissions.
+Administrator navigation also provides:
+
+- **Brands** — add, rename, activate, or deactivate brands
+- **Stock movements** — review receipts, sales, adjustments, and void restorations
+- **Reports** — filter sales, service income, gross profit, and stock in/out by date and print the report
+- **Users** — create accounts, reset passwords, change roles, enable/disable, or delete users
+- **Activity** — review the audit trail and the signed-in actor for important changes
+
+### 7. Switch profiles or sign out
+
+Use **Store settings** in the sidebar to change the profile. The application restarts after saving so every screen is rebuilt against the selected backend. **Sign out** clears the current session; Online mode also clears its in-memory bearer token.
 
 ## Roles and permissions
 
 | Capability | Staff | Administrator |
 | --- | :---: | :---: |
-| View, add and edit the catalogue | Yes | Yes |
-| Receive stock or add a colour | Yes | Yes |
+| View, add, and edit bicycles and colours | Yes | Yes |
+| Receive stock | Yes | Yes |
 | Create and print invoices | Yes | Yes |
 | Create and print service jobs | Yes | Yes |
-| Deactivate or reactivate catalogue records | No | Yes |
-| Edit/void invoices and restore stock | No | Yes |
+| Deactivate or reactivate bicycles | No | Yes |
+| Edit, void, or delete invoice history | No | Yes |
 | Edit service history and status | No | Yes |
-| Manage brands and users | No | Yes |
-| View reports, movements and audit activity | No | Yes |
+| Manage brands and user accounts | No | Yes |
+| View reports, movements, and activity | No | Yes |
 
-New Demo and Local databases create the starter administrator shown in Quick start. Change that password before using a Local profile operationally. Online permissions come from the connected server.
+The user-management screen prevents an administrator from disabling, demoting, or deleting the account currently in use.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-    UI[WinForms desktop UI] --> Contract[IStoreBackend]
-    Contract --> SQLite[SQLite backend]
-    Contract --> Online[Cloudflare API backend]
-    SQLite --> DemoDB[(Demo database)]
-    SQLite --> LocalDB[(Local store database)]
-    Online --> HTTPS[Authenticated HTTPS API]
-    HTTPS --> Worker[Cloudflare Worker or Pages Functions]
-    Worker --> D1[(Cloudflare D1)]
+    Shell[WinForms application shell]
+    Shared[Login and catalogue screens]
+    LocalOnly[Invoices service reports users and audit]
+    Backend[IStoreBackend]
+    Repositories[SQLite repositories]
+    Sqlite[SqliteStoreBackend]
+    Cloud[CloudflareStoreBackend]
+    Demo[(Demo SQLite)]
+    Local[(Local SQLite)]
+    Api[Authenticated HTTPS API]
+    Worker[Cloudflare Worker or Pages Functions]
+    D1[(Cloudflare D1)]
+
+    Shell --> Shared
+    Shell --> LocalOnly
+    Shared --> Backend
+    Backend --> Sqlite
+    Backend --> Cloud
+    Sqlite --> Demo
+    Sqlite --> Local
+    LocalOnly --> Repositories
+    Repositories --> Demo
+    Repositories --> Local
+    Cloud --> Api
+    Api --> Worker
+    Worker --> D1
 ```
 
-`IStoreBackend` defines store operations instead of exposing SQL to the interface. Demo and Local profiles use `SqliteStoreBackend`; Online profiles use `CloudflareStoreBackend`.
+`IStoreBackend` is the shared boundary for login, connection checks, brands, bicycles, colour variants, stock receipt, and active status. Demo and Local profiles use `SqliteStoreBackend`; Online profiles use `CloudflareStoreBackend`.
 
-The desktop application never connects directly to D1. It sends authenticated HTTPS requests to the store API, and only the server-side Worker or Pages Functions can access the D1 binding.
+The full invoice, service, reporting, user, and audit workflow is currently implemented by local SQLite repositories. These modules are hidden in Online mode until equivalent server endpoints and transaction rules exist.
 
-### Current backend coverage
+### Online API currently expected
 
-| Operation | Demo/Local | Online |
-| --- | :---: | :---: |
-| Login | Yes | Yes |
-| Browse and search bicycles | Yes | Yes |
-| Add/edit bicycles and colours | Yes | Yes |
-| Receive stock quantity | Yes | Yes |
-| FIFO purchase-cost tracking | Yes | No |
-| Invoices, service, reports and users | Yes | Planned |
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/bikes` | Connection check |
+| `POST` | `/api/admin/login` | Authenticate and return a token, username, and role |
+| `GET` | `/api/admin/brands` | Load active catalogue brands |
+| `GET` | `/api/admin/bikes` | Load the admin bicycle catalogue |
+| `POST` | `/api/admin/bikes` | Create a bicycle |
+| `PUT` | `/api/admin/bikes` | Update bicycle details, colours, quantity, or active state |
 
-This boundary is intentional: incomplete cloud modules remain hidden instead of silently writing to a local database. Hybrid/offline synchronisation is deferred until conflict, retry and idempotency rules are fully defined.
+Authenticated requests use `Authorization: Bearer <token>`. Write requests also include an `Idempotency-Key` header.
 
 ## Local database model
 
-| Area | Main tables | Purpose |
+| Area | Main tables | Responsibility |
 | --- | --- | --- |
-| Catalogue | `brands`, `bikes`, `products` | Bicycle models and sellable colour variants |
-| Inventory | `stock_lots`, `stock_movements` | FIFO receipt batches and stock history |
-| Sales | `invoices`, `invoice_items`, `invoice_sequences`, `sales`, `sale_lines` | Printable invoices, line items and FIFO allocations |
-| Service | `services` | Service intake, progress and history |
-| Administration | `users`, `audit_log` | Accounts, roles and traceable actions |
+| Website-style catalogue | `brands`, `bikes` | Parent bicycles and JSON colour variants |
+| Local sellable variants | `products` | Colour-level records used by FIFO sales |
+| Inventory | `stock_lots`, `stock_movements` | Purchase batches, remaining quantities, and movement history |
+| Sales | `sales`, `sale_lines` | Sale records and FIFO lot allocations |
+| Invoicing | `invoices`, `invoice_items`, `invoice_sequences` | Customer documents, lines, status, and numbering |
+| Service | `services` | Intake, status, cost, completion, and history |
+| Administration | `users`, `audit_log` | Accounts, roles, login events, and operational audit entries |
 
-Database initialisation is additive. Existing records are retained while missing tables, columns and indexes are created. Related inventory and invoice writes use SQLite transactions to avoid partial updates.
+Database initialization is additive. It creates missing tables, columns, and indexes while retaining existing data. Legacy product quantities are converted into opening FIFO lots and movement records. Related receipts, invoice sales, void restorations, and administrative updates use transactions to avoid partial writes.
 
 ## Configuration and data locations
 
-Non-secret profile settings are saved to:
-
 ```text
-%LOCALAPPDATA%\BikeStoreDesktop\store-profile.json
+%LOCALAPPDATA%\BikeStoreDesktop\
+├── store-profile.json
+├── demo.db
+└── store.db
 ```
 
-Default databases are stored beside that file as `demo.db` and `store.db`. A Local profile may point to another `.db` file selected during setup.
+`store-profile.json` contains non-secret display and connection settings. A Local profile can reference a database stored elsewhere.
 
-The profile file may contain the online server address, but it does not contain the user's password, bearer token, Cloudflare credentials, D1 database ID or Cloudflare API token.
-
-To restore the sample dataset, open **Store settings → Reset demo data**. This deletes only the isolated demo database and recreates it on the next start.
-
-## Technology
-
-- C# and .NET 8
-- Windows Forms
-- Microsoft.Data.Sqlite
-- SQLite transactions and FIFO stock allocation
-- `HttpClient` and `System.Text.Json` for the online adapter
-- Cloudflare Workers/Pages Functions and D1 for the CV Niaga Bersama deployment
-- GitHub Actions on `windows-latest`
-
-## Repository structure
+## Project structure
 
 ```text
-Backends/            Backend contract plus SQLite and Cloudflare adapters
-Configuration/       Store profiles, application paths and saved settings
-Core/                Session, permissions, hashing, prompts and formatting
+Backends/            Shared backend contract and SQLite/Cloudflare adapters
+Configuration/       Store profiles, saved settings, and application paths
+Core/                Session, permissions, hashing, prompts, and formatting
 Data/
-  Models/            Catalogue, invoice and user data objects
-  Repositories/      SQLite queries and transactional business operations
+  Models/            Invoice, catalogue, and user data objects
+  Repositories/      SQLite business operations and transactions
 UI/
-  Controls/          Dashboard, online overview, charts and shared theme
-  Dialogs/           Bicycle and stock workflow dialogs
-  Forms/             Setup, login and operational/admin screens
-Program.cs           Startup, profile selection and dependency configuration
+  Controls/          Dashboard, online overview, charts, and shared theme
+  Dialogs/           Bicycle editor and stock-receipt workflow
+  Forms/             Setup, login, shell, operational, and admin screens
+Program.cs           Startup, recovery, profile selection, and backend setup
 ```
 
-The dashboard is the single application shell. Obsolete alternative catalogue, product editor, sales, service-log and transaction-log forms were removed so new work has one clear implementation path.
-
-## Build verification
-
-Every push and pull request targeting `master` is restored and built on Windows:
+## Build and verification
 
 ```powershell
 dotnet restore "Bike STore Project.sln"
 dotnet build "Bike STore Project.sln" --configuration Release --no-restore
 ```
 
-## Project status
+GitHub Actions runs this build on `windows-latest` for every push and pull request targeting `master`.
 
-- Demo workflow: available
-- Complete Local SQLite workflow: available
-- Online login, catalogue and stock quantity workflow: available
-- Remaining Online desktop modules: planned
-- Hybrid/offline synchronisation: intentionally deferred
+## Technology
+
+- C# and .NET 8 for Windows
+- Windows Forms
+- Microsoft.Data.Sqlite
+- SQLite transactions and FIFO allocation
+- `HttpClient` and `System.Text.Json`
+- Cloudflare Workers or Pages Functions with D1 for the online deployment
 
 ## License
 
