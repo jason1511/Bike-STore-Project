@@ -42,7 +42,7 @@
             label1.Name = "label1";
             label1.Size = new Size(53, 20);
             label1.TabIndex = 0;
-            label1.Text = "Search";
+            label1.Text = Strings.Get("Common_Search");
             // 
             // txtSearch
             // 
@@ -62,7 +62,7 @@
             btnRefresh.Name = "btnRefresh";
             btnRefresh.Size = new Size(118, 36);
             btnRefresh.TabIndex = 2;
-            btnRefresh.Text = "Refresh";
+            btnRefresh.Text = Strings.Get("Common_Refresh");
             btnRefresh.UseVisualStyleBackColor = true;
             // 
             // dgvProducts
@@ -83,7 +83,7 @@
             btnAdd.Name = "btnAdd";
             btnAdd.Size = new Size(118, 36);
             btnAdd.TabIndex = 4;
-            btnAdd.Text = "Add bicycle";
+            btnAdd.Text = Strings.Get("Inventory_Add");
             btnAdd.UseVisualStyleBackColor = true;
             // 
             // btnEdit
@@ -93,7 +93,7 @@
             btnEdit.Name = "btnEdit";
             btnEdit.Size = new Size(118, 36);
             btnEdit.TabIndex = 5;
-            btnEdit.Text = "Edit selected";
+            btnEdit.Text = Strings.Get("Inventory_Edit");
             btnEdit.UseVisualStyleBackColor = true;
             // 
             // btnDelete
@@ -103,7 +103,7 @@
             btnDelete.Name = "btnDelete";
             btnDelete.Size = new Size(118, 36);
             btnDelete.TabIndex = 6;
-            btnDelete.Text = "Deactivate";
+            btnDelete.Text = Strings.Get("Inventory_Deactivate");
             btnDelete.UseVisualStyleBackColor = true;
             // 
             // btnReceiveStock
@@ -113,7 +113,7 @@
             btnReceiveStock.Name = "btnReceiveStock";
             btnReceiveStock.Size = new Size(149, 36);
             btnReceiveStock.TabIndex = 7;
-            btnReceiveStock.Text = "Receive stock";
+            btnReceiveStock.Text = Strings.Get("Inventory_Receive");
             btnReceiveStock.UseVisualStyleBackColor = true;
             // 
             // tableLayoutPanel1
@@ -178,7 +178,7 @@
             MinimumSize = new Size(700, 460);
             Name = "InventoryForm";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Inventory";
+            Text = Strings.Get("Inventory_Title");
             ((System.ComponentModel.ISupportInitialize)dgvProducts).EndInit();
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();

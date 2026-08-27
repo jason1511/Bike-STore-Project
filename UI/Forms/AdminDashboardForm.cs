@@ -22,7 +22,7 @@ namespace Bike_STore_Project
 
         public AdminDashboardForm()
         {
-            Text = $"{AppServices.Profile.StoreName} — Desktop Admin";
+            Text = Strings.Format("Nav_WindowTitle", AppServices.Profile.StoreName);
             StartPosition = FormStartPosition.CenterScreen;
             ClientSize = new Size(1180, 680);
             WindowState = FormWindowState.Normal;
@@ -71,12 +71,12 @@ namespace Bike_STore_Project
             var role = new Label { Name = "sidebarRole", Dock = DockStyle.Top, Height = 25, ForeColor = Color.FromArgb(180, 199, 196), Font = new Font("Segoe UI", 8F) };
             var logout = new Button
             {
-                Text = "Sign out", Dock = DockStyle.Bottom, Height = 34, FlatStyle = FlatStyle.Flat,
+                Text = Strings.Get("Nav_SignOut"), Dock = DockStyle.Bottom, Height = 34, FlatStyle = FlatStyle.Flat,
                 BackColor = UiTheme.SidebarHover, ForeColor = Color.White, Cursor = Cursors.Hand, Tag = "nav"
             };
             var settings = new Button
             {
-                Text = "Store settings", Dock = DockStyle.Bottom, Height = 32, FlatStyle = FlatStyle.Flat,
+                Text = Strings.Get("Nav_StoreSettings"), Dock = DockStyle.Bottom, Height = 32, FlatStyle = FlatStyle.Flat,
                 BackColor = UiTheme.Sidebar, ForeColor = Color.FromArgb(210, 223, 220), Cursor = Cursors.Hand, Tag = "nav"
             };
             settings.FlatAppearance.BorderColor = Color.FromArgb(90, 115, 112); settings.Click += (_, __) => OpenStoreSettings();
@@ -98,20 +98,20 @@ namespace Bike_STore_Project
         private void RebuildNavigation()
         {
             _nav.Controls.Clear(); _navButtons.Clear();
-            AddNav("dashboard", "Overview", "Daily operations and key figures");
-            AddSection("OPERATIONS");
-            AddNav("inventory", "Bicycles & stock", "Website-style bicycle, colour and stock management");
+            AddNav("dashboard", Strings.Get("Nav_Overview"), Strings.Get("Nav_OverviewTip"));
+            AddSection(Strings.Get("Nav_Operations"));
+            AddNav("inventory", Strings.Get("Nav_Inventory"), Strings.Get("Nav_InventoryTip"));
             if (!AppServices.Backend.SupportsFullDesktopWorkflow) return;
-            AddNav("sales", "Sales & invoices", "Create, print and review invoices");
-            AddNav("service", "Service", "Service jobs and status");
+            AddNav("sales", Strings.Get("Nav_Sales"), Strings.Get("Nav_SalesTip"));
+            AddNav("service", Strings.Get("Nav_Service"), Strings.Get("Nav_ServiceTip"));
             if (AppSession.IsAdmin)
             {
-                AddSection("ADMINISTRATION");
-                AddNav("brands", "Brands", "Brand records and visibility");
-                AddNav("stock", "Stock movements", "Incoming and outgoing stock");
-                AddNav("reports", "Reports", "Sales, service and profit");
-                AddNav("users", "Users", "Accounts and roles");
-                AddNav("activity", "Activity", "Audit trail");
+                AddSection(Strings.Get("Nav_Administration"));
+                AddNav("brands", Strings.Get("Nav_Brands"), Strings.Get("Nav_BrandsTip"));
+                AddNav("stock", Strings.Get("Nav_StockMovements"), Strings.Get("Nav_StockMovementsTip"));
+                AddNav("reports", Strings.Get("Nav_Reports"), Strings.Get("Nav_ReportsTip"));
+                AddNav("users", Strings.Get("Nav_Users"), Strings.Get("Nav_UsersTip"));
+                AddNav("activity", Strings.Get("Nav_Activity"), Strings.Get("Nav_ActivityTip"));
             }
         }
 
@@ -140,21 +140,21 @@ namespace Bike_STore_Project
             string title, subtitle;
             switch (key.ToLowerInvariant())
             {
-                case "inventory": page = Embed(new InventoryForm()); title = "Bicycles & stock"; subtitle = "Manage website-style bike models, colour variants and local stock."; break;
-                case "sales": page = Embed(new InvoiceManagementForm()); title = "Sales & invoices"; subtitle = "Create multi-item invoices, record payments and print customer documents."; break;
-                case "service": page = Embed(new ServiceManagementForm()); title = "Service"; subtitle = "Create service jobs, follow progress and print service documents."; break;
-                case "brands": page = Embed(new LocalAdminCenterForm(LocalAdminSection.Brands)); title = "Brands"; subtitle = "Maintain the brand directory used by the catalogue."; break;
-                case "stock": page = Embed(new LocalAdminCenterForm(LocalAdminSection.StockMovements)); title = "Stock movements"; subtitle = "Review every receipt, sale, adjustment and void restoration."; break;
-                case "reports": page = Embed(new LocalAdminCenterForm(LocalAdminSection.Reports)); title = "Reports"; subtitle = "Analyse sales, service income, gross profit and stock movement."; break;
-                case "users": page = Embed(new UserManagementForm()); title = "Users"; subtitle = "Manage staff access, roles, status and password resets."; break;
-                case "activity": page = Embed(new LocalAdminCenterForm(LocalAdminSection.Activity)); title = "Activity"; subtitle = "Trace important actions back to the signed-in user."; break;
+                case "inventory": page = Embed(new InventoryForm()); title = Strings.Get("Nav_Inventory"); subtitle = Strings.Get("Nav_PageInventoryTip"); break;
+                case "sales": page = Embed(new InvoiceManagementForm()); title = Strings.Get("Nav_Sales"); subtitle = Strings.Get("Nav_PageSalesTip"); break;
+                case "service": page = Embed(new ServiceManagementForm()); title = Strings.Get("Nav_Service"); subtitle = Strings.Get("Nav_PageServiceTip"); break;
+                case "brands": page = Embed(new LocalAdminCenterForm(LocalAdminSection.Brands)); title = Strings.Get("Nav_Brands"); subtitle = Strings.Get("Nav_PageBrandsTip"); break;
+                case "stock": page = Embed(new LocalAdminCenterForm(LocalAdminSection.StockMovements)); title = Strings.Get("Nav_StockMovements"); subtitle = Strings.Get("Nav_PageStockTip"); break;
+                case "reports": page = Embed(new LocalAdminCenterForm(LocalAdminSection.Reports)); title = Strings.Get("Nav_Reports"); subtitle = Strings.Get("Nav_PageReportsTip"); break;
+                case "users": page = Embed(new UserManagementForm()); title = Strings.Get("Nav_Users"); subtitle = Strings.Get("Nav_PageUsersTip"); break;
+                case "activity": page = Embed(new LocalAdminCenterForm(LocalAdminSection.Activity)); title = Strings.Get("Nav_Activity"); subtitle = Strings.Get("Nav_PageActivityTip"); break;
                 default:
                     if (AppServices.Backend.SupportsFullDesktopWorkflow)
                     {
                         var dashboard = new DashboardPageControl(); dashboard.NavigateRequested += ShowPage; page = dashboard;
                     }
                     else page = new OnlineOverviewControl();
-                    title = "Overview"; subtitle = $"{AppServices.Profile.StoreName} · {AppServices.Profile.BackendLabel}"; key = "dashboard"; break;
+                    title = Strings.Get("Nav_Overview"); subtitle = $"{AppServices.Profile.StoreName} · {AppServices.Profile.BackendLabel}"; key = "dashboard"; break;
             }
 
             _currentPage?.Dispose(); _host.Controls.Clear(); _currentPage = page; page.Dock = DockStyle.Fill; _host.Controls.Add(page);
@@ -185,9 +185,7 @@ namespace Bike_STore_Project
             foreach (Control control in root.Controls.Cast<Control>().ToArray())
             {
                 if (control is MenuStrip ||
-                    (control is Button button &&
-                     (button.Text.Equals("Close", StringComparison.OrdinalIgnoreCase) ||
-                      button.Text.Equals("Logout", StringComparison.OrdinalIgnoreCase))))
+                    (control is Button button && button.Name.Equals("btnClose", StringComparison.OrdinalIgnoreCase)))
                 { control.Visible = false; continue; }
                 HideLegacyChrome(control);
             }
@@ -207,14 +205,14 @@ namespace Bike_STore_Project
         private void UpdateSessionLabels()
         {
             _userLabel.Text = AppSession.Username;
-            _roleLabel.Text = AppSession.IsAdmin ? "Administrator" : "Staff";
+            _roleLabel.Text = Strings.Role(AppSession.Role);
             var user = FindControl(_sidebar, "sidebarUser") as Label; if (user != null) user.Text = AppSession.Username;
-            var role = FindControl(_sidebar, "sidebarRole") as Label; if (role != null) role.Text = AppSession.IsAdmin ? "ADMINISTRATOR" : "STAFF";
+            var role = FindControl(_sidebar, "sidebarRole") as Label; if (role != null) role.Text = Strings.Role(AppSession.Role).ToUpperInvariant();
         }
 
         private void Logout()
         {
-            if (MessageBox.Show("Sign out of the desktop admin?", "Sign out", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
+            if (MessageBox.Show(Strings.Get("Nav_SignOutQuestion"), Strings.Get("Nav_SignOut"), MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
             AppSession.SignOut(); Hide();
             AppServices.Backend.SignOut();
             using var login = new LoginForm();
@@ -226,7 +224,7 @@ namespace Bike_STore_Project
         {
             using var setup = new StoreSetupForm(AppServices.Profile);
             if (setup.ShowDialog(this) != DialogResult.OK) return;
-            MessageBox.Show("The app will restart to apply the new store profile.", "Store settings", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(Strings.Get("Nav_RestartMessage"), Strings.Get("Nav_StoreSettings"), MessageBoxButtons.OK, MessageBoxIcon.Information);
             Application.Restart();
             Close();
         }

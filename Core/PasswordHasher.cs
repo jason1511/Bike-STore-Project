@@ -17,7 +17,7 @@ namespace Bike_STore_Project
         public static string Hash(string password)
         {
             if (string.IsNullOrWhiteSpace(password))
-                throw new ArgumentException("Password cannot be empty.", nameof(password));
+                throw new ArgumentException(Strings.Get("Error_PasswordEmpty"), nameof(password));
 
             byte[] salt = RandomNumberGenerator.GetBytes(SaltSize);
 

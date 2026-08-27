@@ -31,10 +31,8 @@ namespace Bike_STore_Project
                         StyleGrid(grid);
                         break;
                     case Button button when button.Tag?.ToString() is not ("nav" or "primary"):
-                        var destructive = button.Text.Contains("delete", System.StringComparison.OrdinalIgnoreCase) ||
-                                          button.Text.Contains("void", System.StringComparison.OrdinalIgnoreCase) ||
-                                          button.Text.Contains("deactivate", System.StringComparison.OrdinalIgnoreCase) ||
-                                          button.Text.Contains("disable", System.StringComparison.OrdinalIgnoreCase);
+                        var destructive = button.Tag?.ToString() == "destructive" ||
+                                          Contains(button.Text, "Invoice_DeleteRecord", "Invoice_Void", "Service_Delete", "Inventory_Deactivate", "Admin_DeactivateBrand", "User_Disable", "User_Delete");
                         StyleButton(button, destructive);
                         break;
                     case TextBox textBox:
@@ -80,6 +78,13 @@ namespace Bike_STore_Project
             button.Padding = new Padding(8, 0, 8, 0);
         }
 
+        private static bool Contains(string text, params string[] resourceKeys)
+        {
+            foreach (var key in resourceKeys)
+                if (text.Contains(Strings.Get(key), System.StringComparison.CurrentCultureIgnoreCase)) return true;
+            return false;
+        }
+
         public static void StyleGrid(DataGridView grid)
         {
             grid.BackgroundColor = Card;
@@ -100,9 +105,23 @@ namespace Bike_STore_Project
             grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(249, 251, 250);
             grid.CellFormatting -= GridCellFormatting;
             grid.CellFormatting += GridCellFormatting;
+            grid.DataBindingComplete -= GridDataBindingComplete;
+            grid.DataBindingComplete += GridDataBindingComplete;
+            LocalizeGridColumns(grid);
+        }
+
+        private static void GridDataBindingComplete(object? sender, DataGridViewBindingCompleteEventArgs e)
+        {
+            if (sender is DataGridView grid) LocalizeGridColumns(grid);
+        }
+
+        private static void LocalizeGridColumns(DataGridView grid)
+        {
             foreach (DataGridViewColumn column in grid.Columns)
             {
                 var name = column.Name.ToLowerInvariant();
+                var resourceName = "Grid_" + name.Replace(" ", "_");
+                if (Strings.TryGet(resourceName, out var header)) column.HeaderText = header;
                 if (name.Contains("price") || name.Contains("cost") || name.Contains("revenue") ||
                     name.Contains("profit") || name == "total" || name.Contains("sell_price"))
                     column.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
@@ -121,29 +140,32 @@ namespace Bike_STore_Project
                 if (value is "ACTIVE" or "COMPLETED") SetBadge(e, Color.FromArgb(226, 246, 235), Success);
                 else if (value is "VOID" or "CANCELLED") SetBadge(e, Color.FromArgb(255, 232, 232), Danger);
                 else SetBadge(e, Color.FromArgb(255, 246, 224), Warning);
-                e.Value = FriendlyLabel(value);
+                e.Value = Strings.Status(value);
                 e.FormattingApplied = true;
             }
             else if (name == "role")
             {
                 SetBadge(e, value == "ADMIN" ? Color.FromArgb(229, 237, 251) : Color.FromArgb(237, 241, 240), value == "ADMIN" ? Accent : Muted);
-                e.Value = value == "ADMIN" ? "Administrator" : "Staff";
+                e.Value = Strings.Role(value);
                 e.FormattingApplied = true;
             }
             else if (name.Contains("movement_type"))
             {
-                e.Value = FriendlyLabel(value);
+                e.Value = Strings.Movement(value);
+                e.FormattingApplied = true;
+            }
+            else if (name == "section" && Strings.TryGet("Breakdown_" + value, out var section))
+            {
+                e.Value = section;
+                e.FormattingApplied = true;
+            }
+            else if (name == "label" && Strings.TryGet("Payment_" + value.Replace(' ', '_'), out var payment))
+            {
+                e.Value = payment;
                 e.FormattingApplied = true;
             }
             else if (name == "is_active")
                 SetBadge(e, value is "1" or "TRUE" ? Color.FromArgb(226, 246, 235) : Color.FromArgb(255, 232, 232), value is "1" or "TRUE" ? Success : Danger);
-        }
-
-        private static string FriendlyLabel(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value)) return "";
-            var words = value.Replace('_', ' ').ToLowerInvariant();
-            return System.Globalization.CultureInfo.InvariantCulture.TextInfo.ToTitleCase(words);
         }
 
         private static void SetBadge(DataGridViewCellFormattingEventArgs e, Color background, Color foreground)

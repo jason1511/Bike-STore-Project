@@ -29,9 +29,9 @@ namespace Bike_STore_Project
         public bool IsOnline => Backend == StoreBackendMode.Cloudflare;
         public string BackendLabel => Backend switch
         {
-            StoreBackendMode.Demo => "Demo · Local",
-            StoreBackendMode.Local => "Local database",
-            _ => "Online · Cloudflare"
+            StoreBackendMode.Demo => Strings.Get("Backend_Demo"),
+            StoreBackendMode.Local => Strings.Get("Backend_Local"),
+            _ => Strings.Get("Backend_Online")
         };
 
         public static StoreProfile CreateDemo() => new()
@@ -100,7 +100,7 @@ namespace Bike_STore_Project
                 AppPaths.EnsureDataDirectory();
                 if (!File.Exists(AppPaths.SettingsPath)) return StoreProfile.CreateDemo();
                 return JsonSerializer.Deserialize<StoreProfile>(File.ReadAllText(AppPaths.SettingsPath), JsonOptions)
-                    ?? throw new InvalidDataException("The settings file is empty or invalid.");
+                    ?? throw new InvalidDataException(Strings.Get("Startup_InvalidSettings"));
             }
             catch (Exception ex)
             {

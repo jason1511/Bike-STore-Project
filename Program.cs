@@ -17,8 +17,8 @@ namespace Bike_STore_Project
             if (!hadSettings || settingsError != null)
             {
                 if (settingsError != null)
-                    MessageBox.Show("The saved store settings could not be read. Choose the store connection again.\n\n" + settingsError,
-                        "Store settings", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(Strings.Format("Startup_SettingsMessage", settingsError),
+                        Strings.Get("Startup_SettingsTitle"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 using var setup = new StoreSetupForm();
                 if (setup.ShowDialog() != DialogResult.OK) return;
                 profile = setup.SelectedProfile;
@@ -34,8 +34,8 @@ namespace Bike_STore_Project
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("The selected store profile could not be opened.\n\n" + ex.Message,
-                        "Bike Store Desktop", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(Strings.Format("Startup_ProfileMessage", ex.Message),
+                        Strings.Get("Startup_AppTitle"), MessageBoxButtons.OK, MessageBoxIcon.Error);
                     using var setup = new StoreSetupForm(profile);
                     if (setup.ShowDialog() != DialogResult.OK) return;
                     profile = setup.SelectedProfile;

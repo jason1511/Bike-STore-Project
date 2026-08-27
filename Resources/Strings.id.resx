@@ -1,0 +1,508 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="Common_OK" xml:space="preserve"><value>OK</value></data>
+  <data name="Common_Cancel" xml:space="preserve"><value>Batal</value></data>
+  <data name="Common_Close" xml:space="preserve"><value>Tutup</value></data>
+  <data name="Common_Search" xml:space="preserve"><value>Cari</value></data>
+  <data name="Common_Refresh" xml:space="preserve"><value>Segarkan</value></data>
+  <data name="Common_SaveChanges" xml:space="preserve"><value>Simpan perubahan</value></data>
+  <data name="Common_Success" xml:space="preserve"><value>Berhasil</value></data>
+  <data name="Common_Error" xml:space="preserve"><value>Kesalahan</value></data>
+  <data name="Common_From" xml:space="preserve"><value>Dari</value></data>
+  <data name="Common_To" xml:space="preserve"><value>Sampai</value></data>
+  <data name="Common_Today" xml:space="preserve"><value>Hari ini</value></data>
+  <data name="Common_ThisWeek" xml:space="preserve"><value>Minggu ini</value></data>
+  <data name="Common_ThisMonth" xml:space="preserve"><value>Bulan ini</value></data>
+  <data name="Role_ADMIN" xml:space="preserve"><value>Administrator</value></data>
+  <data name="Role_USER" xml:space="preserve"><value>Staf</value></data>
+  <data name="Status_ALL" xml:space="preserve"><value>Semua status</value></data>
+  <data name="Status_ACTIVE" xml:space="preserve"><value>Aktif</value></data>
+  <data name="Status_VOID" xml:space="preserve"><value>Dibatalkan</value></data>
+  <data name="Status_RECEIVED" xml:space="preserve"><value>Diterima</value></data>
+  <data name="Status_IN_PROGRESS" xml:space="preserve"><value>Sedang dikerjakan</value></data>
+  <data name="Status_COMPLETED" xml:space="preserve"><value>Selesai</value></data>
+  <data name="Status_CANCELLED" xml:space="preserve"><value>Dibatalkan</value></data>
+  <data name="Setup_WindowNew" xml:space="preserve"><value>Siapkan Bike Store Desktop</value></data>
+  <data name="Setup_WindowEdit" xml:space="preserve"><value>Pengaturan koneksi toko</value></data>
+  <data name="Setup_ModeDemo" xml:space="preserve"><value>DEMO&#10;Coba dengan data contoh</value></data>
+  <data name="Setup_ModeLocal" xml:space="preserve"><value>SQLITE LOKAL&#10;Simpan data di komputer ini</value></data>
+  <data name="Setup_ModeOnline" xml:space="preserve"><value>API ONLINE&#10;Hubungkan ke toko aktif</value></data>
+  <data name="Setup_SaveContinue" xml:space="preserve"><value>Simpan dan lanjutkan</value></data>
+  <data name="Setup_CheckConnection" xml:space="preserve"><value>Periksa koneksi</value></data>
+  <data name="Setup_ResetDemoDatabase" xml:space="preserve"><value>Atur ulang database demo</value></data>
+  <data name="Setup_Eyebrow" xml:space="preserve"><value>PROFIL TOKO</value></data>
+  <data name="Setup_Title" xml:space="preserve"><value>Siapkan ruang kerja Bike Store</value></data>
+  <data name="Setup_Intro" xml:space="preserve"><value>Pilih tempat penyimpanan data profil ini. Koneksi dapat diubah nanti melalui Pengaturan toko.</value></data>
+  <data name="Setup_StepSource" xml:space="preserve"><value>1. Pilih sumber data</value></data>
+  <data name="Setup_StepDetails" xml:space="preserve"><value>2. Detail toko</value></data>
+  <data name="Setup_DetailsHelp" xml:space="preserve"><value>Nama ini tampil di aplikasi dan dokumen cetak.</value></data>
+  <data name="Setup_ProfileName" xml:space="preserve"><value>Nama profil</value></data>
+  <data name="Setup_StoreName" xml:space="preserve"><value>Nama toko</value></data>
+  <data name="Setup_ShortName" xml:space="preserve"><value>Nama singkat</value></data>
+  <data name="Setup_LanguageCurrency" xml:space="preserve"><value>Bahasa / mata uang</value></data>
+  <data name="Setup_InvoiceTitle" xml:space="preserve"><value>Judul faktur</value></data>
+  <data name="Setup_LowStock" xml:space="preserve"><value>Peringatan stok rendah</value></data>
+  <data name="Setup_SqliteFile" xml:space="preserve"><value>File SQLite</value></data>
+  <data name="Setup_StoreApiUrl" xml:space="preserve"><value>URL API toko</value></data>
+  <data name="Setup_Browse" xml:space="preserve"><value>Pilih…</value></data>
+  <data name="Setup_SectionDemo" xml:space="preserve"><value>3. Penyimpanan demo</value></data>
+  <data name="Setup_SectionLocal" xml:space="preserve"><value>3. Database lokal</value></data>
+  <data name="Setup_SectionOnline" xml:space="preserve"><value>3. Koneksi online</value></data>
+  <data name="Setup_DemoSecurity" xml:space="preserve"><value>Detail koneksi tidak diperlukan. Data demo disimpan terpisah dan dapat diatur ulang kapan saja.</value></data>
+  <data name="Setup_LocalSecurity" xml:space="preserve"><value>Pilih satu file SQLite untuk profil ini. Aplikasi memeriksa folder dan database sebelum menyimpan.</value></data>
+  <data name="Setup_OnlineSecurity" xml:space="preserve"><value>Hanya alamat server HTTPS yang disimpan. Kredensial Cloudflare/D1 tetap berada di server; pengguna masuk seperti biasa.</value></data>
+  <data name="Setup_DemoHelp" xml:space="preserve"><value>Cocok untuk mencoba: data contoh aman, tersimpan lokal, tanpa koneksi produksi.</value></data>
+  <data name="Setup_LocalHelp" xml:space="preserve"><value>Cocok untuk satu komputer atau toko offline: data tetap berada dalam file SQLite yang Anda kelola.</value></data>
+  <data name="Setup_OnlineHelp" xml:space="preserve"><value>Cocok untuk toko aktif: aplikasi desktop memakai API HTTPS terautentikasi dengan Cloudflare Workers dan D1.</value></data>
+  <data name="Setup_Required" xml:space="preserve"><value>{0} wajib diisi.</value></data>
+  <data name="Setup_ChooseDatabase" xml:space="preserve"><value>Pilih file database SQLite.</value></data>
+  <data name="Setup_InvalidUrl" xml:space="preserve"><value>Masukkan URL toko online HTTPS yang valid.</value></data>
+  <data name="Setup_TitleDialog" xml:space="preserve"><value>Pengaturan toko</value></data>
+  <data name="Setup_Testing" xml:space="preserve"><value>Memeriksa…</value></data>
+  <data name="Setup_Reachable" xml:space="preserve"><value>API toko online dapat dihubungi.</value></data>
+  <data name="Setup_ConnectionSuccess" xml:space="preserve"><value>Koneksi berhasil</value></data>
+  <data name="Setup_ConnectionFailed" xml:space="preserve"><value>Koneksi gagal</value></data>
+  <data name="Setup_ChooseDatabaseTitle" xml:space="preserve"><value>Pilih file database</value></data>
+  <data name="Setup_ResetQuestion" xml:space="preserve"><value>Atur ulang database demo ke data contoh awal?</value></data>
+  <data name="Setup_ResetTitle" xml:space="preserve"><value>Atur ulang demo</value></data>
+  <data name="Setup_ResetDone" xml:space="preserve"><value>Data demo akan dibuat kembali saat Anda melanjutkan.</value></data>
+  <data name="Setup_ResetDoneTitle" xml:space="preserve"><value>Demo diatur ulang</value></data>
+  <data name="Setup_ResetFailed" xml:space="preserve"><value>Gagal mengatur ulang demo</value></data>
+  <data name="Language_Indonesian" xml:space="preserve"><value>Bahasa Indonesia / IDR</value></data>
+  <data name="Language_EnglishAustralia" xml:space="preserve"><value>English (Australia) / AUD</value></data>
+  <data name="Login_Window" xml:space="preserve"><value>{0} — Masuk</value></data>
+  <data name="Login_Eyebrow" xml:space="preserve"><value>ADMIN DESKTOP</value></data>
+  <data name="Login_Subtitle" xml:space="preserve"><value>{0} · Masuk untuk mengelola katalog, stok, faktur, dan servis.</value></data>
+  <data name="Login_FirstRun" xml:space="preserve"><value>Admin pertama: admin / {0}</value></data>
+  <data name="Login_Username" xml:space="preserve"><value>Nama pengguna</value></data>
+  <data name="Login_Password" xml:space="preserve"><value>Kata sandi</value></data>
+  <data name="Login_SignIn" xml:space="preserve"><value>Masuk</value></data>
+  <data name="Login_SigningIn" xml:space="preserve"><value>Sedang masuk…</value></data>
+  <data name="Login_Failed" xml:space="preserve"><value>Gagal masuk.</value></data>
+  <data name="Login_Title" xml:space="preserve"><value>Masuk</value></data>
+  <data name="Startup_SettingsMessage" xml:space="preserve"><value>Pengaturan toko tersimpan tidak dapat dibaca. Pilih kembali koneksi toko.&#10;&#10;{0}</value></data>
+  <data name="Startup_SettingsTitle" xml:space="preserve"><value>Pengaturan toko</value></data>
+  <data name="Startup_ProfileMessage" xml:space="preserve"><value>Profil toko yang dipilih tidak dapat dibuka.&#10;&#10;{0}</value></data>
+  <data name="Startup_AppTitle" xml:space="preserve"><value>Bike Store Desktop</value></data>
+  <data name="Startup_InvalidSettings" xml:space="preserve"><value>File pengaturan kosong atau tidak valid.</value></data>
+  <data name="Nav_Overview" xml:space="preserve"><value>Ringkasan</value></data>
+  <data name="Nav_OverviewTip" xml:space="preserve"><value>Operasional harian dan angka utama</value></data>
+  <data name="Nav_Operations" xml:space="preserve"><value>OPERASIONAL</value></data>
+  <data name="Nav_Inventory" xml:space="preserve"><value>Sepeda &amp; stok</value></data>
+  <data name="Nav_InventoryTip" xml:space="preserve"><value>Kelola sepeda, warna, dan stok seperti di website</value></data>
+  <data name="Nav_Sales" xml:space="preserve"><value>Penjualan &amp; faktur</value></data>
+  <data name="Nav_SalesTip" xml:space="preserve"><value>Buat, cetak, dan tinjau faktur</value></data>
+  <data name="Nav_Service" xml:space="preserve"><value>Servis</value></data>
+  <data name="Nav_ServiceTip" xml:space="preserve"><value>Pekerjaan dan status servis</value></data>
+  <data name="Nav_Administration" xml:space="preserve"><value>ADMINISTRASI</value></data>
+  <data name="Nav_Brands" xml:space="preserve"><value>Merek</value></data>
+  <data name="Nav_BrandsTip" xml:space="preserve"><value>Data dan visibilitas merek</value></data>
+  <data name="Nav_StockMovements" xml:space="preserve"><value>Pergerakan stok</value></data>
+  <data name="Nav_StockMovementsTip" xml:space="preserve"><value>Stok masuk dan keluar</value></data>
+  <data name="Nav_Reports" xml:space="preserve"><value>Laporan</value></data>
+  <data name="Nav_ReportsTip" xml:space="preserve"><value>Penjualan, servis, dan laba</value></data>
+  <data name="Nav_Users" xml:space="preserve"><value>Pengguna</value></data>
+  <data name="Nav_UsersTip" xml:space="preserve"><value>Akun dan peran</value></data>
+  <data name="Nav_Activity" xml:space="preserve"><value>Aktivitas</value></data>
+  <data name="Nav_ActivityTip" xml:space="preserve"><value>Jejak audit</value></data>
+  <data name="Nav_SignOut" xml:space="preserve"><value>Keluar</value></data>
+  <data name="Nav_StoreSettings" xml:space="preserve"><value>Pengaturan toko</value></data>
+  <data name="Nav_WindowTitle" xml:space="preserve"><value>{0} — Admin Desktop</value></data>
+  <data name="Nav_PageInventoryTip" xml:space="preserve"><value>Kelola model sepeda, varian warna, dan stok lokal.</value></data>
+  <data name="Nav_PageSalesTip" xml:space="preserve"><value>Buat faktur multi-item, catat pembayaran, dan cetak dokumen pelanggan.</value></data>
+  <data name="Nav_PageServiceTip" xml:space="preserve"><value>Buat pekerjaan servis, ikuti progres, dan cetak dokumen servis.</value></data>
+  <data name="Nav_PageBrandsTip" xml:space="preserve"><value>Kelola daftar merek yang digunakan katalog.</value></data>
+  <data name="Nav_PageStockTip" xml:space="preserve"><value>Tinjau penerimaan, penjualan, penyesuaian, dan pengembalian stok.</value></data>
+  <data name="Nav_PageReportsTip" xml:space="preserve"><value>Analisis penjualan, pendapatan servis, laba kotor, dan pergerakan stok.</value></data>
+  <data name="Nav_PageUsersTip" xml:space="preserve"><value>Kelola akses staf, peran, status, dan kata sandi.</value></data>
+  <data name="Nav_PageActivityTip" xml:space="preserve"><value>Lacak tindakan penting ke pengguna yang masuk.</value></data>
+  <data name="Nav_SignOutQuestion" xml:space="preserve"><value>Keluar dari admin desktop?</value></data>
+  <data name="Nav_RestartMessage" xml:space="preserve"><value>Aplikasi akan dimulai ulang untuk menerapkan profil toko baru.</value></data>
+  <data name="Inventory_Title" xml:space="preserve"><value>Inventaris</value></data>
+  <data name="Inventory_Add" xml:space="preserve"><value>Tambah sepeda</value></data>
+  <data name="Inventory_Edit" xml:space="preserve"><value>Edit pilihan</value></data>
+  <data name="Inventory_Deactivate" xml:space="preserve"><value>Nonaktifkan</value></data>
+  <data name="Inventory_Reactivate" xml:space="preserve"><value>Aktifkan kembali</value></data>
+  <data name="Inventory_Receive" xml:space="preserve"><value>Tambah stok</value></data>
+  <data name="Inventory_Brand" xml:space="preserve"><value>Merek</value></data>
+  <data name="Inventory_Model" xml:space="preserve"><value>Model</value></data>
+  <data name="Inventory_Colours" xml:space="preserve"><value>Varian warna</value></data>
+  <data name="Inventory_TotalStock" xml:space="preserve"><value>Total stok</value></data>
+  <data name="Inventory_SellingPrice" xml:space="preserve"><value>Harga jual</value></data>
+  <data name="Inventory_Active" xml:space="preserve"><value>Aktif</value></data>
+  <data name="Inventory_LoadFailed" xml:space="preserve"><value>Gagal memuat inventaris sepeda: {0}</value></data>
+  <data name="Inventory_SelectBike" xml:space="preserve"><value>Pilih sepeda terlebih dahulu.</value></data>
+  <data name="Inventory_Added" xml:space="preserve"><value>Sepeda berhasil ditambahkan beserta stok warnanya.</value></data>
+  <data name="Inventory_NotSaved" xml:space="preserve"><value>Sepeda tidak tersimpan</value></data>
+  <data name="Inventory_Updated" xml:space="preserve"><value>Sepeda dan varian warna berhasil diperbarui.</value></data>
+  <data name="Inventory_NotUpdated" xml:space="preserve"><value>Sepeda tidak diperbarui</value></data>
+  <data name="Inventory_StockReceived" xml:space="preserve"><value>Stok diterima dan pergerakannya tercatat.</value></data>
+  <data name="Inventory_StockNotReceived" xml:space="preserve"><value>Stok tidak diterima</value></data>
+  <data name="Inventory_StatusQuestion" xml:space="preserve"><value>{0} {1} {2}?</value></data>
+  <data name="Inventory_StatusTitle" xml:space="preserve"><value>Status katalog</value></data>
+  <data name="Inventory_StatusFailed" xml:space="preserve"><value>Gagal memperbarui status</value></data>
+  <data name="Bike_AddTitle" xml:space="preserve"><value>Tambah sepeda</value></data>
+  <data name="Bike_EditTitle" xml:space="preserve"><value>Edit {0} {1}</value></data>
+  <data name="Bike_DetailsTab" xml:space="preserve"><value>Detail sepeda</value></data>
+  <data name="Bike_ColoursTab" xml:space="preserve"><value>Warna dan stok</value></data>
+  <data name="Bike_Id" xml:space="preserve"><value>ID sepeda</value></data>
+  <data name="Bike_BrandRequired" xml:space="preserve"><value>Merek *</value></data>
+  <data name="Bike_ModelRequired" xml:space="preserve"><value>Model *</value></data>
+  <data name="Bike_Battery" xml:space="preserve"><value>Baterai</value></data>
+  <data name="Bike_Motor" xml:space="preserve"><value>Motor</value></data>
+  <data name="Bike_TopSpeed" xml:space="preserve"><value>Kecepatan maksimum</value></data>
+  <data name="Bike_Range" xml:space="preserve"><value>Jarak tempuh</value></data>
+  <data name="Bike_MaxWeight" xml:space="preserve"><value>Beban maksimum</value></data>
+  <data name="Bike_Safety" xml:space="preserve"><value>Keamanan</value></data>
+  <data name="Bike_MainImage" xml:space="preserve"><value>Gambar utama</value></data>
+  <data name="Bike_Description" xml:space="preserve"><value>Deskripsi</value></data>
+  <data name="Bike_Visibility" xml:space="preserve"><value>Visibilitas</value></data>
+  <data name="Bike_Featured" xml:space="preserve"><value>Unggulan</value></data>
+  <data name="Bike_VariantHelp" xml:space="preserve"><value>Setiap warna memiliki gambar dan jumlah stok sendiri. Perubahan jumlah akan mencatat pergerakan stok.</value></data>
+  <data name="Bike_AddColour" xml:space="preserve"><value>Tambah warna</value></data>
+  <data name="Bike_RemoveSelected" xml:space="preserve"><value>Hapus pilihan</value></data>
+  <data name="Bike_Save" xml:space="preserve"><value>Simpan sepeda</value></data>
+  <data name="Bike_ColourName" xml:space="preserve"><value>Nama warna</value></data>
+  <data name="Bike_HexCode" xml:space="preserve"><value>Kode hex</value></data>
+  <data name="Bike_ImagePath" xml:space="preserve"><value>Lokasi gambar</value></data>
+  <data name="Bike_StockQuantity" xml:space="preserve"><value>Jumlah stok</value></data>
+  <data name="Bike_SelectBrand" xml:space="preserve"><value>Pilih merek.</value></data>
+  <data name="Bike_ModelRequiredMessage" xml:space="preserve"><value>Nama model wajib diisi.</value></data>
+  <data name="Bike_InvalidStock" xml:space="preserve"><value>Stok tidak valid untuk {0}.</value></data>
+  <data name="Bike_AddColourMessage" xml:space="preserve"><value>Tambahkan setidaknya satu warna.</value></data>
+  <data name="Stock_ExistingNewColour" xml:space="preserve"><value>Warna lama/baru</value></data>
+  <data name="Stock_NewColourName" xml:space="preserve"><value>Nama warna baru</value></data>
+  <data name="Stock_ColourHex" xml:space="preserve"><value>Hex warna</value></data>
+  <data name="Stock_ColourImage" xml:space="preserve"><value>Lokasi gambar warna</value></data>
+  <data name="Stock_QuantityReceived" xml:space="preserve"><value>Jumlah diterima</value></data>
+  <data name="Stock_UnitCost" xml:space="preserve"><value>Harga beli per unit</value></data>
+  <data name="Stock_Online" xml:space="preserve"><value>Stok online</value></data>
+  <data name="Stock_OnlineHelp" xml:space="preserve"><value>Jumlah dicatat melalui alur toko Cloudflare.</value></data>
+  <data name="Stock_ReceivedAt" xml:space="preserve"><value>Waktu diterima</value></data>
+  <data name="Stock_Notes" xml:space="preserve"><value>Catatan / referensi</value></data>
+  <data name="Stock_After" xml:space="preserve"><value>Stok setelah penerimaan</value></data>
+  <data name="Stock_AddNewColour" xml:space="preserve"><value>+ Tambah warna baru</value></data>
+  <data name="Stock_Summary" xml:space="preserve"><value>{0} + {1} = {2} unit</value></data>
+  <data name="Stock_EnterColour" xml:space="preserve"><value>Masukkan nama warna baru.</value></data>
+  <data name="Stock_EnterCost" xml:space="preserve"><value>Masukkan harga beli per unit.</value></data>
+  <data name="Stock_Bicycle" xml:space="preserve"><value>Sepeda</value></data>
+  <data name="Stock_Choice" xml:space="preserve"><value>{0} — stok {1}</value></data>
+  <data name="Dashboard_NewInvoice" xml:space="preserve"><value>+ Faktur baru</value></data>
+  <data name="Dashboard_ReceiveStock" xml:space="preserve"><value>+ Tambah stok</value></data>
+  <data name="Dashboard_NewService" xml:space="preserve"><value>+ Servis baru</value></data>
+  <data name="Dashboard_Refresh" xml:space="preserve"><value>Segarkan dasbor</value></data>
+  <data name="Dashboard_SalesChart" xml:space="preserve"><value>Penjualan — 7 hari terakhir</value></data>
+  <data name="Dashboard_StockChart" xml:space="preserve"><value>Pergerakan stok — 7 hari terakhir</value></data>
+  <data name="Dashboard_RecentInvoices" xml:space="preserve"><value>Faktur terbaru</value></data>
+  <data name="Dashboard_OpenServices" xml:space="preserve"><value>Servis aktif</value></data>
+  <data name="Dashboard_TodaysSales" xml:space="preserve"><value>Penjualan hari ini</value></data>
+  <data name="Dashboard_Invoices" xml:space="preserve"><value>Faktur</value></data>
+  <data name="Dashboard_StockUnits" xml:space="preserve"><value>Unit stok</value></data>
+  <data name="Dashboard_LowStock" xml:space="preserve"><value>Stok rendah</value></data>
+  <data name="Dashboard_GrossProfit" xml:space="preserve"><value>Laba kotor</value></data>
+  <data name="Dashboard_RefreshFailed" xml:space="preserve"><value>Dasbor tidak dapat disegarkan: {0}</value></data>
+  <data name="Dashboard_Title" xml:space="preserve"><value>Dasbor</value></data>
+  <data name="Dashboard_Revenue" xml:space="preserve"><value>Pendapatan</value></data>
+  <data name="Dashboard_In" xml:space="preserve"><value>Masuk</value></data>
+  <data name="Dashboard_Out" xml:space="preserve"><value>Keluar</value></data>
+  <data name="Online_Connected" xml:space="preserve"><value>Terhubung ke {0}</value></data>
+  <data name="Online_Status" xml:space="preserve"><value>ONLINE · {0}</value></data>
+  <data name="Online_Explanation" xml:space="preserve"><value>Perubahan katalog, warna, dan stok pada layar ini dikirim melalui API Cloudflare yang terautentikasi. Layar faktur, servis, laporan, pengguna, dan audit lokal disembunyikan agar data cloud tidak tercampur dengan SQLite lokal.</value></data>
+  <data name="Payment_CASH" xml:space="preserve"><value>Tunai</value></data>
+  <data name="Payment_BANK_TRANSFER" xml:space="preserve"><value>Transfer bank</value></data>
+  <data name="Payment_OTHER" xml:space="preserve"><value>Lainnya</value></data>
+  <data name="Invoice_Window" xml:space="preserve"><value>Bike Store - Faktur - {0} ({1})</value></data>
+  <data name="Invoice_NewTab" xml:space="preserve"><value>Faktur baru</value></data>
+  <data name="Invoice_HistoryTab" xml:space="preserve"><value>Riwayat faktur</value></data>
+  <data name="Invoice_CustomerRequired" xml:space="preserve"><value>Pelanggan *</value></data>
+  <data name="Invoice_Customer" xml:space="preserve"><value>Pelanggan</value></data>
+  <data name="Invoice_Phone" xml:space="preserve"><value>Telepon</value></data>
+  <data name="Invoice_Address" xml:space="preserve"><value>Alamat</value></data>
+  <data name="Invoice_Payment" xml:space="preserve"><value>Pembayaran</value></data>
+  <data name="Invoice_Bank" xml:space="preserve"><value>Bank</value></data>
+  <data name="Invoice_Notes" xml:space="preserve"><value>Catatan</value></data>
+  <data name="Invoice_SelectedBike" xml:space="preserve"><value>Sepeda terpilih</value></data>
+  <data name="Invoice_Quantity" xml:space="preserve"><value>Jumlah</value></data>
+  <data name="Invoice_UnitPrice" xml:space="preserve"><value>Harga jual per unit</value></data>
+  <data name="Invoice_FrameNumbers" xml:space="preserve"><value>Nomor rangka (satu per baris, opsional)</value></data>
+  <data name="Invoice_AddItem" xml:space="preserve"><value>Tambah item</value></data>
+  <data name="Invoice_RemoveSelected" xml:space="preserve"><value>Hapus pilihan</value></data>
+  <data name="Invoice_SavePrint" xml:space="preserve"><value>Simpan dan cetak faktur</value></data>
+  <data name="Invoice_Save" xml:space="preserve"><value>Simpan faktur</value></data>
+  <data name="Invoice_Print" xml:space="preserve"><value>Cetak faktur</value></data>
+  <data name="Invoice_EditDetails" xml:space="preserve"><value>Edit detail</value></data>
+  <data name="Invoice_VoidRestore" xml:space="preserve"><value>Batalkan dan kembalikan stok</value></data>
+  <data name="Invoice_Delete" xml:space="preserve"><value>Hapus faktur</value></data>
+  <data name="Invoice_LoadBikesFailed" xml:space="preserve"><value>Sepeda tidak dapat dimuat</value></data>
+  <data name="Invoice_TotalRevenue" xml:space="preserve"><value>Total pendapatan</value></data>
+  <data name="Invoice_ActiveInvoices" xml:space="preserve"><value>Faktur aktif</value></data>
+  <data name="Invoice_Voided" xml:space="preserve"><value>Dibatalkan</value></data>
+  <data name="Invoice_HistoryFailed" xml:space="preserve"><value>Riwayat faktur tidak dapat dimuat</value></data>
+  <data name="Invoice_UpdateFailed" xml:space="preserve"><value>Gagal memperbarui faktur</value></data>
+  <data name="Invoice_DeleteRecord" xml:space="preserve"><value>Hapus data faktur</value></data>
+  <data name="Invoice_DeleteReason" xml:space="preserve"><value>Alasan penghapusan permanen:</value></data>
+  <data name="Invoice_AdminCorrection" xml:space="preserve"><value>Koreksi administrasi</value></data>
+  <data name="Invoice_DeleteQuestion" xml:space="preserve"><value>Data faktur akan dihapus setelah stok dikembalikan. Lanjutkan?</value></data>
+  <data name="Invoice_DeleteFailed" xml:space="preserve"><value>Penghapusan gagal</value></data>
+  <data name="Invoice_SelectBike" xml:space="preserve"><value>Pilih sepeda yang tersedia terlebih dahulu.</value></data>
+  <data name="Invoice_Available" xml:space="preserve"><value>Hanya {0} unit tambahan yang tersedia.</value></data>
+  <data name="Invoice_FrameLimit" xml:space="preserve"><value>Jumlah nomor rangka tidak boleh melebihi jumlah item.</value></data>
+  <data name="Invoice_NotSaved" xml:space="preserve"><value>Faktur tidak tersimpan</value></data>
+  <data name="Invoice_Saved" xml:space="preserve"><value>Faktur {0} tersimpan.</value></data>
+  <data name="Invoice_SavedTitle" xml:space="preserve"><value>Faktur tersimpan</value></data>
+  <data name="Invoice_ReloadFailed" xml:space="preserve"><value>Faktur tersimpan, tetapi tidak dapat dimuat kembali.&#10;&#10;{0}</value></data>
+  <data name="Invoice_PrintPreviewFailed" xml:space="preserve"><value>Faktur tersimpan, tetapi pratinjau cetak tidak dapat dibuka.&#10;&#10;{0}</value></data>
+  <data name="Invoice_PrintPreview" xml:space="preserve"><value>Pratinjau cetak</value></data>
+  <data name="Invoice_Void" xml:space="preserve"><value>Batalkan faktur</value></data>
+  <data name="Invoice_VoidReason" xml:space="preserve"><value>Alasan pembatalan faktur:</value></data>
+  <data name="Invoice_CustomerCancellation" xml:space="preserve"><value>Pembatalan pelanggan</value></data>
+  <data name="Invoice_VoidQuestion" xml:space="preserve"><value>Batalkan faktur ini dan kembalikan seluruh stok?</value></data>
+  <data name="Invoice_ConfirmVoid" xml:space="preserve"><value>Konfirmasi pembatalan</value></data>
+  <data name="Invoice_VoidFailed" xml:space="preserve"><value>Pembatalan gagal</value></data>
+  <data name="Invoice_PrintFailed" xml:space="preserve"><value>Faktur tidak dapat dicetak</value></data>
+  <data name="Invoice_SelectInvoice" xml:space="preserve"><value>Pilih faktur terlebih dahulu.</value></data>
+  <data name="Invoice_Total" xml:space="preserve"><value>Total: {0}</value></data>
+  <data name="Invoice_EditTitle" xml:space="preserve"><value>Edit {0}</value></data>
+  <data name="Invoice_CustomerNameRequired" xml:space="preserve"><value>Nama pelanggan wajib diisi.</value></data>
+  <data name="Print_Date" xml:space="preserve"><value>Tanggal: {0}</value></data>
+  <data name="Print_CustomerPhone" xml:space="preserve"><value>Pelanggan: {0}   Tel: {1}</value></data>
+  <data name="Print_Address" xml:space="preserve"><value>Alamat: {0}</value></data>
+  <data name="Print_FrameNumber" xml:space="preserve"><value>No. rangka: {0}</value></data>
+  <data name="Print_Total" xml:space="preserve"><value>TOTAL</value></data>
+  <data name="Print_Payment" xml:space="preserve"><value>Pembayaran: {0} {1}</value></data>
+  <data name="Print_CreatedStatus" xml:space="preserve"><value>Dibuat oleh: {0}    Status: {1}</value></data>
+  <data name="Service_Window" xml:space="preserve"><value>Bike Store - Servis - {0} ({1})</value></data>
+  <data name="Service_NewTab" xml:space="preserve"><value>Servis baru</value></data>
+  <data name="Service_HistoryTab" xml:space="preserve"><value>Riwayat servis</value></data>
+  <data name="Service_CustomerRequired" xml:space="preserve"><value>Pelanggan *</value></data>
+  <data name="Service_Phone" xml:space="preserve"><value>Telepon</value></data>
+  <data name="Service_Address" xml:space="preserve"><value>Alamat</value></data>
+  <data name="Service_BrandRequired" xml:space="preserve"><value>Merek *</value></data>
+  <data name="Service_ModelRequired" xml:space="preserve"><value>Tipe/model *</value></data>
+  <data name="Service_Colour" xml:space="preserve"><value>Warna</value></data>
+  <data name="Service_TypeRequired" xml:space="preserve"><value>Jenis servis *</value></data>
+  <data name="Service_Cost" xml:space="preserve"><value>Biaya servis</value></data>
+  <data name="Service_Notes" xml:space="preserve"><value>Catatan</value></data>
+  <data name="Service_SavePrint" xml:space="preserve"><value>Simpan dan cetak</value></data>
+  <data name="Service_Save" xml:space="preserve"><value>Simpan servis</value></data>
+  <data name="Service_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Service_Print" xml:space="preserve"><value>Cetak pekerjaan servis</value></data>
+  <data name="Service_UpdateStatus" xml:space="preserve"><value>Perbarui status</value></data>
+  <data name="Service_EditDetails" xml:space="preserve"><value>Edit detail</value></data>
+  <data name="Service_Delete" xml:space="preserve"><value>Hapus pekerjaan servis</value></data>
+  <data name="Service_RequiredMessage" xml:space="preserve"><value>Pelanggan, merek, model, dan jenis servis wajib diisi.</value></data>
+  <data name="Service_NotSaved" xml:space="preserve"><value>Servis tidak tersimpan</value></data>
+  <data name="Service_Saved" xml:space="preserve"><value>Servis {0} tersimpan.</value></data>
+  <data name="Service_PrintAfterSaveFailed" xml:space="preserve"><value>Pekerjaan servis tersimpan, tetapi pratinjau cetak tidak dapat dibuka.&#10;&#10;{0}</value></data>
+  <data name="Service_HistoryFailed" xml:space="preserve"><value>Riwayat servis tidak dapat dimuat</value></data>
+  <data name="Service_StatusPrompt" xml:space="preserve"><value>Masukkan {0}, {1}, {2}, atau {3}:</value></data>
+  <data name="Service_InvalidStatus" xml:space="preserve"><value>Status servis tidak valid.</value></data>
+  <data name="Service_StatusUpdateFailed" xml:space="preserve"><value>Status servis tidak dapat diperbarui</value></data>
+  <data name="Service_SelectFirst" xml:space="preserve"><value>Pilih servis terlebih dahulu.</value></data>
+  <data name="Service_UpdateFailed" xml:space="preserve"><value>Gagal memperbarui servis</value></data>
+  <data name="Service_JobUpdateFailed" xml:space="preserve"><value>Pekerjaan servis tidak dapat diperbarui</value></data>
+  <data name="Service_DeleteRecord" xml:space="preserve"><value>Hapus data servis</value></data>
+  <data name="Service_DeleteReason" xml:space="preserve"><value>Alasan penghapusan:</value></data>
+  <data name="Service_DeleteQuestion" xml:space="preserve"><value>Hapus permanen data servis ini?</value></data>
+  <data name="Service_DeleteTitle" xml:space="preserve"><value>Hapus servis</value></data>
+  <data name="Service_DeleteFailed" xml:space="preserve"><value>Penghapusan gagal</value></data>
+  <data name="Service_PrintFailed" xml:space="preserve"><value>Pekerjaan servis tidak dapat dicetak</value></data>
+  <data name="Service_EditTitle" xml:space="preserve"><value>Edit detail servis</value></data>
+  <data name="Service_CustomerBrandRequired" xml:space="preserve"><value>Pelanggan, merek, model, dan jenis servis wajib diisi.</value></data>
+  <data name="Print_ServiceTitle" xml:space="preserve"><value>FORM SERVICE SEPEDA LISTRIK</value></data>
+  <data name="Print_Number" xml:space="preserve"><value>Nomor: {0}</value></data>
+  <data name="Print_Phone" xml:space="preserve"><value>Telepon: {0}</value></data>
+  <data name="Print_Bicycle" xml:space="preserve"><value>Sepeda: {0} {1} {2}</value></data>
+  <data name="Print_ServiceType" xml:space="preserve"><value>Jenis servis: {0}</value></data>
+  <data name="Print_Status" xml:space="preserve"><value>Status: {0}</value></data>
+  <data name="Print_Cost" xml:space="preserve"><value>Biaya: {0}</value></data>
+  <data name="Print_Notes" xml:space="preserve"><value>Catatan: {0}</value></data>
+  <data name="Print_Technician" xml:space="preserve"><value>Teknisi / Staf</value></data>
+  <data name="Print_Customer" xml:space="preserve"><value>Pelanggan</value></data>
+  <data name="Print_CustomerValue" xml:space="preserve"><value>Pelanggan: {0}</value></data>
+  <data name="Admin_AccessRequired" xml:space="preserve"><value>Akses administrator diperlukan.</value></data>
+  <data name="Admin_Window" xml:space="preserve"><value>Bike Store - Admin Lokal - {0} (ADMIN)</value></data>
+  <data name="Admin_BrandsTab" xml:space="preserve"><value>Merek</value></data>
+  <data name="Admin_AddBrand" xml:space="preserve"><value>Tambah merek</value></data>
+  <data name="Admin_RenameSelected" xml:space="preserve"><value>Ubah nama pilihan</value></data>
+  <data name="Admin_DeactivateBrand" xml:space="preserve"><value>Nonaktifkan merek</value></data>
+  <data name="Admin_ActivateBrand" xml:space="preserve"><value>Aktifkan merek</value></data>
+  <data name="Admin_AddBrandFailed" xml:space="preserve"><value>Merek tidak dapat ditambahkan</value></data>
+  <data name="Admin_RenameBrandFailed" xml:space="preserve"><value>Nama merek tidak dapat diubah</value></data>
+  <data name="Admin_BrandStatusFailed" xml:space="preserve"><value>Status merek tidak dapat diubah</value></data>
+  <data name="Admin_StockTab" xml:space="preserve"><value>Pergerakan stok</value></data>
+  <data name="Admin_StockHelp" xml:space="preserve"><value>Penerimaan stok, penjualan faktur, dan pengembalian akibat pembatalan dicatat otomatis.</value></data>
+  <data name="Admin_ReportsTab" xml:space="preserve"><value>Laporan</value></data>
+  <data name="Admin_RefreshReport" xml:space="preserve"><value>Segarkan laporan</value></data>
+  <data name="Admin_PrintReport" xml:space="preserve"><value>Cetak laporan</value></data>
+  <data name="Admin_ActivityTab" xml:space="preserve"><value>Log aktivitas</value></data>
+  <data name="Admin_BrandsLoadFailed" xml:space="preserve"><value>Merek tidak dapat dimuat</value></data>
+  <data name="Admin_MovementsLoadFailed" xml:space="preserve"><value>Pergerakan stok tidak dapat dimuat</value></data>
+  <data name="Admin_ActivityLoadFailed" xml:space="preserve"><value>Aktivitas tidak dapat dimuat</value></data>
+  <data name="Admin_ReportGenerateFailed" xml:space="preserve"><value>Laporan tidak dapat dibuat</value></data>
+  <data name="Admin_DateInvalid" xml:space="preserve"><value>Tanggal akhir harus sama atau setelah tanggal awal.</value></data>
+  <data name="Admin_ReportSummary" xml:space="preserve"><value>Periode: {0} – {1}    Penjualan: {2}    Servis: {3}    Laba kotor: {4}    Stok masuk/keluar: {5}/{6}</value></data>
+  <data name="Admin_BrandName" xml:space="preserve"><value>Nama merek:</value></data>
+  <data name="Admin_RenameBrand" xml:space="preserve"><value>Ubah nama merek</value></data>
+  <data name="Admin_NewBrandName" xml:space="preserve"><value>Nama merek baru:</value></data>
+  <data name="Admin_SelectBrand" xml:space="preserve"><value>Pilih merek terlebih dahulu.</value></data>
+  <data name="Admin_BrandUpdateFailed" xml:space="preserve"><value>Gagal memperbarui merek</value></data>
+  <data name="Admin_ReportDocument" xml:space="preserve"><value>Laporan Bike Store</value></data>
+  <data name="Admin_ReportLine" xml:space="preserve"><value>{0}    Penjualan: {1}    Servis: {2}    Total: {3}</value></data>
+  <data name="Admin_ReportPrintFailed" xml:space="preserve"><value>Laporan tidak dapat dicetak</value></data>
+  <data name="Common_PermissionDenied" xml:space="preserve"><value>Izin ditolak</value></data>
+  <data name="Common_Blocked" xml:space="preserve"><value>Diblokir</value></data>
+  <data name="Backend_Demo" xml:space="preserve"><value>Demo · Lokal</value></data>
+  <data name="Backend_Local" xml:space="preserve"><value>Database lokal</value></data>
+  <data name="Backend_Online" xml:space="preserve"><value>Online · Cloudflare</value></data>
+  <data name="Movement_STOCK_IN" xml:space="preserve"><value>Stok masuk</value></data>
+  <data name="Movement_SALE" xml:space="preserve"><value>Penjualan</value></data>
+  <data name="Movement_VOID_RESTORE" xml:space="preserve"><value>Pengembalian pembatalan</value></data>
+  <data name="Movement_CORRECTION" xml:space="preserve"><value>Koreksi</value></data>
+  <data name="Grid_id" xml:space="preserve"><value>ID</value></data>
+  <data name="Grid_username" xml:space="preserve"><value>Nama pengguna</value></data>
+  <data name="Grid_role" xml:space="preserve"><value>Peran</value></data>
+  <data name="Grid_is_active" xml:space="preserve"><value>Aktif</value></data>
+  <data name="Grid_created_at" xml:space="preserve"><value>Dibuat</value></data>
+  <data name="Grid_updated_at" xml:space="preserve"><value>Diperbarui</value></data>
+  <data name="Grid_brand" xml:space="preserve"><value>Merek</value></data>
+  <data name="Grid_products" xml:space="preserve"><value>Produk</value></data>
+  <data name="Grid_sort_order" xml:space="preserve"><value>Urutan</value></data>
+  <data name="Grid_movement_type" xml:space="preserve"><value>Pergerakan</value></data>
+  <data name="Grid_type" xml:space="preserve"><value>Model</value></data>
+  <data name="Grid_color" xml:space="preserve"><value>Warna</value></data>
+  <data name="Grid_quantity_change" xml:space="preserve"><value>Perubahan</value></data>
+  <data name="Grid_quantity_before" xml:space="preserve"><value>Sebelum</value></data>
+  <data name="Grid_quantity_after" xml:space="preserve"><value>Sesudah</value></data>
+  <data name="Grid_note" xml:space="preserve"><value>Catatan</value></data>
+  <data name="Grid_created_by" xml:space="preserve"><value>Dibuat oleh</value></data>
+  <data name="Grid_date" xml:space="preserve"><value>Tanggal</value></data>
+  <data name="Grid_sales" xml:space="preserve"><value>Penjualan</value></data>
+  <data name="Grid_service" xml:space="preserve"><value>Servis</value></data>
+  <data name="Grid_total" xml:space="preserve"><value>Total</value></data>
+  <data name="Grid_section" xml:space="preserve"><value>Bagian</value></data>
+  <data name="Grid_label" xml:space="preserve"><value>Label</value></data>
+  <data name="Grid_value" xml:space="preserve"><value>Nilai</value></data>
+  <data name="Grid_actor" xml:space="preserve"><value>Pelaku</value></data>
+  <data name="Grid_action" xml:space="preserve"><value>Tindakan</value></data>
+  <data name="Grid_entity" xml:space="preserve"><value>Entitas</value></data>
+  <data name="Grid_entity_id" xml:space="preserve"><value>ID entitas</value></data>
+  <data name="Grid_detail" xml:space="preserve"><value>Detail</value></data>
+  <data name="User_Title" xml:space="preserve"><value>Manajemen pengguna</value></data>
+  <data name="User_AccessDenied" xml:space="preserve"><value>Akses ditolak. Hanya administrator.</value></data>
+  <data name="User_Add" xml:space="preserve"><value>Tambah pengguna</value></data>
+  <data name="User_ResetPassword" xml:space="preserve"><value>Atur ulang kata sandi</value></data>
+  <data name="User_Enable" xml:space="preserve"><value>Aktifkan pengguna</value></data>
+  <data name="User_Disable" xml:space="preserve"><value>Nonaktifkan pengguna</value></data>
+  <data name="User_MakeStaff" xml:space="preserve"><value>Jadikan staf</value></data>
+  <data name="User_MakeAdmin" xml:space="preserve"><value>Jadikan administrator</value></data>
+  <data name="User_Delete" xml:space="preserve"><value>Hapus pengguna</value></data>
+  <data name="User_LoadFailed" xml:space="preserve"><value>Gagal memuat pengguna: {0}</value></data>
+  <data name="User_UsernamePrompt" xml:space="preserve"><value>Nama pengguna (contoh: kasir1):</value></data>
+  <data name="User_PasswordPrompt" xml:space="preserve"><value>Kata sandi:</value></data>
+  <data name="User_RolePrompt" xml:space="preserve"><value>Peran (Administrator atau Staf):</value></data>
+  <data name="User_InvalidRoleMessage" xml:space="preserve"><value>Peran harus Administrator atau Staf.</value></data>
+  <data name="User_InvalidRoleTitle" xml:space="preserve"><value>Peran tidak valid</value></data>
+  <data name="User_Created" xml:space="preserve"><value>Pengguna dibuat.</value></data>
+  <data name="User_CreateFailed" xml:space="preserve"><value>Gagal membuat pengguna: {0}</value></data>
+  <data name="User_SelectFirst" xml:space="preserve"><value>Pilih pengguna terlebih dahulu.</value></data>
+  <data name="User_NewPasswordPrompt" xml:space="preserve"><value>Kata sandi baru untuk '{0}':</value></data>
+  <data name="User_PasswordReset" xml:space="preserve"><value>Kata sandi diatur ulang.</value></data>
+  <data name="User_ResetFailed" xml:space="preserve"><value>Gagal mengatur ulang: {0}</value></data>
+  <data name="User_CannotDisableSelf" xml:space="preserve"><value>Anda tidak dapat menonaktifkan pengguna yang sedang masuk.</value></data>
+  <data name="User_UpdateFailed" xml:space="preserve"><value>Gagal memperbarui: {0}</value></data>
+  <data name="User_CannotDemoteSelf" xml:space="preserve"><value>Anda tidak dapat menurunkan peran sendiri saat sedang masuk.</value></data>
+  <data name="User_RoleFailed" xml:space="preserve"><value>Gagal mengubah peran: {0}</value></data>
+  <data name="User_CannotDeleteSelf" xml:space="preserve"><value>Anda tidak dapat menghapus pengguna yang sedang masuk.</value></data>
+  <data name="User_DeleteQuestion" xml:space="preserve"><value>Hapus pengguna '{0}'?</value></data>
+  <data name="User_ConfirmDelete" xml:space="preserve"><value>Konfirmasi penghapusan</value></data>
+  <data name="User_DeleteFailed" xml:space="preserve"><value>Gagal menghapus: {0}</value></data>
+  <data name="User_Details" xml:space="preserve"><value>Detail pengguna</value></data>
+  <data name="Error_OnlineUrlHttps" xml:space="preserve"><value>URL toko online harus berupa alamat HTTPS yang valid.</value></data>
+  <data name="Error_NoSessionToken" xml:space="preserve"><value>Server tidak mengembalikan token sesi.</value></data>
+  <data name="Error_ServerHttp" xml:space="preserve"><value>Server mengembalikan HTTP {0}.</value></data>
+  <data name="Error_OnlineSignInFirst" xml:space="preserve"><value>Masuk ke toko online terlebih dahulu.</value></data>
+  <data name="Error_InvalidServerResponse" xml:space="preserve"><value>Server mengembalikan respons kosong atau tidak valid.</value></data>
+  <data name="Error_PasswordEmpty" xml:space="preserve"><value>Kata sandi tidak boleh kosong.</value></data>
+  <data name="Error_DatabasePathRequired" xml:space="preserve"><value>Lokasi database wajib diisi.</value></data>
+  <data name="Error_UserNotFound" xml:space="preserve"><value>Pengguna tidak ditemukan.</value></data>
+  <data name="Error_CredentialsRequired" xml:space="preserve"><value>Nama pengguna dan kata sandi wajib diisi.</value></data>
+  <data name="Error_InvalidCredentials" xml:space="preserve"><value>Nama pengguna atau kata sandi tidak valid.</value></data>
+  <data name="Error_UserDisabled" xml:space="preserve"><value>Pengguna ini dinonaktifkan.</value></data>
+  <data name="Error_LoginFailedDetail" xml:space="preserve"><value>Gagal masuk: {0}</value></data>
+  <data name="Error_UsernameRequired" xml:space="preserve"><value>Nama pengguna wajib diisi.</value></data>
+  <data name="Error_PasswordRequired" xml:space="preserve"><value>Kata sandi wajib diisi.</value></data>
+  <data name="Error_RoleCode" xml:space="preserve"><value>Peran harus ADMIN atau USER.</value></data>
+  <data name="Error_SignInBeforeInvoice" xml:space="preserve"><value>Masuk sebelum membuat faktur.</value></data>
+  <data name="Error_CustomerRequired" xml:space="preserve"><value>Nama pelanggan wajib diisi.</value></data>
+  <data name="Error_InvoiceItemRequired" xml:space="preserve"><value>Tambahkan setidaknya satu item faktur.</value></data>
+  <data name="Error_InvoiceItemPositive" xml:space="preserve"><value>Setiap item harus memiliki jumlah dan harga satuan lebih dari nol.</value></data>
+  <data name="Error_AdminVoidInvoice" xml:space="preserve"><value>Akses administrator diperlukan untuk membatalkan faktur.</value></data>
+  <data name="Error_VoidReasonRequired" xml:space="preserve"><value>Alasan pembatalan wajib diisi.</value></data>
+  <data name="Error_InvoiceNotFound" xml:space="preserve"><value>Faktur tidak ditemukan.</value></data>
+  <data name="Error_InvoiceAlreadyVoid" xml:space="preserve"><value>Faktur sudah dibatalkan.</value></data>
+  <data name="Error_AdminEditInvoice" xml:space="preserve"><value>Akses administrator diperlukan untuk mengubah faktur.</value></data>
+  <data name="Error_AdminDeleteInvoice" xml:space="preserve"><value>Akses administrator diperlukan untuk menghapus catatan faktur.</value></data>
+  <data name="Error_BikeIdExists" xml:space="preserve"><value>ID sepeda sudah ada.</value></data>
+  <data name="Error_BikeNotFound" xml:space="preserve"><value>Sepeda tidak ditemukan.</value></data>
+  <data name="Error_AdminCatalogueStatus" xml:space="preserve"><value>Hanya administrator yang dapat mengubah status katalog.</value></data>
+  <data name="Error_QuantityMinimum" xml:space="preserve"><value>Jumlah minimal 1.</value></data>
+  <data name="Error_UnitCostPositive" xml:space="preserve"><value>Biaya satuan harus lebih dari 0.</value></data>
+  <data name="Error_ColourNameRequired" xml:space="preserve"><value>Nama warna baru wajib diisi.</value></data>
+  <data name="Error_BrandModelRequired" xml:space="preserve"><value>Merek dan model wajib diisi.</value></data>
+  <data name="Error_ColourRequired" xml:space="preserve"><value>Setidaknya satu warna wajib diisi.</value></data>
+  <data name="Error_ColourUnique" xml:space="preserve"><value>Nama warna dalam satu sepeda harus unik.</value></data>
+  <data name="Error_StockCorrectionExceeds" xml:space="preserve"><value>Koreksi stok melebihi stok yang tersedia.</value></data>
+  <data name="Breakdown_PAYMENT" xml:space="preserve"><value>Pembayaran</value></data>
+  <data name="Breakdown_TOP_BRAND" xml:space="preserve"><value>Merek teratas</value></data>
+  <data name="Breakdown_TOP_MODEL" xml:space="preserve"><value>Model teratas</value></data>
+  <data name="Breakdown_TOP_COLOUR" xml:space="preserve"><value>Warna teratas</value></data>
+  <data name="Payment_UNSPECIFIED" xml:space="preserve"><value>Tidak ditentukan</value></data>
+  <data name="Payment_NO_COLOUR" xml:space="preserve"><value>Tanpa warna</value></data>
+  <data name="Service_Title" xml:space="preserve"><value>Servis</value></data>
+  <data name="Report_Header" xml:space="preserve"><value>{0} — LAPORAN USAHA</value></data>
+  <data name="Error_InsufficientStock" xml:space="preserve"><value>Stok {0} tidak cukup. Tersedia: {1}.</value></data>
+  <data name="Error_FifoAllocation" xml:space="preserve"><value>Alokasi FIFO gagal untuk {0}.</value></data>
+  <data name="Setup_DatabaseFilter" xml:space="preserve"><value>Database SQLite (*.db)|*.db|Semua berkas (*.*)|*.*</value></data>
+  <data name="Grid_name" xml:space="preserve"><value>Nama</value></data>
+  <data name="Grid_sell_price" xml:space="preserve"><value>Harga jual</value></data>
+  <data name="Grid_available" xml:space="preserve"><value>Tersedia</value></data>
+  <data name="Grid_invoice_number" xml:space="preserve"><value>Nomor faktur</value></data>
+  <data name="Grid_customer_name" xml:space="preserve"><value>Pelanggan</value></data>
+  <data name="Grid_customer_phone" xml:space="preserve"><value>Telepon</value></data>
+  <data name="Grid_customer_address" xml:space="preserve"><value>Alamat</value></data>
+  <data name="Grid_payment_method" xml:space="preserve"><value>Pembayaran</value></data>
+  <data name="Grid_payment_bank" xml:space="preserve"><value>Bank</value></data>
+  <data name="Grid_status" xml:space="preserve"><value>Status</value></data>
+  <data name="Grid_created_by_username" xml:space="preserve"><value>Dibuat oleh</value></data>
+  <data name="Grid_product_id" xml:space="preserve"><value>ID produk</value></data>
+  <data name="Grid_quantity" xml:space="preserve"><value>Jumlah</value></data>
+  <data name="Grid_unit_price" xml:space="preserve"><value>Harga satuan</value></data>
+  <data name="Grid_line_total" xml:space="preserve"><value>Total baris</value></data>
+  <data name="Grid_frame_numbers" xml:space="preserve"><value>Nomor rangka</value></data>
+  <data name="Grid_service_number" xml:space="preserve"><value>Nomor servis</value></data>
+  <data name="Grid_service_type" xml:space="preserve"><value>Jenis servis</value></data>
+  <data name="Grid_service_status" xml:space="preserve"><value>Status</value></data>
+  <data name="Grid_service_cost" xml:space="preserve"><value>Biaya</value></data>
+  <data name="Grid_notes" xml:space="preserve"><value>Catatan</value></data>
+  <data name="Grid_invoice" xml:space="preserve"><value>Faktur</value></data>
+  <data name="Grid_customer" xml:space="preserve"><value>Pelanggan</value></data>
+  <data name="Grid_payment" xml:space="preserve"><value>Pembayaran</value></data>
+  <data name="Grid_created" xml:space="preserve"><value>Dibuat</value></data>
+  <data name="Grid_bicycle" xml:space="preserve"><value>Sepeda</value></data>
+  <data name="Grid_battery" xml:space="preserve"><value>Baterai</value></data>
+  <data name="Grid_motor" xml:space="preserve"><value>Motor</value></data>
+  <data name="Grid_topspeed" xml:space="preserve"><value>Kecepatan maksimum</value></data>
+  <data name="Grid_range" xml:space="preserve"><value>Jarak tempuh</value></data>
+  <data name="Grid_maxweight" xml:space="preserve"><value>Berat maksimum</value></data>
+  <data name="Grid_safety" xml:space="preserve"><value>Keamanan</value></data>
+  <data name="Grid_description" xml:space="preserve"><value>Deskripsi</value></data>
+  <data name="Grid_price" xml:space="preserve"><value>Harga</value></data>
+  <data name="Grid_featured" xml:space="preserve"><value>Unggulan</value></data>
+  <data name="Grid_instock" xml:space="preserve"><value>Aktif</value></data>
+  <data name="Grid_stockqty" xml:space="preserve"><value>Stok</value></data>
+</root>

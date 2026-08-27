@@ -88,7 +88,7 @@ VALUES ($action, $entity, $entityId, $actorId, $actorUser, $detail, $at);";
             cmd.Parameters.AddWithValue("$id", userId);
 
             using var rdr = cmd.ExecuteReader();
-            if (!rdr.Read()) throw new InvalidOperationException("User not found.");
+            if (!rdr.Read()) throw new InvalidOperationException(Strings.Get("Error_UserNotFound"));
 
             return (
                 rdr.GetString(0),
@@ -107,7 +107,7 @@ VALUES ($action, $entity, $entityId, $actorId, $actorUser, $detail, $at);";
 
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
-                error = "Username and password are required.";
+                error = Strings.Get("Error_CredentialsRequired");
                 return false;
             }
 
@@ -134,7 +134,7 @@ LIMIT 1;";
                     WriteAudit(conn, tx, "LOGIN_FAIL", "users", null, $"username={username}, reason=not_found");
                     tx.Commit();
 
-                    error = "Invalid username or password.";
+                    error = Strings.Get("Error_InvalidCredentials");
                     return false;
                 }
 
@@ -148,7 +148,7 @@ LIMIT 1;";
                     WriteAudit(conn, tx, "LOGIN_FAIL", "users", id, $"username={username}, reason=disabled");
                     tx.Commit();
 
-                    error = "This user is disabled.";
+                    error = Strings.Get("Error_UserDisabled");
                     return false;
                 }
 
@@ -157,7 +157,7 @@ LIMIT 1;";
                     WriteAudit(conn, tx, "LOGIN_FAIL", "users", id, $"username={username}, reason=bad_password");
                     tx.Commit();
 
-                    error = "Invalid username or password.";
+                    error = Strings.Get("Error_InvalidCredentials");
                     return false;
                 }
 
@@ -173,7 +173,7 @@ LIMIT 1;";
             catch (Exception ex)
             {
                 try { tx.Rollback(); } catch { }
-                error = "Login failed: " + ex.Message;
+                error = Strings.Format("Error_LoginFailedDetail", ex.Message);
                 return false;
             }
         }
@@ -182,10 +182,10 @@ LIMIT 1;";
 
         public int CreateUser(string username, string password, string role, bool isActive = true)
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Username required.");
-            if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("Password required.");
+            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException(Strings.Get("Error_UsernameRequired"));
+            if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException(Strings.Get("Error_PasswordRequired"));
             role = role.Trim().ToUpperInvariant();
-            if (role != "ADMIN" && role != "USER") throw new ArgumentException("Role must be ADMIN or USER.");
+            if (role != "ADMIN" && role != "USER") throw new ArgumentException(Strings.Get("Error_RoleCode"));
 
             username = username.Trim().ToLowerInvariant();
             var hash = PasswordHasher.Hash(password);
@@ -227,7 +227,7 @@ SELECT last_insert_rowid();";
         public void ResetPassword(int userId, string newPassword)
         {
             if (userId <= 0) throw new ArgumentOutOfRangeException(nameof(userId));
-            if (string.IsNullOrWhiteSpace(newPassword)) throw new ArgumentException("Password required.");
+            if (string.IsNullOrWhiteSpace(newPassword)) throw new ArgumentException(Strings.Get("Error_PasswordRequired"));
 
             using var conn = Database.OpenConnection();
             using var tx = conn.BeginTransaction();
@@ -245,7 +245,7 @@ SELECT last_insert_rowid();";
                     cmd.Parameters.AddWithValue("$id", userId);
 
                     if (cmd.ExecuteNonQuery() != 1)
-                        throw new InvalidOperationException("User not found.");
+                        throw new InvalidOperationException(Strings.Get("Error_UserNotFound"));
                 }
 
                 WriteAudit(conn, tx, "RESET_PASSWORD", "users", userId, $"username={snap.Username}");
@@ -275,7 +275,7 @@ SELECT last_insert_rowid();";
                     cmd.Parameters.AddWithValue("$id", userId);
 
                     if (cmd.ExecuteNonQuery() != 1)
-                        throw new InvalidOperationException("User not found.");
+                        throw new InvalidOperationException(Strings.Get("Error_UserNotFound"));
                 }
 
                 WriteAudit(conn, tx, "TOGGLE_ACTIVE", "users", userId,
@@ -294,7 +294,7 @@ SELECT last_insert_rowid();";
         {
             newRole = (newRole ?? "").Trim().ToUpperInvariant();
             if (newRole != "ADMIN" && newRole != "USER")
-                throw new ArgumentException("Role must be ADMIN or USER.");
+                throw new ArgumentException(Strings.Get("Error_RoleCode"));
 
             using var conn = Database.OpenConnection();
             using var tx = conn.BeginTransaction();
@@ -311,7 +311,7 @@ SELECT last_insert_rowid();";
                     cmd.Parameters.AddWithValue("$id", userId);
 
                     if (cmd.ExecuteNonQuery() != 1)
-                        throw new InvalidOperationException("User not found.");
+                        throw new InvalidOperationException(Strings.Get("Error_UserNotFound"));
                 }
 
                 WriteAudit(conn, tx, "SET_ROLE", "users", userId,
@@ -345,7 +345,7 @@ SELECT last_insert_rowid();";
                     cmd.Parameters.AddWithValue("$id", userId);
 
                     if (cmd.ExecuteNonQuery() != 1)
-                        throw new InvalidOperationException("User not found.");
+                        throw new InvalidOperationException(Strings.Get("Error_UserNotFound"));
                 }
 
                 tx.Commit();

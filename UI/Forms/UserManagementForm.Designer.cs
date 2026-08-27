@@ -85,7 +85,7 @@
             btnAddUser.Name = "btnAddUser";
             btnAddUser.Size = new Size(190, 36);
             btnAddUser.TabIndex = 0;
-            btnAddUser.Text = "Add user";
+            btnAddUser.Text = Strings.Get("User_Add");
             btnAddUser.UseVisualStyleBackColor = true;
             // 
             // btnResetPassword
@@ -94,7 +94,7 @@
             btnResetPassword.Name = "btnResetPassword";
             btnResetPassword.Size = new Size(190, 36);
             btnResetPassword.TabIndex = 1;
-            btnResetPassword.Text = "Reset password";
+            btnResetPassword.Text = Strings.Get("User_ResetPassword");
             btnResetPassword.UseVisualStyleBackColor = true;
             // 
             // btnToggleActive
@@ -103,7 +103,7 @@
             btnToggleActive.Name = "btnToggleActive";
             btnToggleActive.Size = new Size(190, 36);
             btnToggleActive.TabIndex = 2;
-            btnToggleActive.Text = "Disable user";
+            btnToggleActive.Text = Strings.Get("User_Disable");
             btnToggleActive.UseVisualStyleBackColor = true;
             // 
             // btnToggleRole
@@ -112,7 +112,7 @@
             btnToggleRole.Name = "btnToggleRole";
             btnToggleRole.Size = new Size(190, 36);
             btnToggleRole.TabIndex = 3;
-            btnToggleRole.Text = "Make administrator";
+            btnToggleRole.Text = Strings.Get("User_MakeAdmin");
             btnToggleRole.UseVisualStyleBackColor = true;
             // 
             // btnDeleteUser
@@ -121,7 +121,7 @@
             btnDeleteUser.Name = "btnDeleteUser";
             btnDeleteUser.Size = new Size(190, 36);
             btnDeleteUser.TabIndex = 4;
-            btnDeleteUser.Text = "Delete user";
+            btnDeleteUser.Text = Strings.Get("User_Delete");
             btnDeleteUser.UseVisualStyleBackColor = true;
             // 
             // btnClose
@@ -130,7 +130,7 @@
             btnClose.Name = "btnClose";
             btnClose.Size = new Size(190, 36);
             btnClose.TabIndex = 5;
-            btnClose.Text = "Close";
+            btnClose.Text = Strings.Get("Common_Close");
             btnClose.UseVisualStyleBackColor = true;
             // 
             // UserManagementForm
@@ -141,7 +141,7 @@
             Controls.Add(tableRoot);
             Name = "UserManagementForm";
             StartPosition = FormStartPosition.CenterParent;
-            Text = "User Management";
+            Text = Strings.Get("User_Title");
             tableRoot.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dataGridViewUsers).EndInit();
             panelButtons.ResumeLayout(false);

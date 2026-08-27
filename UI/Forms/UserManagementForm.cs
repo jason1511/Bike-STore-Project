@@ -12,12 +12,13 @@ namespace Bike_STore_Project
         public UserManagementForm()
         {
             InitializeComponent();
+            ApplyLocalizedText();
 
             // ✅ Admin-only guard
             if (!AppSession.IsAdmin)
             {
-                MessageBox.Show("Access denied. Admin only.",
-                    "Permission denied", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(Strings.Get("User_AccessDenied"),
+                    Strings.Get("Common_PermissionDenied"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                 // Make sure form doesn't keep showing
                 Shown += (_, __) => Close();
@@ -54,14 +55,14 @@ namespace Bike_STore_Project
             dataGridViewUsers.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "Id",
-                HeaderText = "ID",
+                HeaderText = Strings.Get("Grid_id"),
                 Width = 70
             });
 
             dataGridViewUsers.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "Username",
-                HeaderText = "Username",
+                HeaderText = Strings.Get("Grid_username"),
                 Width = 220
             });
 
@@ -69,7 +70,7 @@ namespace Bike_STore_Project
             {
                 Name = "role",
                 DataPropertyName = "Role",
-                HeaderText = "Role",
+                HeaderText = Strings.Get("Grid_role"),
                 Width = 90
             });
 
@@ -77,14 +78,14 @@ namespace Bike_STore_Project
             {
                 Name = "is_active",
                 DataPropertyName = "IsActive",
-                HeaderText = "Active",
+                HeaderText = Strings.Get("Grid_is_active"),
                 Width = 70
             });
 
             dataGridViewUsers.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "CreatedAt",
-                HeaderText = "Created",
+                HeaderText = Strings.Get("Grid_created_at"),
                 Width = 180,
                 DefaultCellStyle = { Format = "yyyy-MM-dd HH:mm" }
             });
@@ -101,8 +102,8 @@ namespace Bike_STore_Project
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to load users: " + ex.Message,
-                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(Strings.Format("User_LoadFailed", ex.Message),
+                    Strings.Get("Common_Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -111,22 +112,22 @@ namespace Bike_STore_Project
 
         private void AddUser()
         {
-            var username = Prompt("Username (e.g. cashier1):");
+            var username = Prompt(Strings.Get("User_UsernamePrompt"));
             if (string.IsNullOrWhiteSpace(username)) return;
 
-            var password = Prompt("Password:");
+            var password = Prompt(Strings.Get("User_PasswordPrompt"), password: true);
             if (string.IsNullOrWhiteSpace(password)) return;
 
-            var roleInput = Prompt("Role (Administrator or Staff):", "Staff")?.Trim();
+            var roleInput = Prompt(Strings.Get("User_RolePrompt"), Strings.Get("Role_USER"))?.Trim();
             var role = roleInput?.ToUpperInvariant() switch
             {
-                "ADMIN" or "ADMINISTRATOR" => "ADMIN",
-                "USER" or "STAFF" => "USER",
+                "ADMIN" or "ADMINISTRATOR" or "ADMINISTRATOR/ADMIN" => "ADMIN",
+                "USER" or "STAFF" or "STAF" => "USER",
                 _ => ""
             };
             if (role.Length == 0)
             {
-                MessageBox.Show("Role must be Administrator or Staff.", "Invalid role",
+                MessageBox.Show(Strings.Get("User_InvalidRoleMessage"), Strings.Get("User_InvalidRoleTitle"),
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
@@ -135,13 +136,13 @@ namespace Bike_STore_Project
             {
                 _repo.CreateUser(username, password, role);
                 Reload();
-                MessageBox.Show("User created.", "Success",
+                MessageBox.Show(Strings.Get("User_Created"), Strings.Get("Common_Success"),
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Create user failed: " + ex.Message,
-                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(Strings.Format("User_CreateFailed", ex.Message),
+                    Strings.Get("Common_Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -150,23 +151,23 @@ namespace Bike_STore_Project
             var u = Selected();
             if (u == null)
             {
-                MessageBox.Show("Select a user first.");
+                MessageBox.Show(Strings.Get("User_SelectFirst"));
                 return;
             }
 
-            var newPass = Prompt($"New password for '{u.Username}':");
+            var newPass = Prompt(Strings.Format("User_NewPasswordPrompt", u.Username), password: true);
             if (string.IsNullOrWhiteSpace(newPass)) return;
 
             try
             {
                 _repo.ResetPassword(u.Id, newPass);
-                MessageBox.Show("Password reset.", "Success",
+                MessageBox.Show(Strings.Get("User_PasswordReset"), Strings.Get("Common_Success"),
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Reset failed: " + ex.Message,
-                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(Strings.Format("User_ResetFailed", ex.Message),
+                    Strings.Get("Common_Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -175,14 +176,14 @@ namespace Bike_STore_Project
             var u = Selected();
             if (u == null)
             {
-                MessageBox.Show("Select a user first.");
+                MessageBox.Show(Strings.Get("User_SelectFirst"));
                 return;
             }
 
             if (u.Id == AppSession.UserId && u.IsActive)
             {
-                MessageBox.Show("You cannot disable the currently signed-in user.",
-                    "Blocked", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(Strings.Get("User_CannotDisableSelf"),
+                    Strings.Get("Common_Blocked"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -193,8 +194,8 @@ namespace Bike_STore_Project
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Update failed: " + ex.Message,
-                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(Strings.Format("User_UpdateFailed", ex.Message),
+                    Strings.Get("Common_Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -203,7 +204,7 @@ namespace Bike_STore_Project
             var u = Selected();
             if (u == null)
             {
-                MessageBox.Show("Select a user first.");
+                MessageBox.Show(Strings.Get("User_SelectFirst"));
                 return;
             }
 
@@ -211,8 +212,8 @@ namespace Bike_STore_Project
 
             if (u.Id == AppSession.UserId && u.Role == "ADMIN" && newRole == "USER")
             {
-                MessageBox.Show("You cannot demote yourself while logged in.",
-                    "Blocked", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(Strings.Get("User_CannotDemoteSelf"),
+                    Strings.Get("Common_Blocked"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -223,8 +224,8 @@ namespace Bike_STore_Project
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Role change failed: " + ex.Message,
-                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(Strings.Format("User_RoleFailed", ex.Message),
+                    Strings.Get("Common_Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -233,20 +234,20 @@ namespace Bike_STore_Project
             var u = Selected();
             if (u == null)
             {
-                MessageBox.Show("Select a user first.");
+                MessageBox.Show(Strings.Get("User_SelectFirst"));
                 return;
             }
 
             if (u.Id == AppSession.UserId)
             {
-                MessageBox.Show("You cannot delete the currently signed-in user.",
-                    "Blocked", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(Strings.Get("User_CannotDeleteSelf"),
+                    Strings.Get("Common_Blocked"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             var confirm = MessageBox.Show(
-                $"Delete user '{u.Username}'?",
-                "Confirm delete",
+                Strings.Format("User_DeleteQuestion", u.Username),
+                Strings.Get("User_ConfirmDelete"),
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning);
 
@@ -259,8 +260,8 @@ namespace Bike_STore_Project
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Delete failed: " + ex.Message,
-                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(Strings.Format("User_DeleteFailed", ex.Message),
+                    Strings.Get("Common_Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -272,8 +273,8 @@ namespace Bike_STore_Project
             btnToggleActive.Enabled = hasSelection;
             btnToggleRole.Enabled = hasSelection;
             btnDeleteUser.Enabled = hasSelection;
-            btnToggleActive.Text = user?.IsActive == false ? "Enable user" : "Disable user";
-            btnToggleRole.Text = user?.Role == "ADMIN" ? "Make staff" : "Make administrator";
+            btnToggleActive.Text = Strings.Get(user?.IsActive == false ? "User_Enable" : "User_Disable");
+            btnToggleRole.Text = Strings.Get(user?.Role == "ADMIN" ? "User_MakeStaff" : "User_MakeAdmin");
             UiTheme.StyleButton(btnToggleActive, user?.IsActive == true);
         }
 
@@ -306,13 +307,24 @@ namespace Bike_STore_Project
             tableRoot.ResumeLayout();
         }
 
-        private static string? Prompt(string label, string defaultValue = "")
+        private void ApplyLocalizedText()
+        {
+            Text = Strings.Get("User_Title");
+            btnAddUser.Text = Strings.Get("User_Add");
+            btnResetPassword.Text = Strings.Get("User_ResetPassword");
+            btnToggleActive.Text = Strings.Get("User_Disable");
+            btnToggleRole.Text = Strings.Get("User_MakeAdmin");
+            btnDeleteUser.Text = Strings.Get("User_Delete");
+            btnClose.Text = Strings.Get("Common_Close");
+        }
+
+        private static string? Prompt(string label, string defaultValue = "", bool password = false)
         {
             using var f = new Form
             {
                 Width = 420,
                 Height = 160,
-                Text = "User details",
+                Text = Strings.Get("User_Details"),
                 StartPosition = FormStartPosition.CenterParent,
                 FormBorderStyle = FormBorderStyle.FixedDialog,
                 MaximizeBox = false,
@@ -322,9 +334,9 @@ namespace Bike_STore_Project
 
             var lbl = new Label { Left = 10, Top = 15, Width = 380, Text = label };
             var tb = new TextBox { Left = 10, Top = 40, Width = 380, Text = defaultValue };
-            tb.UseSystemPasswordChar = label.Contains("password", StringComparison.OrdinalIgnoreCase);
-            var ok = new Button { Text = "OK", Left = 230, Width = 75, Top = 75, DialogResult = DialogResult.OK };
-            var cancel = new Button { Text = "Cancel", Left = 315, Width = 75, Top = 75, DialogResult = DialogResult.Cancel };
+            tb.UseSystemPasswordChar = password;
+            var ok = new Button { Text = Strings.Get("Common_OK"), Left = 230, Width = 75, Top = 75, DialogResult = DialogResult.OK };
+            var cancel = new Button { Text = Strings.Get("Common_Cancel"), Left = 315, Width = 75, Top = 75, DialogResult = DialogResult.Cancel };
 
             f.Controls.Add(lbl);
             f.Controls.Add(tb);

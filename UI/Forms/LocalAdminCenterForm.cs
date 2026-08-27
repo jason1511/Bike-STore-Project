@@ -31,10 +31,10 @@ namespace Bike_STore_Project
         public LocalAdminCenterForm(LocalAdminSection? singleSection = null)
         {
             if (!AppSession.IsAdmin)
-                throw new InvalidOperationException("Admin access required.");
+                throw new InvalidOperationException(Strings.Get("Admin_AccessRequired"));
 
             _singleSection = singleSection;
-            Text = $"Bike Store - Local Admin - {AppSession.Username} (ADMIN)";
+            Text = Strings.Format("Admin_Window", AppSession.Username);
             StartPosition = FormStartPosition.CenterScreen;
             ClientSize = new Size(1000, 620);
             WindowState = FormWindowState.Normal;
@@ -84,18 +84,18 @@ namespace Bike_STore_Project
 
         private TabPage BuildBrands()
         {
-            var tab = new TabPage("Brands");
+            var tab = new TabPage(Strings.Get("Admin_BrandsTab"));
             var root = RootWithActions(out var actions);
-            var add = new Button { Text = "Add brand" };
-            add.Click += (_, __) => RunSafely(AddBrand, "Brand could not be added");
-            var rename = new Button { Text = "Rename selected" };
-            rename.Click += (_, __) => RunSafely(RenameBrand, "Brand could not be renamed");
-            var toggle = new Button { Text = "Deactivate brand", AutoSize = true };
-            toggle.Click += (_, __) => RunSafely(ToggleBrand, "Brand status could not be changed");
+            var add = new Button { Text = Strings.Get("Admin_AddBrand") };
+            add.Click += (_, __) => RunSafely(AddBrand, Strings.Get("Admin_AddBrandFailed"));
+            var rename = new Button { Text = Strings.Get("Admin_RenameSelected") };
+            rename.Click += (_, __) => RunSafely(RenameBrand, Strings.Get("Admin_RenameBrandFailed"));
+            var toggle = new Button { Text = Strings.Get("Admin_DeactivateBrand"), AutoSize = true };
+            toggle.Click += (_, __) => RunSafely(ToggleBrand, Strings.Get("Admin_BrandStatusFailed"));
             void UpdateToggleText()
             {
                 var active = _brands.CurrentRow?.DataBoundItem is DataRowView row && Convert.ToInt32(row["is_active"]) == 1;
-                toggle.Text = active ? "Deactivate brand" : "Activate brand";
+                toggle.Text = Strings.Get(active ? "Admin_DeactivateBrand" : "Admin_ActivateBrand");
                 UiTheme.StyleButton(toggle, active);
             }
             _brands.SelectionChanged += (_, __) => UpdateToggleText();
@@ -107,14 +107,14 @@ namespace Bike_STore_Project
 
         private TabPage BuildMovements()
         {
-            var tab = new TabPage("Stock Movements");
+            var tab = new TabPage(Strings.Get("Admin_StockTab"));
             var root = RootWithActions(out var actions);
-            var refresh = new Button { Text = "Refresh" };
+            var refresh = new Button { Text = Strings.Get("Common_Refresh") };
             refresh.Click += (_, __) => LoadMovements();
             actions.Controls.Add(refresh);
             actions.Controls.Add(new Label
             {
-                Text = "Stock receipts, invoice sales, and void restorations are recorded automatically.",
+                Text = Strings.Get("Admin_StockHelp"),
                 AutoSize = true, Padding = new Padding(10, 7, 0, 0)
             });
             root.Controls.Add(_movements, 0, 1);
@@ -124,29 +124,29 @@ namespace Bike_STore_Project
 
         private TabPage BuildReports()
         {
-            var tab = new TabPage("Reports");
+            var tab = new TabPage(Strings.Get("Admin_ReportsTab"));
             var root = new TableLayoutPanel { Dock = DockStyle.Fill, RowCount = 3, Padding = new Padding(12) };
             root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
             var actions = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true };
-            actions.Controls.Add(new Label { Text = "From", AutoSize = true, Padding = new Padding(0, 7, 0, 0) });
+            actions.Controls.Add(new Label { Text = Strings.Get("Common_From"), AutoSize = true, Padding = new Padding(0, 7, 0, 0) });
             actions.Controls.Add(_from);
-            actions.Controls.Add(new Label { Text = "To", AutoSize = true, Padding = new Padding(8, 7, 0, 0) });
+            actions.Controls.Add(new Label { Text = Strings.Get("Common_To"), AutoSize = true, Padding = new Padding(8, 7, 0, 0) });
             actions.Controls.Add(_to);
-            var today = new Button { Text = "Today" };
+            var today = new Button { Text = Strings.Get("Common_Today") };
             today.Click += (_, __) => { _from.Value = DateTime.Today; _to.Value = DateTime.Today; GenerateReport(); };
-            var month = new Button { Text = "This month" };
+            var month = new Button { Text = Strings.Get("Common_ThisMonth") };
             month.Click += (_, __) => { _from.Value = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1); _to.Value = DateTime.Today; GenerateReport(); };
-            var week = new Button { Text = "This week" };
+            var week = new Button { Text = Strings.Get("Common_ThisWeek") };
             week.Click += (_, __) =>
             {
                 var offset = ((int)DateTime.Today.DayOfWeek + 6) % 7;
                 _from.Value = DateTime.Today.AddDays(-offset); _to.Value = DateTime.Today; GenerateReport();
             };
-            var generate = new Button { Text = "Refresh report" };
+            var generate = new Button { Text = Strings.Get("Admin_RefreshReport") };
             generate.Click += (_, __) => GenerateReport();
-            var print = new Button { Text = "Print report" };
+            var print = new Button { Text = Strings.Get("Admin_PrintReport") };
             print.Click += (_, __) => PrintReport();
             actions.Controls.AddRange(new Control[] { today, week, month, generate, print });
             root.Controls.Add(actions, 0, 0);
@@ -168,9 +168,9 @@ namespace Bike_STore_Project
 
         private TabPage BuildActivity()
         {
-            var tab = new TabPage("Activity Log");
+            var tab = new TabPage(Strings.Get("Admin_ActivityTab"));
             var root = RootWithActions(out var actions);
-            var refresh = new Button { Text = "Refresh" };
+            var refresh = new Button { Text = Strings.Get("Common_Refresh") };
             refresh.Click += (_, __) => LoadActivity();
             actions.Controls.Add(refresh);
             root.Controls.Add(_activity, 0, 1);
@@ -182,9 +182,9 @@ namespace Bike_STore_Project
 SELECT b.id,b.name,b.is_active,b.sort_order,b.created_at,
        COUNT(DISTINCT p.id) AS products
 FROM brands b LEFT JOIN products p ON UPPER(p.brand)=UPPER(b.name)
-GROUP BY b.id ORDER BY b.sort_order,b.name;"), "Brands could not be loaded");
+GROUP BY b.id ORDER BY b.sort_order,b.name;"), Strings.Get("Admin_BrandsLoadFailed"));
 
-        private void LoadMovements() => RunSafely(LoadMovementsCore, "Stock movements could not be loaded");
+        private void LoadMovements() => RunSafely(LoadMovementsCore, Strings.Get("Admin_MovementsLoadFailed"));
         private void LoadMovementsCore()
         {
             _movements.DataSource = Query(@"
@@ -196,7 +196,7 @@ ORDER BY datetime(sm.created_at) DESC,sm.id DESC;");
             if (_movements.Columns.Contains("id")) _movements.Columns["id"].Visible = false;
         }
 
-        private void LoadActivity() => RunSafely(LoadActivityCore, "Activity could not be loaded");
+        private void LoadActivity() => RunSafely(LoadActivityCore, Strings.Get("Admin_ActivityLoadFailed"));
         private void LoadActivityCore()
         {
             _activity.DataSource = Query(@"
@@ -209,14 +209,14 @@ FROM audit_log ORDER BY datetime(created_at) DESC,id DESC;");
         private bool GenerateReport()
         {
             try { return GenerateReportCore(); }
-            catch (Exception ex) { MessageBox.Show(ex.Message, "Report could not be generated", MessageBoxButtons.OK, MessageBoxIcon.Warning); return false; }
+            catch (Exception ex) { MessageBox.Show(ex.Message, Strings.Get("Admin_ReportGenerateFailed"), MessageBoxButtons.OK, MessageBoxIcon.Warning); return false; }
         }
 
         private bool GenerateReportCore()
         {
             if (_to.Value.Date < _from.Value.Date)
             {
-                MessageBox.Show("The end date must be on or after the start date.");
+                MessageBox.Show(Strings.Get("Admin_DateInvalid"));
                 return false;
             }
             var from = _from.Value.Date.ToString("yyyy-MM-dd 00:00:00");
@@ -227,7 +227,7 @@ FROM audit_log ORDER BY datetime(created_at) DESC,id DESC;");
             decimal cost = Scalar(conn, @"SELECT COALESCE(SUM(sl.qty_sold*sl.unit_cost),0) FROM sale_lines sl JOIN sales s ON s.id=sl.sale_id WHERE s.voided=0 AND datetime(s.date_time)>=datetime($from) AND datetime(s.date_time)<datetime($to);", from, to);
             decimal stockIn = Scalar(conn, @"SELECT COALESCE(SUM(CASE WHEN quantity_change>0 THEN quantity_change ELSE 0 END),0) FROM stock_movements WHERE LOWER(movement_type)='stock_in' AND datetime(created_at)>=datetime($from) AND datetime(created_at)<datetime($to);", from, to);
             decimal stockOut = Scalar(conn, @"SELECT COALESCE(ABS(SUM(CASE WHEN quantity_change<0 THEN quantity_change ELSE 0 END)),0) FROM stock_movements WHERE datetime(created_at)>=datetime($from) AND datetime(created_at)<datetime($to);", from, to);
-            _reportSummary = $"Period: {_from.Value:dd MMM yyyy} – {_to.Value:dd MMM yyyy}    Sales: {StoreFormat.Money(revenue)}    Service: {StoreFormat.Money(service)}    Gross profit: {StoreFormat.Money(revenue - cost)}    Stock in/out: {stockIn:N0}/{stockOut:N0}";
+            _reportSummary = Strings.Format("Admin_ReportSummary", _from.Value.ToString("dd MMM yyyy"), _to.Value.ToString("dd MMM yyyy"), StoreFormat.Money(revenue), StoreFormat.Money(service), StoreFormat.Money(revenue - cost), stockIn.ToString("N0"), stockOut.ToString("N0"));
             _summary.Text = _reportSummary;
 
             using var cmd = conn.CreateCommand();
@@ -265,18 +265,18 @@ ORDER BY date DESC;";
             using var breakdown = conn.CreateCommand();
             breakdown.CommandText = @"
 SELECT section,label,value FROM (
- SELECT 'Payment' section,COALESCE(NULLIF(i.payment_method,''),'UNSPECIFIED') label,SUM(ii.line_total) value
+ SELECT 'PAYMENT' section,COALESCE(NULLIF(i.payment_method,''),'UNSPECIFIED') label,SUM(ii.line_total) value
  FROM invoices i JOIN invoice_items ii ON ii.invoice_id=i.id
  WHERE i.status='ACTIVE' AND datetime(i.created_at)>=datetime($from) AND datetime(i.created_at)<datetime($to)
  GROUP BY i.payment_method
  UNION ALL
- SELECT 'Top brand',ii.brand,SUM(ii.line_total) FROM invoices i JOIN invoice_items ii ON ii.invoice_id=i.id
+ SELECT 'TOP_BRAND',ii.brand,SUM(ii.line_total) FROM invoices i JOIN invoice_items ii ON ii.invoice_id=i.id
  WHERE i.status='ACTIVE' AND datetime(i.created_at)>=datetime($from) AND datetime(i.created_at)<datetime($to) GROUP BY ii.brand
  UNION ALL
- SELECT 'Top model',ii.type,SUM(ii.quantity) FROM invoices i JOIN invoice_items ii ON ii.invoice_id=i.id
+ SELECT 'TOP_MODEL',ii.type,SUM(ii.quantity) FROM invoices i JOIN invoice_items ii ON ii.invoice_id=i.id
  WHERE i.status='ACTIVE' AND datetime(i.created_at)>=datetime($from) AND datetime(i.created_at)<datetime($to) GROUP BY ii.type
  UNION ALL
- SELECT 'Top colour',COALESCE(NULLIF(ii.color,''),'NO COLOUR'),SUM(ii.quantity) FROM invoices i JOIN invoice_items ii ON ii.invoice_id=i.id
+ SELECT 'TOP_COLOUR',COALESCE(NULLIF(ii.color,''),'NO_COLOUR'),SUM(ii.quantity) FROM invoices i JOIN invoice_items ii ON ii.invoice_id=i.id
  WHERE i.status='ACTIVE' AND datetime(i.created_at)>=datetime($from) AND datetime(i.created_at)<datetime($to) GROUP BY ii.color
 ) ORDER BY section,value DESC;";
             breakdown.Parameters.AddWithValue("$from", from); breakdown.Parameters.AddWithValue("$to", to);
@@ -287,7 +287,7 @@ SELECT section,label,value FROM (
 
         private void AddBrand()
         {
-            var name = DialogPrompt.Show(this, "Add brand", "Brand name:");
+            var name = DialogPrompt.Show(this, Strings.Get("Admin_AddBrand"), Strings.Get("Admin_BrandName"));
             if (string.IsNullOrWhiteSpace(name)) return;
             ExecuteAdmin("INSERT INTO brands(name) VALUES ($value);", name.ToUpperInvariant(), "CREATE_BRAND", $"name={name}");
             LoadBrands();
@@ -296,7 +296,7 @@ SELECT section,label,value FROM (
         private void RenameBrand()
         {
             if (!SelectedBrand(out var id, out var oldName)) return;
-            var name = DialogPrompt.Show(this, "Rename brand", "New brand name:", oldName);
+            var name = DialogPrompt.Show(this, Strings.Get("Admin_RenameBrand"), Strings.Get("Admin_NewBrandName"), oldName);
             if (string.IsNullOrWhiteSpace(name) || name.Equals(oldName, StringComparison.OrdinalIgnoreCase)) return;
             using var conn = Database.OpenConnection();
             using var tx = conn.BeginTransaction();
@@ -316,7 +316,7 @@ SELECT section,label,value FROM (
                 tx.Commit();
                 LoadBrands();
             }
-            catch (Exception ex) { try { tx.Rollback(); } catch { } MessageBox.Show(ex.Message); }
+            catch (Exception ex) { try { tx.Rollback(); } catch { } MessageBox.Show(ex.Message, Strings.Get("Admin_RenameBrandFailed")); }
         }
 
         private void ToggleBrand()
@@ -332,7 +332,7 @@ SELECT section,label,value FROM (
             id = 0; name = "";
             if (_brands.CurrentRow?.DataBoundItem is not DataRowView row)
             {
-                MessageBox.Show("Select a brand first."); return false;
+                MessageBox.Show(Strings.Get("Admin_SelectBrand")); return false;
             }
             id = Convert.ToInt32(row["id"]); name = Convert.ToString(row["name"]) ?? ""; return true;
         }
@@ -352,7 +352,7 @@ SELECT section,label,value FROM (
                 LocalAdminRepository.WriteAudit(conn, tx, action, "brands", id, detail);
                 tx.Commit();
             }
-            catch (Exception ex) { try { tx.Rollback(); } catch { } MessageBox.Show(ex.Message, "Brand update failed"); }
+            catch (Exception ex) { try { tx.Rollback(); } catch { } MessageBox.Show(ex.Message, Strings.Get("Admin_BrandUpdateFailed")); }
         }
 
         private void PrintReport()
@@ -360,7 +360,7 @@ SELECT section,label,value FROM (
             if (!GenerateReport()) return;
             try
             {
-                var doc = new PrintDocument { DocumentName = "Bike Store Report" };
+                var doc = new PrintDocument { DocumentName = Strings.Get("Admin_ReportDocument") };
                 doc.DefaultPageSettings.Landscape = true;
                 doc.PrintPage += (_, e) =>
                 {
@@ -375,7 +375,7 @@ SELECT section,label,value FROM (
                     foreach (DataGridViewRow row in _report.Rows)
                     {
                         if (row.IsNewRow) continue;
-                        var line = $"{row.Cells["date"].Value}    Sales: {StoreFormat.Money(Convert.ToDecimal(row.Cells["sales"].Value))}    Service: {StoreFormat.Money(Convert.ToDecimal(row.Cells["service"].Value))}    Total: {StoreFormat.Money(Convert.ToDecimal(row.Cells["total"].Value))}";
+                        var line = Strings.Format("Admin_ReportLine", row.Cells["date"].Value, StoreFormat.Money(Convert.ToDecimal(row.Cells["sales"].Value)), StoreFormat.Money(Convert.ToDecimal(row.Cells["service"].Value)), StoreFormat.Money(Convert.ToDecimal(row.Cells["total"].Value)));
                         e.Graphics.DrawString(line, body, Brushes.Black, e.MarginBounds.Left, y);
                         y += 20;
                     }
@@ -383,7 +383,7 @@ SELECT section,label,value FROM (
                 using var preview = new PrintPreviewDialog { Document = doc, Width = 1050, Height = 750 };
                 preview.ShowDialog(this);
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message, "Report could not be printed", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+            catch (Exception ex) { MessageBox.Show(ex.Message, Strings.Get("Admin_ReportPrintFailed"), MessageBoxButtons.OK, MessageBoxIcon.Warning); }
         }
 
         private static DataTable Query(string sql)

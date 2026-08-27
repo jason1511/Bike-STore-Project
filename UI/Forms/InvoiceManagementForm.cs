@@ -32,7 +32,7 @@ namespace Bike_STore_Project
 
         public InvoiceManagementForm()
         {
-            Text = $"Bike Store - Invoices - {AppSession.Username} ({AppSession.Role})";
+            Text = Strings.Format("Invoice_Window", AppSession.Username, Strings.Role(AppSession.Role));
             StartPosition = FormStartPosition.CenterScreen;
             ClientSize = new Size(1050, 650);
             WindowState = FormWindowState.Normal;
@@ -44,11 +44,11 @@ namespace Bike_STore_Project
             tabs.TabPages.Add(BuildHistoryTab());
             Controls.Add(tabs);
 
-            _payment.Items.AddRange(new object[] { "Cash", "Bank transfer" });
+            _payment.Items.AddRange(new object[] { new PaymentChoice("CASH", Strings.Get("Payment_CASH")), new PaymentChoice("BANK TRANSFER", Strings.Get("Payment_BANK_TRANSFER")) });
             _payment.SelectedIndex = 0;
-            _bank.Items.AddRange(new object[] { "", "BRI", "BNI", "BCA", "Other" });
+            _bank.Items.AddRange(new object[] { new BankChoice("", ""), new BankChoice("BRI", "BRI"), new BankChoice("BNI", "BNI"), new BankChoice("BCA", "BCA"), new BankChoice("OTHER", Strings.Get("Payment_OTHER")) });
             _bank.SelectedIndex = 0;
-            _payment.SelectedIndexChanged += (_, __) => _bank.Enabled = _payment.Text.Equals("Bank transfer", StringComparison.OrdinalIgnoreCase);
+            _payment.SelectedIndexChanged += (_, __) => _bank.Enabled = SelectedPaymentCode(_payment) == "BANK TRANSFER";
             _bank.Enabled = false;
 
             _items.AutoGenerateColumns = true;
@@ -61,7 +61,7 @@ namespace Bike_STore_Project
 
         private TabPage BuildCreateTab()
         {
-            var tab = new TabPage("New invoice");
+            var tab = new TabPage(Strings.Get("Invoice_NewTab"));
             var root = new TableLayoutPanel { Dock = DockStyle.Fill, RowCount = 4, ColumnCount = 1, Padding = new Padding(12) };
             root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             root.RowStyles.Add(new RowStyle(SizeType.Percent, 48));
@@ -69,12 +69,12 @@ namespace Bike_STore_Project
             root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
             var customerPanel = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, WrapContents = true, AutoScroll = true };
-            AddField(customerPanel, "Customer *", _customer);
-            AddField(customerPanel, "Phone", _phone);
-            AddField(customerPanel, "Address", _address);
-            AddField(customerPanel, "Payment", _payment);
-            AddField(customerPanel, "Bank", _bank);
-            AddField(customerPanel, "Notes", _notes);
+            AddField(customerPanel, Strings.Get("Invoice_CustomerRequired"), _customer);
+            AddField(customerPanel, Strings.Get("Invoice_Phone"), _phone);
+            AddField(customerPanel, Strings.Get("Invoice_Address"), _address);
+            AddField(customerPanel, Strings.Get("Invoice_Payment"), _payment);
+            AddField(customerPanel, Strings.Get("Invoice_Bank"), _bank);
+            AddField(customerPanel, Strings.Get("Invoice_Notes"), _notes);
 
             var productPanel = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2 };
             productPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 68));
@@ -82,14 +82,14 @@ namespace Bike_STore_Project
             _products.AutoGenerateColumns = true;
             productPanel.Controls.Add(_products, 0, 0);
             var addPanel = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown, Padding = new Padding(12), AutoScroll = true };
-            addPanel.Controls.Add(new Label { Text = "Selected bicycle", Font = new Font("Segoe UI", 10, FontStyle.Bold), AutoSize = true });
-            addPanel.Controls.Add(new Label { Text = "Quantity", AutoSize = true });
+            addPanel.Controls.Add(new Label { Text = Strings.Get("Invoice_SelectedBike"), Font = new Font("Segoe UI", 10, FontStyle.Bold), AutoSize = true });
+            addPanel.Controls.Add(new Label { Text = Strings.Get("Invoice_Quantity"), AutoSize = true });
             addPanel.Controls.Add(_qty);
-            addPanel.Controls.Add(new Label { Text = "Unit selling price", AutoSize = true });
+            addPanel.Controls.Add(new Label { Text = Strings.Get("Invoice_UnitPrice"), AutoSize = true });
             addPanel.Controls.Add(_price);
-            addPanel.Controls.Add(new Label { Text = "Frame numbers (one per line, optional)", AutoSize = true });
+            addPanel.Controls.Add(new Label { Text = Strings.Get("Invoice_FrameNumbers"), AutoSize = true });
             addPanel.Controls.Add(_frames);
-            var add = new Button { Text = "Add item", Width = 130, Height = 34 };
+            var add = new Button { Text = Strings.Get("Invoice_AddItem"), Width = 130, Height = 34 };
             add.Click += (_, __) => AddItem();
             addPanel.Controls.Add(add);
             productPanel.Controls.Add(addPanel, 1, 0);
@@ -101,16 +101,16 @@ namespace Bike_STore_Project
             cartPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             cartPanel.Controls.Add(_items, 0, 0);
             var cartActions = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true };
-            var remove = new Button { Text = "Remove selected" };
+            var remove = new Button { Text = Strings.Get("Invoice_RemoveSelected") };
             remove.Click += (_, __) => RemoveItem();
             cartActions.Controls.Add(remove);
             cartActions.Controls.Add(_total);
             cartPanel.Controls.Add(cartActions, 0, 1);
 
             var savePanel = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, FlowDirection = FlowDirection.RightToLeft };
-            var save = new Button { Text = "Save and print invoice", Width = 185, Height = 40 };
+            var save = new Button { Text = Strings.Get("Invoice_SavePrint"), Width = 185, Height = 40 };
             save.Click += (_, __) => SaveInvoice(print: true);
-            var saveOnly = new Button { Text = "Save invoice", Width = 130, Height = 40 };
+            var saveOnly = new Button { Text = Strings.Get("Invoice_Save"), Width = 130, Height = 40 };
             saveOnly.Click += (_, __) => SaveInvoice(print: false);
             savePanel.Controls.Add(save);
             savePanel.Controls.Add(saveOnly);
@@ -150,23 +150,23 @@ namespace Bike_STore_Project
 
         private TabPage BuildHistoryTab()
         {
-            var tab = new TabPage("Invoice history");
+            var tab = new TabPage(Strings.Get("Invoice_HistoryTab"));
             var root = new TableLayoutPanel { Dock = DockStyle.Fill, RowCount = 3, Padding = new Padding(12) };
             root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             root.RowStyles.Add(new RowStyle(SizeType.Absolute, 92));
             root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
             var actions = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, AutoScroll = true, WrapContents = true };
-            actions.Controls.Add(new Label { Text = "Search", AutoSize = true, Padding = new Padding(0, 7, 0, 0) });
+            actions.Controls.Add(new Label { Text = Strings.Get("Common_Search"), AutoSize = true, Padding = new Padding(0, 7, 0, 0) });
             actions.Controls.Add(_search);
-            var refresh = new Button { Text = "Refresh" };
+            var refresh = new Button { Text = Strings.Get("Common_Refresh") };
             refresh.Click += (_, __) => LoadHistory();
-            var print = new Button { Text = "Print invoice" };
+            var print = new Button { Text = Strings.Get("Invoice_Print") };
             print.Click += (_, __) => PrintSelected();
-            var edit = new Button { Text = "Edit details", Enabled = AppSession.IsAdmin };
+            var edit = new Button { Text = Strings.Get("Invoice_EditDetails"), Enabled = AppSession.IsAdmin };
             edit.Click += (_, __) => EditSelected();
-            var voidButton = new Button { Text = "Void and restore stock", Enabled = AppSession.IsAdmin, AutoSize = true };
+            var voidButton = new Button { Text = Strings.Get("Invoice_VoidRestore"), Enabled = AppSession.IsAdmin, AutoSize = true };
             voidButton.Click += (_, __) => VoidSelected();
-            var delete = new Button { Text = "Delete invoice", Enabled = AppSession.IsAdmin };
+            var delete = new Button { Text = Strings.Get("Invoice_Delete"), Enabled = AppSession.IsAdmin };
             delete.Click += (_, __) => DeleteSelected();
             actions.Controls.Add(refresh);
             actions.Controls.Add(print);
@@ -189,7 +189,7 @@ namespace Bike_STore_Project
                 if (_products.Columns.Contains("sell_price")) _products.Columns["sell_price"].DefaultCellStyle.Format = "N0";
                 ApplySelectedPrice();
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message, "Bicycles could not be loaded", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+            catch (Exception ex) { MessageBox.Show(ex.Message, Strings.Get("Invoice_LoadBikesFailed"), MessageBoxButtons.OK, MessageBoxIcon.Warning); }
         }
 
         private void ApplySelectedPrice()
@@ -216,12 +216,12 @@ namespace Bike_STore_Project
                 decimal active = Metric(conn, "SELECT COUNT(*) FROM invoices WHERE status='ACTIVE';");
                 decimal voided = Metric(conn, "SELECT COUNT(*) FROM invoices WHERE status='VOID';");
                 _historyMetrics.Controls.Clear();
-                _historyMetrics.Controls.Add(HistoryCard("Total revenue", StoreFormat.Money(revenue), UiTheme.Accent));
-                _historyMetrics.Controls.Add(HistoryCard("Today", StoreFormat.Money(today), UiTheme.Success));
-                _historyMetrics.Controls.Add(HistoryCard("Active invoices", active.ToString("N0"), UiTheme.Warning));
-                _historyMetrics.Controls.Add(HistoryCard("Voided", voided.ToString("N0"), UiTheme.Danger));
+                _historyMetrics.Controls.Add(HistoryCard(Strings.Get("Invoice_TotalRevenue"), StoreFormat.Money(revenue), UiTheme.Accent));
+                _historyMetrics.Controls.Add(HistoryCard(Strings.Get("Common_Today"), StoreFormat.Money(today), UiTheme.Success));
+                _historyMetrics.Controls.Add(HistoryCard(Strings.Get("Invoice_ActiveInvoices"), active.ToString("N0"), UiTheme.Warning));
+                _historyMetrics.Controls.Add(HistoryCard(Strings.Get("Invoice_Voided"), voided.ToString("N0"), UiTheme.Danger));
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message, "Invoice history could not be loaded", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+            catch (Exception ex) { MessageBox.Show(ex.Message, Strings.Get("Invoice_HistoryFailed"), MessageBoxButtons.OK, MessageBoxIcon.Warning); }
         }
 
         private void EditSelected()
@@ -233,17 +233,17 @@ namespace Bike_STore_Project
                 if (dialog.ShowDialog(this) != DialogResult.OK) return;
                 _repo.UpdateInvoiceDetails(invoice); LoadHistory();
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message, "Invoice update failed"); }
+            catch (Exception ex) { MessageBox.Show(ex.Message, Strings.Get("Invoice_UpdateFailed")); }
         }
 
         private void DeleteSelected()
         {
             var id = SelectedInvoiceId(); if (id == 0) return;
-            var reason = DialogPrompt.Show(this, "Delete invoice record", "Reason for permanent record deletion:", "Administrative correction");
+            var reason = DialogPrompt.Show(this, Strings.Get("Invoice_DeleteRecord"), Strings.Get("Invoice_DeleteReason"), Strings.Get("Invoice_AdminCorrection"));
             if (string.IsNullOrWhiteSpace(reason)) return;
-            if (MessageBox.Show("This removes the invoice record after restoring stock. Continue?", "Delete invoice record", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
+            if (MessageBox.Show(Strings.Get("Invoice_DeleteQuestion"), Strings.Get("Invoice_DeleteRecord"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
             try { _repo.DeleteInvoiceRecord(id, reason); LoadHistory(); LoadProducts(); }
-            catch (Exception ex) { MessageBox.Show(ex.Message, "Delete failed"); }
+            catch (Exception ex) { MessageBox.Show(ex.Message, Strings.Get("Invoice_DeleteFailed")); }
         }
 
         private static decimal Metric(Microsoft.Data.Sqlite.SqliteConnection conn, string sql)
@@ -255,7 +255,7 @@ namespace Bike_STore_Project
         {
             if (_products.CurrentRow?.DataBoundItem is not DataRowView row)
             {
-                MessageBox.Show("Select an available bicycle first.");
+                MessageBox.Show(Strings.Get("Invoice_SelectBike"));
                 return;
             }
             var available = Convert.ToInt32(row["available"]);
@@ -264,13 +264,13 @@ namespace Bike_STore_Project
             var quantity = (int)_qty.Value;
             if (quantity + already > available)
             {
-                MessageBox.Show($"Only {available - already} more unit(s) are available.");
+                MessageBox.Show(Strings.Format("Invoice_Available", available - already));
                 return;
             }
             var frames = _frames.Lines.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => x.Trim()).ToArray();
             if (frames.Length > quantity)
             {
-                MessageBox.Show("Frame-number count cannot exceed item quantity.");
+                MessageBox.Show(Strings.Get("Invoice_FrameLimit"));
                 return;
             }
             _cart.Add(new InvoiceDraftItem
@@ -297,20 +297,20 @@ namespace Bike_STore_Project
             try
             {
                 number = _repo.CreateInvoice(_customer.Text, _phone.Text, _address.Text,
-                    _payment.Text.ToUpperInvariant(), _bank.Text.ToUpperInvariant(), _notes.Text, _cart.ToList());
+                    SelectedPaymentCode(_payment), SelectedBankCode(_bank), _notes.Text, _cart.ToList());
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Invoice not saved", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(ex.Message, Strings.Get("Invoice_NotSaved"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            MessageBox.Show($"Invoice {number} saved.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(Strings.Format("Invoice_Saved", number), Strings.Get("Common_Success"), MessageBoxButtons.OK, MessageBoxIcon.Information);
             try { _printInvoice = _repo.GetInvoice(FindInvoiceId(number)); }
-            catch (Exception ex) { _printInvoice = null; MessageBox.Show("The invoice was saved, but it could not be reloaded.\n\n" + ex.Message, "Invoice saved", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+            catch (Exception ex) { _printInvoice = null; MessageBox.Show(Strings.Format("Invoice_ReloadFailed", ex.Message), Strings.Get("Invoice_SavedTitle"), MessageBoxButtons.OK, MessageBoxIcon.Warning); }
             ClearDraft(); LoadProducts(); LoadHistory();
             if (print && _printInvoice != null)
                 try { ShowPrintPreview(); }
-                catch (Exception ex) { MessageBox.Show("The invoice was saved, but print preview could not be opened.\n\n" + ex.Message, "Print preview", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+                catch (Exception ex) { MessageBox.Show(Strings.Format("Invoice_PrintPreviewFailed", ex.Message), Strings.Get("Invoice_PrintPreview"), MessageBoxButtons.OK, MessageBoxIcon.Warning); }
         }
 
         private int FindInvoiceId(string number)
@@ -326,9 +326,9 @@ namespace Bike_STore_Project
         {
             var id = SelectedInvoiceId();
             if (id == 0) return;
-            var reason = DialogPrompt.Show(this, "Void invoice", "Reason for voiding this invoice:", "Customer cancellation");
+            var reason = DialogPrompt.Show(this, Strings.Get("Invoice_Void"), Strings.Get("Invoice_VoidReason"), Strings.Get("Invoice_CustomerCancellation"));
             if (string.IsNullOrWhiteSpace(reason)) return;
-            if (MessageBox.Show("Void this invoice and restore all stock?", "Confirm void",
+            if (MessageBox.Show(Strings.Get("Invoice_VoidQuestion"), Strings.Get("Invoice_ConfirmVoid"),
                 MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
             try
             {
@@ -336,7 +336,7 @@ namespace Bike_STore_Project
                 LoadHistory();
                 LoadProducts();
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message, "Void failed"); }
+            catch (Exception ex) { MessageBox.Show(ex.Message, Strings.Get("Invoice_VoidFailed")); }
         }
 
         private void PrintSelected()
@@ -344,14 +344,14 @@ namespace Bike_STore_Project
             var id = SelectedInvoiceId();
             if (id == 0) return;
             try { _printInvoice = _repo.GetInvoice(id); ShowPrintPreview(); }
-            catch (Exception ex) { MessageBox.Show(ex.Message, "Invoice could not be printed", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+            catch (Exception ex) { MessageBox.Show(ex.Message, Strings.Get("Invoice_PrintFailed"), MessageBoxButtons.OK, MessageBoxIcon.Warning); }
         }
 
         private int SelectedInvoiceId()
         {
             if (_history.CurrentRow?.DataBoundItem is not DataRowView row)
             {
-                MessageBox.Show("Select an invoice first.");
+                MessageBox.Show(Strings.Get("Invoice_SelectInvoice"));
                 return 0;
             }
             return Convert.ToInt32(row["id"]);
@@ -382,13 +382,13 @@ namespace Bike_STore_Project
             g.DrawString(AppServices.Profile.InvoiceTitle, heading, Brushes.Black, left, y);
             g.DrawString(_printInvoice.InvoiceNumber, heading, Brushes.Black, right - 140, y);
             y += 24;
-            g.DrawString($"Tanggal: {_printInvoice.CreatedAt:dd MMM yyyy HH:mm}", body, Brushes.Black, left, y);
+            g.DrawString(Strings.Format("Print_Date", _printInvoice.CreatedAt.ToString("dd MMM yyyy HH:mm", StoreFormat.Culture)), body, Brushes.Black, left, y);
             y += 18;
-            g.DrawString($"Pelanggan: {_printInvoice.CustomerName}   Tel: {_printInvoice.CustomerPhone}", body, Brushes.Black, left, y);
+            g.DrawString(Strings.Format("Print_CustomerPhone", _printInvoice.CustomerName, _printInvoice.CustomerPhone), body, Brushes.Black, left, y);
             y += 18;
             if (!string.IsNullOrWhiteSpace(_printInvoice.CustomerAddress))
             {
-                g.DrawString($"Alamat: {_printInvoice.CustomerAddress}", body, Brushes.Black, left, y);
+                g.DrawString(Strings.Format("Print_Address", _printInvoice.CustomerAddress), body, Brushes.Black, left, y);
                 y += 18;
             }
             g.DrawLine(Pens.Black, left, y, right, y);
@@ -402,18 +402,20 @@ namespace Bike_STore_Project
                 y += 17;
                 if (!string.IsNullOrWhiteSpace(item.FrameNumbers))
                 {
-                    g.DrawString($"No. rangka: {item.FrameNumbers.Replace(Environment.NewLine, ", ")}", body, Brushes.Black, left + 12, y);
+                    g.DrawString(Strings.Format("Print_FrameNumber", item.FrameNumbers.Replace(Environment.NewLine, ", ")), body, Brushes.Black, left + 12, y);
                     y += 17;
                 }
             }
             g.DrawLine(Pens.Black, left, y, right, y);
             y += 8;
-            g.DrawString("TOTAL", heading, Brushes.Black, left, y);
+            g.DrawString(Strings.Get("Print_Total"), heading, Brushes.Black, left, y);
             g.DrawString(StoreFormat.Money(_printInvoice.Total), title, Brushes.Black, right - 150, y);
             y += 28;
-            g.DrawString($"Pembayaran: {_printInvoice.PaymentMethod} {_printInvoice.PaymentBank}".Trim(), body, Brushes.Black, left, y);
+            var payment = Strings.Get("Payment_" + _printInvoice.PaymentMethod.Replace(' ', '_').ToUpperInvariant());
+            var bank = _printInvoice.PaymentBank.Equals("OTHER", StringComparison.OrdinalIgnoreCase) ? Strings.Get("Payment_OTHER") : _printInvoice.PaymentBank;
+            g.DrawString(Strings.Format("Print_Payment", payment, bank).Trim(), body, Brushes.Black, left, y);
             y += 18;
-            g.DrawString($"Dibuat oleh: {_printInvoice.CreatedBy}    Status: {_printInvoice.Status}", body, Brushes.Black, left, y);
+            g.DrawString(Strings.Format("Print_CreatedStatus", _printInvoice.CreatedBy, Strings.Status(_printInvoice.Status)), body, Brushes.Black, left, y);
         }
 
         private void ClearDraft()
@@ -423,7 +425,10 @@ namespace Bike_STore_Project
             _payment.SelectedIndex = 0; _bank.SelectedIndex = 0; _qty.Value = 1; _price.Value = 1;
         }
 
-        private void UpdateTotal() => _total.Text = $"Total: {StoreFormat.Money(_cart.Sum(x => x.LineTotal))}";
+        private void UpdateTotal() => _total.Text = Strings.Format("Invoice_Total", StoreFormat.Money(_cart.Sum(x => x.LineTotal)));
+
+        internal static string SelectedPaymentCode(ComboBox combo) => (combo.SelectedItem as PaymentChoice)?.Code ?? "CASH";
+        internal static string SelectedBankCode(ComboBox combo) => (combo.SelectedItem as BankChoice)?.Code ?? "";
 
         private static void AddField(FlowLayoutPanel panel, string label, Control control)
         {
@@ -455,28 +460,28 @@ namespace Bike_STore_Project
 
         public InvoiceMetadataDialog(InvoiceHeader invoice)
         {
-            _invoice = invoice; Text = $"Edit {invoice.InvoiceNumber}"; StartPosition = FormStartPosition.CenterParent;
+            _invoice = invoice; Text = Strings.Format("Invoice_EditTitle", invoice.InvoiceNumber); StartPosition = FormStartPosition.CenterParent;
             ClientSize = new Size(510, 430); MinimumSize = new Size(460, 380); FormBorderStyle = FormBorderStyle.Sizable; MinimizeBox = false; AutoScaleMode = AutoScaleMode.Dpi;
-            _payment.Items.AddRange(new object[] { "Cash", "Bank transfer" });
-            _bank.Items.AddRange(new object[] { "", "BRI", "BNI", "BCA", "Other" });
+            _payment.Items.AddRange(new object[] { new PaymentChoice("CASH", Strings.Get("Payment_CASH")), new PaymentChoice("BANK TRANSFER", Strings.Get("Payment_BANK_TRANSFER")) });
+            _bank.Items.AddRange(new object[] { new BankChoice("", ""), new BankChoice("BRI", "BRI"), new BankChoice("BNI", "BNI"), new BankChoice("BCA", "BCA"), new BankChoice("OTHER", Strings.Get("Payment_OTHER")) });
             _name.Text = invoice.CustomerName; _phone.Text = invoice.CustomerPhone; _address.Text = invoice.CustomerAddress;
-            _notes.Text = invoice.Notes; SelectIgnoringCase(_payment, invoice.PaymentMethod); if (_payment.SelectedIndex < 0) _payment.SelectedIndex = 0;
-            SelectIgnoringCase(_bank, invoice.PaymentBank); if (_bank.SelectedIndex < 0) _bank.SelectedIndex = 0;
-            void UpdateBankState() => _bank.Enabled = _payment.Text.Equals("Bank transfer", StringComparison.OrdinalIgnoreCase);
+            _notes.Text = invoice.Notes; SelectByCode(_payment, invoice.PaymentMethod); if (_payment.SelectedIndex < 0) _payment.SelectedIndex = 0;
+            SelectByCode(_bank, invoice.PaymentBank); if (_bank.SelectedIndex < 0) _bank.SelectedIndex = 0;
+            void UpdateBankState() => _bank.Enabled = InvoiceManagementForm.SelectedPaymentCode(_payment) == "BANK TRANSFER";
             _payment.SelectedIndexChanged += (_, __) => UpdateBankState(); UpdateBankState();
 
             var table = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, Padding = new Padding(20), AutoScroll = true };
             table.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 145)); table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            Add(table, "Customer *", _name); Add(table, "Phone", _phone); Add(table, "Address", _address);
-            Add(table, "Payment", _payment); Add(table, "Bank", _bank); Add(table, "Notes", _notes);
+            Add(table, Strings.Get("Invoice_CustomerRequired"), _name); Add(table, Strings.Get("Invoice_Phone"), _phone); Add(table, Strings.Get("Invoice_Address"), _address);
+            Add(table, Strings.Get("Invoice_Payment"), _payment); Add(table, Strings.Get("Invoice_Bank"), _bank); Add(table, Strings.Get("Invoice_Notes"), _notes);
             var actions = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.RightToLeft };
-            var save = new Button { Text = "Save changes", Width = 120, DialogResult = DialogResult.OK };
-            var cancel = new Button { Text = "Cancel", Width = 90, DialogResult = DialogResult.Cancel };
+            var save = new Button { Text = Strings.Get("Common_SaveChanges"), Width = 120, DialogResult = DialogResult.OK };
+            var cancel = new Button { Text = Strings.Get("Common_Cancel"), Width = 90, DialogResult = DialogResult.Cancel };
             save.Click += (_, __) =>
             {
-                if (string.IsNullOrWhiteSpace(_name.Text)) { MessageBox.Show("Customer name is required."); DialogResult = DialogResult.None; return; }
+                if (string.IsNullOrWhiteSpace(_name.Text)) { MessageBox.Show(Strings.Get("Invoice_CustomerNameRequired")); DialogResult = DialogResult.None; return; }
                 _invoice.CustomerName = _name.Text.Trim(); _invoice.CustomerPhone = _phone.Text.Trim(); _invoice.CustomerAddress = _address.Text.Trim();
-                _invoice.PaymentMethod = _payment.Text.ToUpperInvariant(); _invoice.PaymentBank = _bank.Text.ToUpperInvariant(); _invoice.Notes = _notes.Text.Trim();
+                _invoice.PaymentMethod = InvoiceManagementForm.SelectedPaymentCode(_payment); _invoice.PaymentBank = InvoiceManagementForm.SelectedBankCode(_bank); _invoice.Notes = _notes.Text.Trim();
             };
             actions.Controls.Add(save); actions.Controls.Add(cancel); Add(table, "", actions);
             Controls.Add(table); AcceptButton = save; CancelButton = cancel; UiTheme.Apply(this);
@@ -489,11 +494,15 @@ namespace Bike_STore_Project
             table.Controls.Add(control, 1, row);
         }
 
-        private static void SelectIgnoringCase(ComboBox combo, string value)
+        private static void SelectByCode(ComboBox combo, string value)
         {
             for (var i = 0; i < combo.Items.Count; i++)
-                if (string.Equals(combo.Items[i]?.ToString(), value, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals((combo.Items[i] as ICodeChoice)?.Code, value, StringComparison.OrdinalIgnoreCase))
                 { combo.SelectedIndex = i; return; }
         }
     }
+
+    internal interface ICodeChoice { string Code { get; } }
+    internal sealed record PaymentChoice(string Code, string Label) : ICodeChoice { public override string ToString() => Label; }
+    internal sealed record BankChoice(string Code, string Label) : ICodeChoice { public override string ToString() => Label; }
 }

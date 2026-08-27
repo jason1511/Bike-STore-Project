@@ -24,7 +24,7 @@ namespace Bike_STore_Project
         private void ApplyLoginDesign(string? initialAdminPassword)
         {
             var profile = AppServices.Profile;
-            Text = $"{profile.StoreName} — Sign in";
+            Text = Strings.Format("Login_Window", profile.StoreName);
             BackColor = UiTheme.Canvas;
             MinimumSize = new Size(620, 480);
             AutoScaleMode = AutoScaleMode.Dpi;
@@ -34,9 +34,9 @@ namespace Bike_STore_Project
             panelLogin.BackColor = Color.White;
             panelLogin.BorderStyle = BorderStyle.FixedSingle;
 
-            var eyebrow = new Label { Text = "DESKTOP ADMIN", Tag = "accent", Left = 40, Top = 28, Width = 330, Height = 20, ForeColor = UiTheme.Accent, Font = new Font("Segoe UI Semibold", 8F) };
+            var eyebrow = new Label { Text = Strings.Get("Login_Eyebrow"), Tag = "accent", Left = 40, Top = 28, Width = 330, Height = 20, ForeColor = UiTheme.Accent, Font = new Font("Segoe UI Semibold", 8F) };
             var title = new Label { Text = profile.StoreName, Left = 40, Top = 51, Width = 345, Height = 34, ForeColor = UiTheme.Text, Font = new Font("Segoe UI Semibold", 15F) };
-            var subtitle = new Label { Text = $"{profile.BackendLabel} · Sign in to manage catalogue, stock, invoices and service.", Tag = "muted", Left = 40, Top = 87, Width = 345, Height = 38, ForeColor = UiTheme.Muted, Font = new Font("Segoe UI", 9F) };
+            var subtitle = new Label { Text = Strings.Format("Login_Subtitle", profile.BackendLabel), Tag = "muted", Left = 40, Top = 87, Width = 345, Height = 38, ForeColor = UiTheme.Muted, Font = new Font("Segoe UI", 9F) };
             label1.Location = new Point(40, 137); txtUser.Location = new Point(40, 161); txtUser.Width = 345; txtUser.Height = 31;
             label2.Location = new Point(40, 207); txtPass.Location = new Point(40, 231); txtPass.Width = 345; txtPass.Height = 31;
             btnLogin.Location = new Point(40, 293); btnLogin.Size = new Size(345, 42); btnLogin.BackColor = UiTheme.Sidebar; btnLogin.ForeColor = Color.White;
@@ -44,7 +44,7 @@ namespace Bike_STore_Project
             panelLogin.Controls.Add(eyebrow); panelLogin.Controls.Add(title); panelLogin.Controls.Add(subtitle);
             if (!string.IsNullOrWhiteSpace(initialAdminPassword))
             {
-                var demo = new Label { Text = $"First-run admin: admin / {initialAdminPassword}", Left = 40, Top = 268, Width = 345, Height = 20, ForeColor = UiTheme.Accent, Font = new Font("Segoe UI Semibold", 8.5F) };
+                var demo = new Label { Text = Strings.Format("Login_FirstRun", initialAdminPassword), Left = 40, Top = 268, Width = 345, Height = 20, ForeColor = UiTheme.Accent, Font = new Font("Segoe UI Semibold", 8.5F) };
                 panelLogin.Controls.Add(demo); demo.BringToFront();
             }
             eyebrow.BringToFront(); title.BringToFront(); subtitle.BringToFront();
@@ -58,7 +58,7 @@ namespace Bike_STore_Project
             var password = txtPass.Text ?? "";
 
             btnLogin.Enabled = false;
-            btnLogin.Text = "Signing in…";
+            btnLogin.Text = Strings.Get("Login_SigningIn");
             try
             {
                 var result = await AppServices.Backend.LoginAsync(username, password);
@@ -71,18 +71,18 @@ namespace Bike_STore_Project
                     return;
                 }
 
-                MessageBox.Show(string.IsNullOrWhiteSpace(result.Error) ? "Login failed." : result.Error,
-                    "Login", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(string.IsNullOrWhiteSpace(result.Error) ? Strings.Get("Login_Failed") : result.Error,
+                    Strings.Get("Login_Title"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                 txtPass.SelectAll(); txtPass.Focus();
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Login", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(ex.Message, Strings.Get("Login_Title"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             finally
             {
-                btnLogin.Enabled = true; btnLogin.Text = "Sign in";
+                btnLogin.Enabled = true; btnLogin.Text = Strings.Get("Login_SignIn");
             }
         }
     }

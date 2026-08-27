@@ -8,9 +8,9 @@ namespace Bike_STore_Project
 {
     public sealed class StoreSetupForm : Form
     {
-        private readonly RadioButton _demo = new() { Text = "DEMO\nExplore with sample data" };
-        private readonly RadioButton _local = new() { Text = "LOCAL SQLITE\nKeep data on this computer" };
-        private readonly RadioButton _online = new() { Text = "ONLINE API\nConnect to a deployed store" };
+        private readonly RadioButton _demo = new() { Text = Strings.Get("Setup_ModeDemo") };
+        private readonly RadioButton _local = new() { Text = Strings.Get("Setup_ModeLocal") };
+        private readonly RadioButton _online = new() { Text = Strings.Get("Setup_ModeOnline") };
         private readonly TextBox _profileName = Box();
         private readonly TextBox _storeName = Box();
         private readonly TextBox _shortName = Box(100);
@@ -22,9 +22,9 @@ namespace Bike_STore_Project
         private readonly Label _modeHelp = new() { AutoSize = true, Dock = DockStyle.Fill, Tag = "muted" };
         private readonly Label _connectionTitle = new() { AutoSize = true, Font = new Font("Segoe UI Semibold", 11F) };
         private readonly Label _securityNote = new() { AutoSize = true, Dock = DockStyle.Fill, Tag = "muted" };
-        private readonly Button _save = new() { Text = "Save and continue", Width = 160, Height = 40, Tag = "primary" };
-        private readonly Button _test = new() { Text = "Check connection", Width = 140, Height = 38 };
-        private readonly Button _resetDemo = new() { Text = "Reset demo database", Width = 155, Height = 38 };
+        private readonly Button _save = new() { Text = Strings.Get("Setup_SaveContinue"), Width = 160, Height = 40, Tag = "primary" };
+        private readonly Button _test = new() { Text = Strings.Get("Setup_CheckConnection"), Width = 140, Height = 38 };
+        private readonly Button _resetDemo = new() { Text = Strings.Get("Setup_ResetDemoDatabase"), Width = 155, Height = 38 };
         private TableLayoutPanel _connectionFields = null!;
         private int _sqliteRow;
         private int _onlineRow;
@@ -37,13 +37,13 @@ namespace Bike_STore_Project
         {
             _initial = current ?? StoreProfile.CreateDemo();
             SelectedProfile = _initial;
-            Text = current == null ? "Set up Bike Store Desktop" : "Store connection settings";
+            Text = Strings.Get(current == null ? "Setup_WindowNew" : "Setup_WindowEdit");
             StartPosition = FormStartPosition.CenterScreen;
             ClientSize = new Size(940, 720);
             MinimumSize = new Size(760, 620);
             AutoScaleMode = AutoScaleMode.Dpi;
             BackColor = UiTheme.Canvas;
-            _save.Text = current == null ? "Save and continue" : "Save changes";
+            _save.Text = Strings.Get(current == null ? "Setup_SaveContinue" : "Common_SaveChanges");
             Build();
             _filling = true;
             Fill(_initial);
@@ -71,11 +71,11 @@ namespace Bike_STore_Project
             root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
             var header = new TableLayoutPanel { Dock = DockStyle.Top, AutoSize = true, ColumnCount = 1, Margin = new Padding(0, 0, 0, 18) };
-            header.Controls.Add(new Label { Text = "STORE PROFILE", AutoSize = true, Tag = "accent", Font = new Font("Segoe UI Semibold", 8F) });
-            header.Controls.Add(new Label { Text = "Set up your Bike Store workspace", AutoSize = true, Font = new Font("Segoe UI Semibold", 20F), Margin = new Padding(0, 3, 0, 0) });
+            header.Controls.Add(new Label { Text = Strings.Get("Setup_Eyebrow"), AutoSize = true, Tag = "accent", Font = new Font("Segoe UI Semibold", 8F) });
+            header.Controls.Add(new Label { Text = Strings.Get("Setup_Title"), AutoSize = true, Font = new Font("Segoe UI Semibold", 20F), Margin = new Padding(0, 3, 0, 0) });
             header.Controls.Add(new Label
             {
-                Text = "Choose where this profile keeps its data. You can change the connection later from Store settings.",
+                Text = Strings.Get("Setup_Intro"),
                 AutoSize = true,
                 Dock = DockStyle.Fill,
                 Tag = "muted",
@@ -84,7 +84,7 @@ namespace Bike_STore_Project
             root.Controls.Add(header, 0, 0);
 
             var modeSection = new TableLayoutPanel { Dock = DockStyle.Top, AutoSize = true, ColumnCount = 1, Margin = new Padding(0, 0, 0, 18) };
-            modeSection.Controls.Add(new Label { Text = "1. Choose a data source", AutoSize = true, Font = new Font("Segoe UI Semibold", 11F), Margin = new Padding(0, 0, 0, 8) });
+            modeSection.Controls.Add(new Label { Text = Strings.Get("Setup_StepSource"), AutoSize = true, Font = new Font("Segoe UI Semibold", 11F), Margin = new Padding(0, 0, 0, 8) });
             var modes = new TableLayoutPanel { Dock = DockStyle.Top, Height = 88, ColumnCount = 3, Margin = new Padding(0) };
             modes.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.333F));
             modes.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.333F));
@@ -106,21 +106,21 @@ namespace Bike_STore_Project
 
             var identity = CreateCard();
             var identityLayout = CreateCardLayout();
-            var identityTitle = new Label { Text = "2. Store details", AutoSize = true, Font = new Font("Segoe UI Semibold", 11F), Margin = new Padding(0, 0, 0, 5) };
-            var identityHelp = new Label { Text = "These names appear in the app and on printed documents.", AutoSize = true, Dock = DockStyle.Fill, Tag = "muted", Margin = new Padding(0, 0, 0, 14) };
+            var identityTitle = new Label { Text = Strings.Get("Setup_StepDetails"), AutoSize = true, Font = new Font("Segoe UI Semibold", 11F), Margin = new Padding(0, 0, 0, 5) };
+            var identityHelp = new Label { Text = Strings.Get("Setup_DetailsHelp"), AutoSize = true, Dock = DockStyle.Fill, Tag = "muted", Margin = new Padding(0, 0, 0, 14) };
             identityLayout.Controls.Add(identityTitle, 0, 0);
             identityLayout.SetColumnSpan(identityTitle, 2);
             identityLayout.Controls.Add(identityHelp, 0, 1);
             identityLayout.SetColumnSpan(identityHelp, 2);
-            Add(identityLayout, "Profile name", _profileName);
-            Add(identityLayout, "Store name", _storeName);
+            Add(identityLayout, Strings.Get("Setup_ProfileName"), _profileName);
+            Add(identityLayout, Strings.Get("Setup_StoreName"), _storeName);
             _shortName.Dock = DockStyle.Left;
-            Add(identityLayout, "Short name", _shortName);
+            Add(identityLayout, Strings.Get("Setup_ShortName"), _shortName);
             _culture.Dock = DockStyle.Left;
-            Add(identityLayout, "Language / currency", _culture);
-            Add(identityLayout, "Invoice title", _invoiceTitle);
+            Add(identityLayout, Strings.Get("Setup_LanguageCurrency"), _culture);
+            Add(identityLayout, Strings.Get("Setup_InvoiceTitle"), _invoiceTitle);
             _lowStock.Dock = DockStyle.Left;
-            Add(identityLayout, "Low-stock warning", _lowStock);
+            Add(identityLayout, Strings.Get("Setup_LowStock"), _lowStock);
             identity.Controls.Add(identityLayout);
             content.Controls.Add(identity);
 
@@ -136,11 +136,11 @@ namespace Bike_STore_Project
             databaseEditor.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
             databaseEditor.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
             _databasePath.Dock = DockStyle.Fill;
-            var browse = new Button { Text = "Browse…", Width = 90, Height = 30, Margin = new Padding(8, 0, 0, 0) };
+            var browse = new Button { Text = Strings.Get("Setup_Browse"), Width = 90, Height = 30, Margin = new Padding(8, 0, 0, 0) };
             browse.Click += (_, __) => BrowseDatabase();
             databaseEditor.Controls.Add(_databasePath, 0, 0); databaseEditor.Controls.Add(browse, 1, 0);
-            _sqliteRow = Add(_connectionFields, "SQLite file", databaseEditor);
-            _onlineRow = Add(_connectionFields, "Store API URL", _apiUrl);
+            _sqliteRow = Add(_connectionFields, Strings.Get("Setup_SqliteFile"), databaseEditor);
+            _onlineRow = Add(_connectionFields, Strings.Get("Setup_StoreApiUrl"), _apiUrl);
             connection.Controls.Add(_connectionFields);
             content.Controls.Add(connection);
             scroll.Controls.Add(content);
@@ -152,7 +152,7 @@ namespace Bike_STore_Project
             var secondaryActions = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, WrapContents = false, Margin = new Padding(0) };
             secondaryActions.Controls.Add(_resetDemo); secondaryActions.Controls.Add(_test);
             var mainActions = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.LeftToRight, WrapContents = false, Margin = new Padding(0) };
-            var cancel = new Button { Text = "Cancel", Width = 92, Height = 40, DialogResult = DialogResult.Cancel, Margin = new Padding(0, 0, 8, 0) };
+            var cancel = new Button { Text = Strings.Get("Common_Cancel"), Width = 92, Height = 40, DialogResult = DialogResult.Cancel, Margin = new Padding(0, 0, 8, 0) };
             mainActions.Controls.Add(cancel); mainActions.Controls.Add(_save);
             footer.Controls.Add(secondaryActions, 0, 0); footer.Controls.Add(mainActions, 1, 0);
             root.Controls.Add(footer, 0, 3);
@@ -163,8 +163,8 @@ namespace Bike_STore_Project
             Controls.Add(root);
             CancelButton = cancel;
 
-            _culture.Items.Add(new CultureChoice("Bahasa Indonesia / IDR", "id-ID", "IDR"));
-            _culture.Items.Add(new CultureChoice("English (Australia) / AUD", "en-AU", "AUD"));
+            _culture.Items.Add(new CultureChoice(Strings.Get("Language_Indonesian"), "id-ID", "IDR"));
+            _culture.Items.Add(new CultureChoice(Strings.Get("Language_EnglishAustralia"), "en-AU", "AUD"));
             _culture.SelectedIndex = 0;
             _shortName.MaxLength = 5;
             _demo.CheckedChanged += (_, __) => ModeChanged(StoreBackendMode.Demo, _demo.Checked);
@@ -214,35 +214,35 @@ namespace Bike_STore_Project
             SetRowVisible(_connectionFields, _onlineRow, _online.Checked);
             _test.Visible = _online.Checked;
             _resetDemo.Visible = _demo.Checked && File.Exists(AppPaths.DemoDatabasePath);
-            _connectionTitle.Text = _demo.Checked ? "3. Demo storage" : _local.Checked ? "3. Local database" : "3. Online connection";
+            _connectionTitle.Text = Strings.Get(_demo.Checked ? "Setup_SectionDemo" : _local.Checked ? "Setup_SectionLocal" : "Setup_SectionOnline");
             _securityNote.Text = _demo.Checked
-                ? "No connection details are required. Demo data is stored separately and can be reset at any time."
+                ? Strings.Get("Setup_DemoSecurity")
                 : _local.Checked
-                    ? "Choose one SQLite file for this profile. The app verifies that the folder and database can be opened before saving."
-                    : "Only the HTTPS server address is saved here. Cloudflare/D1 credentials remain on the server; users sign in normally.";
+                    ? Strings.Get("Setup_LocalSecurity")
+                    : Strings.Get("Setup_OnlineSecurity");
             _modeHelp.Text = _demo.Checked
-                ? "Best for exploring: safe sample data, stored locally, with no production connection."
+                ? Strings.Get("Setup_DemoHelp")
                 : _local.Checked
-                    ? "Best for one computer or an offline store: persistent data in a SQLite file you control."
-                    : "Best for a deployed store: the desktop app uses an authenticated HTTPS API backed by Cloudflare Workers and D1.";
+                    ? Strings.Get("Setup_LocalHelp")
+                    : Strings.Get("Setup_OnlineHelp");
             StyleModeButtons();
         }
 
         private StoreProfile BuildProfile()
         {
-            var culture = _culture.SelectedItem as CultureChoice ?? new CultureChoice("Bahasa Indonesia / IDR", "id-ID", "IDR");
+            var culture = _culture.SelectedItem as CultureChoice ?? new CultureChoice(Strings.Get("Language_Indonesian"), "id-ID", "IDR");
             var mode = _online.Checked ? StoreBackendMode.Cloudflare : _local.Checked ? StoreBackendMode.Local : StoreBackendMode.Demo;
             return new StoreProfile
             {
                 Backend = mode,
-                ProfileName = Required(_profileName.Text, "Profile name"),
-                StoreName = Required(_storeName.Text, "Store name"),
-                ShortName = Required(_shortName.Text, "Short name").ToUpperInvariant(),
+                ProfileName = Required(_profileName.Text, Strings.Get("Setup_ProfileName")),
+                StoreName = Required(_storeName.Text, Strings.Get("Setup_StoreName")),
+                ShortName = Required(_shortName.Text, Strings.Get("Setup_ShortName")).ToUpperInvariant(),
                 DatabasePath = mode == StoreBackendMode.Demo ? AppPaths.DemoDatabasePath : _databasePath.Text.Trim(),
                 ApiBaseUrl = _apiUrl.Text.Trim().TrimEnd('/'),
                 Culture = culture.Culture,
                 CurrencyCode = culture.Currency,
-                InvoiceTitle = Required(_invoiceTitle.Text, "Invoice title"),
+                InvoiceTitle = Required(_invoiceTitle.Text, Strings.Get("Setup_InvoiceTitle")),
                 LowStockThreshold = (int)_lowStock.Value
             };
         }
@@ -253,53 +253,53 @@ namespace Bike_STore_Project
             {
                 var profile = BuildProfile();
                 if (profile.Backend == StoreBackendMode.Local && string.IsNullOrWhiteSpace(profile.DatabasePath))
-                    throw new InvalidOperationException("Choose a SQLite database file.");
+                    throw new InvalidOperationException(Strings.Get("Setup_ChooseDatabase"));
                 if (profile.Backend == StoreBackendMode.Local)
                     Database.ValidateDatabaseFile(profile.DatabasePath);
                 if (profile.IsOnline && (!Uri.TryCreate(profile.ApiBaseUrl, UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps))
-                    throw new InvalidOperationException("Enter a valid HTTPS online store URL.");
+                    throw new InvalidOperationException(Strings.Get("Setup_InvalidUrl"));
                 StoreConfiguration.Save(profile); SelectedProfile = profile; DialogResult = DialogResult.OK; Close();
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message, "Store setup", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+            catch (Exception ex) { MessageBox.Show(ex.Message, Strings.Get("Setup_TitleDialog"), MessageBoxButtons.OK, MessageBoxIcon.Warning); }
         }
 
         private async Task TestAsync()
         {
             try
             {
-                _test.Enabled = false; _test.Text = "Testing…";
+                _test.Enabled = false; _test.Text = Strings.Get("Setup_Testing");
                 var profile = BuildProfile();
                 using var backend = new CloudflareStoreBackend(profile);
                 await backend.TestConnectionAsync();
-                MessageBox.Show("The online store API is reachable.", "Connection successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(Strings.Get("Setup_Reachable"), Strings.Get("Setup_ConnectionSuccess"), MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message, "Connection failed", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
-            finally { _test.Enabled = true; _test.Text = "Check connection"; }
+            catch (Exception ex) { MessageBox.Show(ex.Message, Strings.Get("Setup_ConnectionFailed"), MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+            finally { _test.Enabled = true; _test.Text = Strings.Get("Setup_CheckConnection"); }
         }
 
         private void BrowseDatabase()
         {
             try
             {
-                using var dialog = new SaveFileDialog { Filter = "SQLite database (*.db)|*.db|All files (*.*)|*.*", FileName = Path.GetFileName(_databasePath.Text), InitialDirectory = Path.GetDirectoryName(_databasePath.Text) };
+                using var dialog = new SaveFileDialog { Filter = Strings.Get("Setup_DatabaseFilter"), FileName = Path.GetFileName(_databasePath.Text), InitialDirectory = Path.GetDirectoryName(_databasePath.Text) };
                 if (dialog.ShowDialog(this) == DialogResult.OK) _databasePath.Text = dialog.FileName;
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message, "Choose database file", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+            catch (Exception ex) { MessageBox.Show(ex.Message, Strings.Get("Setup_ChooseDatabaseTitle"), MessageBoxButtons.OK, MessageBoxIcon.Warning); }
         }
 
         private void ResetDemo()
         {
-            if (MessageBox.Show("Reset the demo database to its original sample data?", "Reset demo", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
+            if (MessageBox.Show(Strings.Get("Setup_ResetQuestion"), Strings.Get("Setup_ResetTitle"), MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
             try
             {
                 Database.DeleteDatabaseFile(AppPaths.DemoDatabasePath);
                 _resetDemo.Visible = false;
-                MessageBox.Show("Demo data will be recreated when you continue.", "Demo reset");
+                MessageBox.Show(Strings.Get("Setup_ResetDone"), Strings.Get("Setup_ResetDoneTitle"));
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message, "Demo reset failed", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+            catch (Exception ex) { MessageBox.Show(ex.Message, Strings.Get("Setup_ResetFailed"), MessageBoxButtons.OK, MessageBoxIcon.Warning); }
         }
 
-        private static string Required(string value, string label) => string.IsNullOrWhiteSpace(value) ? throw new InvalidOperationException(label + " is required.") : value.Trim();
+        private static string Required(string value, string label) => string.IsNullOrWhiteSpace(value) ? throw new InvalidOperationException(Strings.Format("Setup_Required", label)) : value.Trim();
         private void SelectCulture(string culture)
         {
             for (var i = 0; i < _culture.Items.Count; i++)

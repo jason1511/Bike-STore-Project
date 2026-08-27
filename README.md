@@ -42,8 +42,9 @@ dotnet run --project "Bike STore Project.csproj"
 1. Select **Demo**, **Local SQLite**, or **Online API**.
 2. Enter the store profile and display details.
 3. For Local mode, choose a SQLite file. For Online mode, enter a valid HTTPS store URL and optionally check the connection.
-4. Select **Save and continue**.
-5. Sign in.
+4. Choose **English** or **Bahasa Indonesia**. This language is used throughout setup, login, operations, validation messages, reports, and printed documents.
+5. Select **Save and continue**.
+6. Sign in.
 
 For a new Demo or Local database, the app creates the `admin` account with a random first-run password. The password is shown on the first login screen for that database; copy it before closing the application. After signing in, an administrator can reset passwords from **Users**.
 
@@ -166,6 +167,20 @@ Administrator navigation also provides:
 
 Use **Store settings** in the sidebar to change the profile. The application restarts after saving so every screen is rebuilt against the selected backend. **Sign out** clears the current session; Online mode also clears its in-memory bearer token.
 
+## Localization
+
+The interface supports English (`en-US`) and Bahasa Indonesia (`id-ID`). The selected culture is stored in the active store profile and applied before any forms or backend services are created. Changing the language in **Store settings** takes effect after the application restarts.
+
+All user-facing application text is kept outside the forms and business logic:
+
+```text
+Resources/Strings.resx       English source strings and fallback catalog
+Resources/Strings.id.resx    Bahasa Indonesia translations
+Localization/Strings.cs      Culture-aware lookup, formatting, status, role, and movement helpers
+```
+
+Database values such as `ADMIN`, `ACTIVE`, `IN_PROGRESS`, and `STOCK_IN` remain stable language-neutral codes. They are translated only when displayed, keeping existing local databases and online API payloads compatible across languages. Add new UI text to both resource files and access it through `Strings.Get(...)` or `Strings.Format(...)`; do not hardcode display wording in forms, controls, repositories, or backend adapters.
+
 ## Roles and permissions
 
 | Capability | Staff | Administrator |
@@ -262,6 +277,8 @@ Database initialization is additive. It creates missing tables, columns, and ind
 Backends/            Shared backend contract and SQLite/Cloudflare adapters
 Configuration/       Store profiles, saved settings, and application paths
 Core/                Session, permissions, hashing, prompts, and formatting
+Localization/        Culture-aware resource access and code-to-label helpers
+Resources/           English and Bahasa Indonesia string catalogs
 Data/
   Models/            Invoice, catalogue, and user data objects
   Repositories/      SQLite business operations and transactions

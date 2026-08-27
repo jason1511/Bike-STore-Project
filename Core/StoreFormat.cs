@@ -14,6 +14,6 @@ namespace Bike_STore_Project
         }
 
         public static string Money(decimal value) => value.ToString("C0", Culture);
-        public static string ReportHeader => $"{AppServices.Profile.StoreName.ToUpperInvariant()} — BUSINESS REPORT";
+        public static string ReportHeader => Strings.Format("Report_Header", AppServices.Profile.StoreName.ToUpperInvariant());
     }
 }

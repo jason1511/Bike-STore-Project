@@ -26,7 +26,7 @@ namespace Bike_STore_Project
 
         public ServiceManagementForm()
         {
-            Text = $"Bike Store - Service - {AppSession.Username} ({AppSession.Role})";
+            Text = Strings.Format("Service_Window", AppSession.Username, Strings.Role(AppSession.Role));
             StartPosition = FormStartPosition.CenterScreen;
             ClientSize = new Size(1000, 620);
             WindowState = FormWindowState.Normal;
@@ -50,26 +50,26 @@ namespace Bike_STore_Project
 
         private TabPage BuildEntry()
         {
-            var tab = new TabPage("New service");
+            var tab = new TabPage(Strings.Get("Service_NewTab"));
             var root = new FlowLayoutPanel
             {
                 Dock = DockStyle.Fill, AutoScroll = true, WrapContents = true,
                 Padding = new Padding(20), FlowDirection = FlowDirection.LeftToRight
             };
-            AddField(root, "Customer *", _customer);
-            AddField(root, "Phone", _phone);
-            AddField(root, "Address", _address);
-            AddField(root, "Brand *", _brand);
-            AddField(root, "Type / model *", _type);
-            AddField(root, "Colour", _color);
-            AddField(root, "Service type *", _serviceType);
-            AddField(root, "Status", _status);
-            AddField(root, "Service cost", _cost);
-            AddField(root, "Notes", _notes);
+            AddField(root, Strings.Get("Service_CustomerRequired"), _customer);
+            AddField(root, Strings.Get("Service_Phone"), _phone);
+            AddField(root, Strings.Get("Service_Address"), _address);
+            AddField(root, Strings.Get("Service_BrandRequired"), _brand);
+            AddField(root, Strings.Get("Service_ModelRequired"), _type);
+            AddField(root, Strings.Get("Service_Colour"), _color);
+            AddField(root, Strings.Get("Service_TypeRequired"), _serviceType);
+            AddField(root, Strings.Get("Service_Status"), _status);
+            AddField(root, Strings.Get("Service_Cost"), _cost);
+            AddField(root, Strings.Get("Service_Notes"), _notes);
             var actions = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.RightToLeft, WrapContents = true };
-            var savePrint = new Button { Text = "Save and print", Width = 150, Height = 40 };
+            var savePrint = new Button { Text = Strings.Get("Service_SavePrint"), Width = 150, Height = 40 };
             savePrint.Click += (_, __) => Save(print: true);
-            var save = new Button { Text = "Save service", Width = 130, Height = 40 };
+            var save = new Button { Text = Strings.Get("Service_Save"), Width = 130, Height = 40 };
             save.Click += (_, __) => Save(print: false);
             actions.Controls.Add(savePrint); actions.Controls.Add(save); root.Controls.Add(actions);
             tab.Controls.Add(root); return tab;
@@ -77,19 +77,19 @@ namespace Bike_STore_Project
 
         private TabPage BuildHistory()
         {
-            var tab = new TabPage("Service history");
+            var tab = new TabPage(Strings.Get("Service_HistoryTab"));
             var root = new TableLayoutPanel { Dock = DockStyle.Fill, RowCount = 2, Padding = new Padding(12) };
             root.RowStyles.Add(new RowStyle(SizeType.AutoSize)); root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
             var actions = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, AutoScroll = true, WrapContents = true };
-            actions.Controls.Add(new Label { Text = "Search", AutoSize = true, Padding = new Padding(0, 7, 0, 0) });
+            actions.Controls.Add(new Label { Text = Strings.Get("Common_Search"), AutoSize = true, Padding = new Padding(0, 7, 0, 0) });
             actions.Controls.Add(_search);
-            actions.Controls.Add(new Label { Text = "Status", AutoSize = true, Padding = new Padding(8, 7, 0, 0) });
+            actions.Controls.Add(new Label { Text = Strings.Get("Service_Status"), AutoSize = true, Padding = new Padding(8, 7, 0, 0) });
             actions.Controls.Add(_filter);
-            var refresh = new Button { Text = "Refresh" }; refresh.Click += (_, __) => LoadHistory();
-            var print = new Button { Text = "Print service job" }; print.Click += (_, __) => PrintSelected();
-            var status = new Button { Text = "Update status", Enabled = AppSession.IsAdmin }; status.Click += (_, __) => RunSafely(UpdateStatus, "Service status could not be updated");
-            var edit = new Button { Text = "Edit details", Enabled = AppSession.IsAdmin }; edit.Click += (_, __) => RunSafely(EditSelected, "Service job could not be updated");
-            var delete = new Button { Text = "Delete service job", Enabled = AppSession.IsAdmin, AutoSize = true }; delete.Click += (_, __) => RunSafely(DeleteSelected, "Service job could not be deleted");
+            var refresh = new Button { Text = Strings.Get("Common_Refresh") }; refresh.Click += (_, __) => LoadHistory();
+            var print = new Button { Text = Strings.Get("Service_Print") }; print.Click += (_, __) => PrintSelected();
+            var status = new Button { Text = Strings.Get("Service_UpdateStatus"), Enabled = AppSession.IsAdmin }; status.Click += (_, __) => RunSafely(UpdateStatus, Strings.Get("Service_StatusUpdateFailed"));
+            var edit = new Button { Text = Strings.Get("Service_EditDetails"), Enabled = AppSession.IsAdmin }; edit.Click += (_, __) => RunSafely(EditSelected, Strings.Get("Service_JobUpdateFailed"));
+            var delete = new Button { Text = Strings.Get("Service_Delete"), Enabled = AppSession.IsAdmin, AutoSize = true }; delete.Click += (_, __) => RunSafely(DeleteSelected, Strings.Get("Service_DeleteFailed"));
             actions.Controls.Add(refresh); actions.Controls.Add(print); actions.Controls.Add(edit); actions.Controls.Add(status); actions.Controls.Add(delete);
             root.Controls.Add(actions, 0, 0); root.Controls.Add(_history, 0, 1); tab.Controls.Add(root); return tab;
         }
@@ -99,7 +99,7 @@ namespace Bike_STore_Project
             if (string.IsNullOrWhiteSpace(_customer.Text) || string.IsNullOrWhiteSpace(_brand.Text) ||
                 string.IsNullOrWhiteSpace(_type.Text) || string.IsNullOrWhiteSpace(_serviceType.Text))
             {
-                MessageBox.Show("Customer, brand, model, and service type are required."); return;
+                MessageBox.Show(Strings.Get("Service_RequiredMessage")); return;
             }
             long id;
             string number;
@@ -147,11 +147,11 @@ SELECT last_insert_rowid();";
                 }
                 catch { try { tx.Rollback(); } catch { } throw; }
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message, "Service not saved"); return; }
-            MessageBox.Show($"Service {number} saved."); LoadHistory();
+            catch (Exception ex) { MessageBox.Show(ex.Message, Strings.Get("Service_NotSaved")); return; }
+            MessageBox.Show(Strings.Format("Service_Saved", number)); LoadHistory();
             if (print)
                 try { PrintService((int)id); }
-                catch (Exception ex) { MessageBox.Show("The service job was saved, but print preview could not be opened.\n\n" + ex.Message, "Print preview", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+                catch (Exception ex) { MessageBox.Show(Strings.Format("Service_PrintAfterSaveFailed", ex.Message), Strings.Get("Invoice_PrintPreview"), MessageBoxButtons.OK, MessageBoxIcon.Warning); }
             ClearEntry();
         }
 
@@ -181,16 +181,17 @@ ORDER BY datetime(COALESCE(created_at,date_time)) DESC,id DESC;";
                     _history.Columns["service_cost"].DefaultCellStyle.FormatProvider = StoreFormat.Culture;
                 }
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message, "Service history could not be loaded", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+            catch (Exception ex) { MessageBox.Show(ex.Message, Strings.Get("Service_HistoryFailed"), MessageBoxButtons.OK, MessageBoxIcon.Warning); }
         }
 
         private void UpdateStatus()
         {
             var id = SelectedId(); if (id == 0) return;
-            var next = DialogPrompt.Show(this, "Update service status", "Enter Received, In progress, Completed, or Cancelled:", "Completed")
-                .Trim().Replace(' ', '_').ToUpperInvariant();
+            var next = NormalizeStatus(DialogPrompt.Show(this, Strings.Get("Service_UpdateStatus"),
+                Strings.Format("Service_StatusPrompt", Strings.Status("RECEIVED"), Strings.Status("IN_PROGRESS"), Strings.Status("COMPLETED"), Strings.Status("CANCELLED")),
+                Strings.Status("COMPLETED")));
             if (Array.IndexOf(new[] { "RECEIVED", "IN_PROGRESS", "COMPLETED", "CANCELLED" }, next) < 0)
-            { MessageBox.Show("Invalid service status."); return; }
+            { MessageBox.Show(Strings.Get("Service_InvalidStatus")); return; }
             using var conn = Database.OpenConnection(); using var tx = conn.BeginTransaction();
             try
             {
@@ -204,7 +205,7 @@ ORDER BY datetime(COALESCE(created_at,date_time)) DESC,id DESC;";
 
         private void EditSelected()
         {
-            if (_history.CurrentRow?.DataBoundItem is not DataRowView row) { MessageBox.Show("Select a service first."); return; }
+            if (_history.CurrentRow?.DataBoundItem is not DataRowView row) { MessageBox.Show(Strings.Get("Service_SelectFirst")); return; }
             using var dialog = new ServiceEditDialog(row);
             if (dialog.ShowDialog(this) != DialogResult.OK) return;
             var id = Convert.ToInt32(row["id"]); using var conn = Database.OpenConnection(); using var tx = conn.BeginTransaction();
@@ -220,32 +221,32 @@ UPDATE services SET customer_name=$customer,customer_phone=$phone,brand=$brand,t
                 cmd.Parameters.AddWithValue("$cost", (double)dialog.Cost); cmd.Parameters.AddWithValue("$notes", Db(dialog.Notes)); cmd.Parameters.AddWithValue("$id", id);
                 cmd.ExecuteNonQuery(); LocalAdminRepository.WriteAudit(conn, tx, "UPDATE_SERVICE", "services", id, $"customer={dialog.Customer}"); tx.Commit(); LoadHistory();
             }
-            catch (Exception ex) { try { tx.Rollback(); } catch { } MessageBox.Show(ex.Message, "Service update failed"); }
+            catch (Exception ex) { try { tx.Rollback(); } catch { } MessageBox.Show(ex.Message, Strings.Get("Service_UpdateFailed")); }
         }
 
         private void DeleteSelected()
         {
             var id = SelectedId(); if (id == 0) return;
-            var reason = DialogPrompt.Show(this, "Delete service record", "Reason for deletion:", "Administrative correction");
-            if (string.IsNullOrWhiteSpace(reason) || MessageBox.Show("Permanently delete this service record?", "Delete service", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
+            var reason = DialogPrompt.Show(this, Strings.Get("Service_DeleteRecord"), Strings.Get("Service_DeleteReason"), Strings.Get("Invoice_AdminCorrection"));
+            if (string.IsNullOrWhiteSpace(reason) || MessageBox.Show(Strings.Get("Service_DeleteQuestion"), Strings.Get("Service_DeleteTitle"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
             using var conn = Database.OpenConnection(); using var tx = conn.BeginTransaction();
             try
             {
                 using var cmd = conn.CreateCommand(); cmd.Transaction = tx; cmd.CommandText = "DELETE FROM services WHERE id=$id;"; cmd.Parameters.AddWithValue("$id", id);
                 cmd.ExecuteNonQuery(); LocalAdminRepository.WriteAudit(conn, tx, "DELETE_SERVICE", "services", id, $"reason={reason}"); tx.Commit(); _printRow = null; LoadHistory();
             }
-            catch (Exception ex) { try { tx.Rollback(); } catch { } MessageBox.Show(ex.Message, "Delete failed"); }
+            catch (Exception ex) { try { tx.Rollback(); } catch { } MessageBox.Show(ex.Message, Strings.Get("Service_DeleteFailed")); }
         }
 
         private void PrintSelected()
         {
             var id = SelectedId(); if (id == 0) return;
             try { PrintService(id); }
-            catch (Exception ex) { MessageBox.Show(ex.Message, "Service job could not be printed", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+            catch (Exception ex) { MessageBox.Show(ex.Message, Strings.Get("Service_PrintFailed"), MessageBoxButtons.OK, MessageBoxIcon.Warning); }
         }
         private int SelectedId()
         {
-            if (_history.CurrentRow?.DataBoundItem is not DataRowView row) { MessageBox.Show("Select a service first."); return 0; }
+            if (_history.CurrentRow?.DataBoundItem is not DataRowView row) { MessageBox.Show(Strings.Get("Service_SelectFirst")); return 0; }
             _printRow = row; return Convert.ToInt32(row["id"]);
         }
 
@@ -259,23 +260,23 @@ UPDATE services SET customer_name=$customer,customer_phone=$phone,brand=$brand,t
                     if (row.DataBoundItem is DataRowView view && Convert.ToInt32(view["id"]) == id) { _printRow = view; break; }
             }
             if (_printRow == null) return;
-            var doc = new PrintDocument { DocumentName = Convert.ToString(_printRow["service_number"]) ?? "Service" };
+            var doc = new PrintDocument { DocumentName = Convert.ToString(_printRow["service_number"]) ?? Strings.Get("Service_Title") };
             doc.PrintPage += (_, e) =>
             {
                 if (e.Graphics == null || _printRow == null) return;
                 var g = e.Graphics; var x = e.MarginBounds.Left; var y = e.MarginBounds.Top;
                 using var title = new Font("Segoe UI", 18, FontStyle.Bold); using var heading = new Font("Segoe UI", 11, FontStyle.Bold); using var body = new Font("Segoe UI", 10);
                 g.DrawString(AppServices.Profile.StoreName.ToUpperInvariant(), title, Brushes.Black, x, y); y += 40;
-                g.DrawString("FORM SERVICE SEPEDA LISTRIK", heading, Brushes.Black, x, y); y += 30;
+                g.DrawString(Strings.Get("Print_ServiceTitle"), heading, Brushes.Black, x, y); y += 30;
                 foreach (var line in new[]
                 {
-                    $"Nomor: {_printRow["service_number"]}", $"Tanggal: {_printRow["created_at"]}",
-                    $"Pelanggan: {_printRow["customer_name"]}", $"Telepon: {_printRow["customer_phone"]}",
-                    $"Sepeda: {_printRow["brand"]} {_printRow["type"]} {_printRow["color"]}",
-                    $"Jenis service: {_printRow["service_type"]}", $"Status: {_printRow["service_status"]}",
-                    $"Biaya: {StoreFormat.Money(Convert.ToDecimal(_printRow["service_cost"]))}", $"Catatan: {_printRow["notes"]}"
+                    Strings.Format("Print_Number", _printRow["service_number"]), Strings.Format("Print_Date", _printRow["created_at"]),
+                    Strings.Format("Print_CustomerValue", _printRow["customer_name"]), Strings.Format("Print_Phone", _printRow["customer_phone"]),
+                    Strings.Format("Print_Bicycle", _printRow["brand"], _printRow["type"], _printRow["color"]),
+                    Strings.Format("Print_ServiceType", _printRow["service_type"]), Strings.Format("Print_Status", Strings.Status(Convert.ToString(_printRow["service_status"]) ?? "RECEIVED")),
+                    Strings.Format("Print_Cost", StoreFormat.Money(Convert.ToDecimal(_printRow["service_cost"]))), Strings.Format("Print_Notes", _printRow["notes"])
                 }) { g.DrawString(line, body, Brushes.Black, x, y); y += 24; }
-                y += 50; g.DrawString("Teknisi / Staff", body, Brushes.Black, x, y); g.DrawString("Pelanggan", body, Brushes.Black, e.MarginBounds.Right - 160, y);
+                y += 50; g.DrawString(Strings.Get("Print_Technician"), body, Brushes.Black, x, y); g.DrawString(Strings.Get("Print_Customer"), body, Brushes.Black, e.MarginBounds.Right - 160, y);
             };
             using var preview = new PrintPreviewDialog { Document = doc, Width = 1000, Height = 750 }; preview.ShowDialog(this);
         }
@@ -293,13 +294,23 @@ UPDATE services SET customer_name=$customer,customer_phone=$phone,brand=$brand,t
             catch (Exception ex) { MessageBox.Show(ex.Message, title, MessageBoxButtons.OK, MessageBoxIcon.Warning); }
         }
         private static TextBox Box(int width) => new() { Width = width };
+        private static string NormalizeStatus(string? value)
+        {
+            var input = value?.Trim() ?? "";
+            foreach (var code in new[] { "RECEIVED", "IN_PROGRESS", "COMPLETED", "CANCELLED" })
+                if (input.Equals(code, StringComparison.OrdinalIgnoreCase) ||
+                    input.Replace(' ', '_').Equals(code, StringComparison.OrdinalIgnoreCase) ||
+                    input.Equals(Strings.Status(code), StringComparison.CurrentCultureIgnoreCase))
+                    return code;
+            return input.Replace(' ', '_').ToUpperInvariant();
+        }
         private static IEnumerable<StatusChoice> StatusChoices(bool includeAll)
         {
-            if (includeAll) yield return new StatusChoice("ALL", "All statuses");
-            yield return new StatusChoice("RECEIVED", "Received");
-            yield return new StatusChoice("IN_PROGRESS", "In progress");
-            yield return new StatusChoice("COMPLETED", "Completed");
-            yield return new StatusChoice("CANCELLED", "Cancelled");
+            if (includeAll) yield return new StatusChoice("ALL", Strings.Status("ALL"));
+            yield return new StatusChoice("RECEIVED", Strings.Status("RECEIVED"));
+            yield return new StatusChoice("IN_PROGRESS", Strings.Status("IN_PROGRESS"));
+            yield return new StatusChoice("COMPLETED", Strings.Status("COMPLETED"));
+            yield return new StatusChoice("CANCELLED", Strings.Status("CANCELLED"));
         }
         private static string SelectedStatus(ComboBox combo) => (combo.SelectedItem as StatusChoice)?.Code ?? "ALL";
         private sealed record StatusChoice(string Code, string Label) { public override string ToString() => Label; }
@@ -328,18 +339,18 @@ UPDATE services SET customer_name=$customer,customer_phone=$phone,brand=$brand,t
 
         public ServiceEditDialog(DataRowView row)
         {
-            Text = "Edit service details"; StartPosition = FormStartPosition.CenterParent; ClientSize = new Size(520, 500);
+            Text = Strings.Get("Service_EditTitle"); StartPosition = FormStartPosition.CenterParent; ClientSize = new Size(520, 500);
             MinimumSize = new Size(470, 420); FormBorderStyle = FormBorderStyle.Sizable; MinimizeBox = false; AutoScaleMode = AutoScaleMode.Dpi;
             _customer.Text = Convert.ToString(row["customer_name"]); _phone.Text = Convert.ToString(row["customer_phone"]);
             _brand.Text = Convert.ToString(row["brand"]); _type.Text = Convert.ToString(row["type"]); _color.Text = Convert.ToString(row["color"]);
             _service.Text = Convert.ToString(row["service_type"]); _notes.Text = Convert.ToString(row["notes"]); _cost.Value = Math.Min(_cost.Maximum, Convert.ToDecimal(row["service_cost"]));
             var table = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, Padding = new Padding(20), AutoScroll = true };
             table.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 145)); table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            Add(table, "Customer *", _customer); Add(table, "Phone", _phone); Add(table, "Brand *", _brand); Add(table, "Type/model *", _type);
-            Add(table, "Colour", _color); Add(table, "Service type *", _service); Add(table, "Cost", _cost); Add(table, "Notes", _notes);
+            Add(table, Strings.Get("Service_CustomerRequired"), _customer); Add(table, Strings.Get("Service_Phone"), _phone); Add(table, Strings.Get("Service_BrandRequired"), _brand); Add(table, Strings.Get("Service_ModelRequired"), _type);
+            Add(table, Strings.Get("Service_Colour"), _color); Add(table, Strings.Get("Service_TypeRequired"), _service); Add(table, Strings.Get("Service_Cost"), _cost); Add(table, Strings.Get("Service_Notes"), _notes);
             var actions = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.RightToLeft };
-            var save = new Button { Text = "Save changes", Width = 120, DialogResult = DialogResult.OK }; var cancel = new Button { Text = "Cancel", Width = 90, DialogResult = DialogResult.Cancel };
-            save.Click += (_, __) => { if (string.IsNullOrWhiteSpace(Customer) || string.IsNullOrWhiteSpace(Brand) || string.IsNullOrWhiteSpace(BikeType) || string.IsNullOrWhiteSpace(ServiceType)) { MessageBox.Show("Customer, brand, model and service type are required."); DialogResult = DialogResult.None; } };
+            var save = new Button { Text = Strings.Get("Common_SaveChanges"), Width = 120, DialogResult = DialogResult.OK }; var cancel = new Button { Text = Strings.Get("Common_Cancel"), Width = 90, DialogResult = DialogResult.Cancel };
+            save.Click += (_, __) => { if (string.IsNullOrWhiteSpace(Customer) || string.IsNullOrWhiteSpace(Brand) || string.IsNullOrWhiteSpace(BikeType) || string.IsNullOrWhiteSpace(ServiceType)) { MessageBox.Show(Strings.Get("Service_CustomerBrandRequired")); DialogResult = DialogResult.None; } };
             actions.Controls.Add(save); actions.Controls.Add(cancel); Add(table, "", actions); Controls.Add(table); AcceptButton = save; CancelButton = cancel; UiTheme.Apply(this);
         }
         private static TextBox Box() => new() { Width = 260 };

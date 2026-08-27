@@ -15,8 +15,8 @@ namespace Bike_STore_Project
             };
             var prompt = new Label { Text = label, Left = 12, Top = 14, Width = 400, AutoSize = false };
             var input = new TextBox { Text = initial, Left = 12, Top = 42, Width = 400 };
-            var ok = new Button { Text = "OK", Left = 245, Top = 92, Width = 80, DialogResult = DialogResult.OK };
-            var cancel = new Button { Text = "Cancel", Left = 332, Top = 92, Width = 80, DialogResult = DialogResult.Cancel };
+            var ok = new Button { Text = Strings.Get("Common_OK"), Left = 245, Top = 92, Width = 80, DialogResult = DialogResult.OK };
+            var cancel = new Button { Text = Strings.Get("Common_Cancel"), Left = 332, Top = 92, Width = 80, DialogResult = DialogResult.Cancel };
             form.Controls.AddRange(new Control[] { prompt, input, ok, cancel });
             form.AcceptButton = ok;
             form.CancelButton = cancel;

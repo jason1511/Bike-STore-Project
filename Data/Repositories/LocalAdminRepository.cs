@@ -36,11 +36,11 @@ ORDER BY p.brand, p.type, p.color;";
             string? notes,
             IReadOnlyCollection<InvoiceDraftItem> items)
         {
-            if (!AppSession.IsSignedIn) throw new InvalidOperationException("Sign in before creating an invoice.");
-            if (string.IsNullOrWhiteSpace(customerName)) throw new ArgumentException("Customer name is required.");
-            if (items.Count == 0) throw new ArgumentException("Add at least one invoice item.");
+            if (!AppSession.IsSignedIn) throw new InvalidOperationException(Strings.Get("Error_SignInBeforeInvoice"));
+            if (string.IsNullOrWhiteSpace(customerName)) throw new ArgumentException(Strings.Get("Error_CustomerRequired"));
+            if (items.Count == 0) throw new ArgumentException(Strings.Get("Error_InvoiceItemRequired"));
             if (items.Any(x => x.Quantity <= 0 || x.UnitPrice <= 0))
-                throw new ArgumentException("Every item requires a positive quantity and unit price.");
+                throw new ArgumentException(Strings.Get("Error_InvoiceItemPositive"));
 
             using var conn = Database.OpenConnection();
             using var tx = conn.BeginTransaction();
@@ -51,7 +51,7 @@ ORDER BY p.brand, p.type, p.color;";
                     var requested = grouped.Sum(x => x.Quantity);
                     var available = GetAvailable(conn, tx, grouped.Key);
                     if (requested > available)
-                        throw new InvalidOperationException($"Insufficient stock for {grouped.First().Bike}. Available: {available}.");
+                    throw new InvalidOperationException(Strings.Format("Error_InsufficientStock", grouped.First().Bike, available));
                 }
 
                 var now = DateTime.Now;
@@ -96,8 +96,8 @@ SELECT last_insert_rowid();";
 
         public void VoidInvoice(int invoiceId, string reason)
         {
-            if (!AppSession.IsAdmin) throw new InvalidOperationException("Admin access is required to void an invoice.");
-            if (string.IsNullOrWhiteSpace(reason)) throw new ArgumentException("A void reason is required.");
+            if (!AppSession.IsAdmin) throw new InvalidOperationException(Strings.Get("Error_AdminVoidInvoice"));
+            if (string.IsNullOrWhiteSpace(reason)) throw new ArgumentException(Strings.Get("Error_VoidReasonRequired"));
 
             using var conn = Database.OpenConnection();
             using var tx = conn.BeginTransaction();
@@ -111,12 +111,12 @@ SELECT last_insert_rowid();";
                     getHeader.CommandText = "SELECT invoice_number,status FROM invoices WHERE id=$id;";
                     getHeader.Parameters.AddWithValue("$id", invoiceId);
                     using var reader = getHeader.ExecuteReader();
-                    if (!reader.Read()) throw new InvalidOperationException("Invoice not found.");
+                    if (!reader.Read()) throw new InvalidOperationException(Strings.Get("Error_InvoiceNotFound"));
                     number = reader.GetString(0);
                     status = reader.GetString(1);
                 }
                 if (status.Equals("VOID", StringComparison.OrdinalIgnoreCase))
-                    throw new InvalidOperationException("Invoice is already void.");
+                    throw new InvalidOperationException(Strings.Get("Error_InvoiceAlreadyVoid"));
 
                 var rows = new List<(int SaleId, int ProductId, int Quantity)>();
                 using (var items = conn.CreateCommand())
@@ -185,8 +185,8 @@ UPDATE invoices SET status='VOID',void_reason=$reason,voided_at=$at,
 
         public void UpdateInvoiceDetails(InvoiceHeader invoice)
         {
-            if (!AppSession.IsAdmin) throw new InvalidOperationException("Admin access is required to edit an invoice.");
-            if (string.IsNullOrWhiteSpace(invoice.CustomerName)) throw new ArgumentException("Customer name is required.");
+            if (!AppSession.IsAdmin) throw new InvalidOperationException(Strings.Get("Error_AdminEditInvoice"));
+            if (string.IsNullOrWhiteSpace(invoice.CustomerName)) throw new ArgumentException(Strings.Get("Error_CustomerRequired"));
             using var conn = Database.OpenConnection(); using var tx = conn.BeginTransaction();
             try
             {
@@ -197,7 +197,7 @@ UPDATE invoices SET customer_name=$name,customer_phone=$phone,customer_address=$
                 cmd.Parameters.AddWithValue("$name", invoice.CustomerName.Trim()); cmd.Parameters.AddWithValue("$phone", Db(invoice.CustomerPhone));
                 cmd.Parameters.AddWithValue("$address", Db(invoice.CustomerAddress)); cmd.Parameters.AddWithValue("$method", invoice.PaymentMethod.Trim().ToUpperInvariant());
                 cmd.Parameters.AddWithValue("$bank", Db(invoice.PaymentBank)); cmd.Parameters.AddWithValue("$notes", Db(invoice.Notes)); cmd.Parameters.AddWithValue("$id", invoice.Id);
-                if (cmd.ExecuteNonQuery() != 1) throw new InvalidOperationException("Invoice not found.");
+                if (cmd.ExecuteNonQuery() != 1) throw new InvalidOperationException(Strings.Get("Error_InvoiceNotFound"));
                 WriteAudit(conn, tx, "UPDATE_INVOICE", "invoices", invoice.Id, $"{invoice.InvoiceNumber}; customer={invoice.CustomerName.Trim()}"); tx.Commit();
             }
             catch { try { tx.Rollback(); } catch { } throw; }
@@ -205,7 +205,7 @@ UPDATE invoices SET customer_name=$name,customer_phone=$phone,customer_address=$
 
         public void DeleteInvoiceRecord(int invoiceId, string reason)
         {
-            if (!AppSession.IsAdmin) throw new InvalidOperationException("Admin access is required to delete an invoice record.");
+            if (!AppSession.IsAdmin) throw new InvalidOperationException(Strings.Get("Error_AdminDeleteInvoice"));
             var invoice = GetInvoice(invoiceId);
             if (!invoice.Status.Equals("VOID", StringComparison.OrdinalIgnoreCase)) VoidInvoice(invoiceId, reason);
             using var conn = Database.OpenConnection(); using var tx = conn.BeginTransaction();
@@ -218,7 +218,7 @@ UPDATE invoices SET customer_name=$name,customer_phone=$phone,customer_address=$
                 }
                 using var cmd = conn.CreateCommand(); cmd.Transaction = tx;
                 cmd.CommandText = "DELETE FROM invoices WHERE id=$id;"; cmd.Parameters.AddWithValue("$id", invoiceId);
-                if (cmd.ExecuteNonQuery() != 1) throw new InvalidOperationException("Invoice not found.");
+                if (cmd.ExecuteNonQuery() != 1) throw new InvalidOperationException(Strings.Get("Error_InvoiceNotFound"));
                 WriteAudit(conn, tx, "DELETE_INVOICE_RECORD", "invoices", invoiceId, $"{invoice.InvoiceNumber}; reason={reason}"); tx.Commit();
             }
             catch { try { tx.Rollback(); } catch { } throw; }
@@ -256,7 +256,7 @@ SELECT id,invoice_number,customer_name,COALESCE(customer_phone,''),COALESCE(cust
 FROM invoices WHERE id=$id;";
                 cmd.Parameters.AddWithValue("$id", invoiceId);
                 using var r = cmd.ExecuteReader();
-                if (!r.Read()) throw new InvalidOperationException("Invoice not found.");
+                if (!r.Read()) throw new InvalidOperationException(Strings.Get("Error_InvoiceNotFound"));
                 result.Id = r.GetInt32(0);
                 result.InvoiceNumber = r.GetString(1);
                 result.CustomerName = r.GetString(2);
@@ -355,7 +355,7 @@ VALUES ($sale,$lot,$qty,$cost,$sell,$uid,$user,$at);";
                 }
                 remaining -= take;
             }
-            if (remaining != 0) throw new InvalidOperationException($"FIFO allocation failed for {item.Bike}.");
+                if (remaining != 0) throw new InvalidOperationException(Strings.Format("Error_FifoAllocation", item.Bike));
 
             using (var invoiceItem = conn.CreateCommand())
             {

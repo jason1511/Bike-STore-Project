@@ -15,7 +15,7 @@ namespace Bike_STore_Project
         /// </summary>
         public static void UseDatabaseFile(string filePath)
         {
-            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentException("Database path is required.", nameof(filePath));
+            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentException(Strings.Get("Error_DatabasePathRequired"), nameof(filePath));
             var fullPath = Path.GetFullPath(filePath);
             var directory = Path.GetDirectoryName(fullPath);
             if (!string.IsNullOrWhiteSpace(directory)) Directory.CreateDirectory(directory);
@@ -36,7 +36,7 @@ namespace Bike_STore_Project
 
         public static void ValidateDatabaseFile(string filePath)
         {
-            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentException("Database path is required.", nameof(filePath));
+            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentException(Strings.Get("Error_DatabasePathRequired"), nameof(filePath));
             var fullPath = Path.GetFullPath(filePath);
             var directory = Path.GetDirectoryName(fullPath);
             if (!string.IsNullOrWhiteSpace(directory)) Directory.CreateDirectory(directory);

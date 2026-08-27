@@ -112,7 +112,7 @@ namespace Bike_STore_Project
             Profile = profile;
             var baseUrl = profile.ApiBaseUrl.Trim().TrimEnd('/');
             if (!Uri.TryCreate(baseUrl + "/", UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps)
-                throw new InvalidOperationException("Online store URL must be a valid HTTPS address.");
+                throw new InvalidOperationException(Strings.Get("Error_OnlineUrlHttps"));
             _http = new HttpClient { BaseAddress = uri, Timeout = TimeSpan.FromSeconds(30) };
         }
 
@@ -124,10 +124,10 @@ namespace Bike_STore_Project
             try { envelope = JsonSerializer.Deserialize<LoginEnvelope>(text, JsonOptions) ?? new LoginEnvelope(); }
             catch { envelope = new LoginEnvelope(); }
             if (!response.IsSuccessStatusCode)
-                return new LoginResult(false, 0, username, "USER", envelope.Error ?? "Login failed.");
+                return new LoginResult(false, 0, username, "USER", envelope.Error ?? Strings.Get("Login_Failed"));
             _token = envelope.Token ?? "";
             if (string.IsNullOrWhiteSpace(_token))
-                return new LoginResult(false, 0, username, "USER", "The server did not return a session token.");
+                return new LoginResult(false, 0, username, "USER", Strings.Get("Error_NoSessionToken"));
             return new LoginResult(true, StableUserId(envelope.Username ?? username), envelope.Username ?? username,
                 NormalizeRole(envelope.Role));
         }
@@ -135,7 +135,7 @@ namespace Bike_STore_Project
         public async Task TestConnectionAsync(CancellationToken cancellationToken = default)
         {
             using var response = await _http.GetAsync("api/bikes", cancellationToken);
-            if (!response.IsSuccessStatusCode) throw new InvalidOperationException($"Server returned HTTP {(int)response.StatusCode}.");
+            if (!response.IsSuccessStatusCode) throw new InvalidOperationException(Strings.Format("Error_ServerHttp", (int)response.StatusCode));
         }
 
         public async Task<IReadOnlyList<StoreBrand>> GetBrandsAsync(CancellationToken cancellationToken = default)
@@ -172,7 +172,7 @@ namespace Bike_STore_Project
         public async Task ReceiveStockAsync(string bikeId, string colorName, string colorHex, string colorImage,
             int quantity, decimal unitCost, DateTime receivedAt, string note, CancellationToken cancellationToken = default)
         {
-            var bike = await GetBikeAsync(bikeId, cancellationToken) ?? throw new InvalidOperationException("Bike not found.");
+            var bike = await GetBikeAsync(bikeId, cancellationToken) ?? throw new InvalidOperationException(Strings.Get("Error_BikeNotFound"));
             var color = bike.Colors.FirstOrDefault(x => x.Name.Equals(colorName, StringComparison.OrdinalIgnoreCase));
             if (color == null)
             {
@@ -188,14 +188,14 @@ namespace Bike_STore_Project
 
         public async Task SetBikeActiveAsync(string bikeId, bool active, CancellationToken cancellationToken = default)
         {
-            var bike = await GetBikeAsync(bikeId, cancellationToken) ?? throw new InvalidOperationException("Bike not found.");
+            var bike = await GetBikeAsync(bikeId, cancellationToken) ?? throw new InvalidOperationException(Strings.Get("Error_BikeNotFound"));
             bike.InStock = active;
             await SaveBikeAsync(bike, false, cancellationToken);
         }
 
         private HttpRequestMessage Authorized(HttpMethod method, string path)
         {
-            if (string.IsNullOrWhiteSpace(_token)) throw new InvalidOperationException("Sign in to the online store first.");
+            if (string.IsNullOrWhiteSpace(_token)) throw new InvalidOperationException(Strings.Get("Error_OnlineSignInFirst"));
             var request = new HttpRequestMessage(method, path);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
             request.Headers.Add("Idempotency-Key", Guid.NewGuid().ToString("N"));
@@ -218,9 +218,9 @@ namespace Bike_STore_Project
             {
                 string error = "";
                 try { error = JsonSerializer.Deserialize<ErrorEnvelope>(text, JsonOptions)?.Error ?? ""; } catch { }
-                throw new HttpRequestException(string.IsNullOrWhiteSpace(error) ? $"Server returned HTTP {(int)response.StatusCode}." : error);
+                throw new HttpRequestException(string.IsNullOrWhiteSpace(error) ? Strings.Format("Error_ServerHttp", (int)response.StatusCode) : error);
             }
-            return result ?? throw new InvalidDataException("The server returned an empty or invalid response.");
+            return result ?? throw new InvalidDataException(Strings.Get("Error_InvalidServerResponse"));
         }
 
         private static async Task EnsureSuccessAsync(HttpResponseMessage response, CancellationToken cancellationToken)
@@ -229,7 +229,7 @@ namespace Bike_STore_Project
             var text = await response.Content.ReadAsStringAsync(cancellationToken);
             string error = "";
             try { error = JsonSerializer.Deserialize<ErrorEnvelope>(text, JsonOptions)?.Error ?? ""; } catch { }
-            throw new HttpRequestException(string.IsNullOrWhiteSpace(error) ? $"Server returned HTTP {(int)response.StatusCode}." : error);
+            throw new HttpRequestException(string.IsNullOrWhiteSpace(error) ? Strings.Format("Error_ServerHttp", (int)response.StatusCode) : error);
         }
 
         private static int StableUserId(string username)

@@ -81,10 +81,10 @@ ORDER BY brand,name;";
             try
             {
                 var existing = GetById(conn, tx, bike.Id);
-                if (isNew && existing != null) throw new InvalidOperationException("Bike ID already exists.");
-                if (!isNew && existing == null) throw new InvalidOperationException("Bike not found.");
+                if (isNew && existing != null) throw new InvalidOperationException(Strings.Get("Error_BikeIdExists"));
+                if (!isNew && existing == null) throw new InvalidOperationException(Strings.Get("Error_BikeNotFound"));
                 if (!isNew && !AppSession.IsAdmin && existing!.InStock != bike.InStock)
-                    throw new InvalidOperationException("Only an administrator can change catalogue status.");
+                    throw new InvalidOperationException(Strings.Get("Error_AdminCatalogueStatus"));
 
                 var previousColors = existing?.Colors ?? new List<WebsiteBikeColor>();
                 for (var index = 0; index < bike.Colors.Count; index++)
@@ -122,17 +122,17 @@ ORDER BY brand,name;";
         public void ReceiveStock(string bikeId, string colorName, string colorHex, string colorImage,
             int quantity, decimal unitCost, DateTime receivedAt, string note)
         {
-            if (quantity <= 0) throw new ArgumentException("Quantity must be at least 1.");
-            if (unitCost <= 0) throw new ArgumentException("Unit cost must be greater than 0.");
+            if (quantity <= 0) throw new ArgumentException(Strings.Get("Error_QuantityMinimum"));
+            if (unitCost <= 0) throw new ArgumentException(Strings.Get("Error_UnitCostPositive"));
             using var conn = Database.OpenConnection(); using var tx = conn.BeginTransaction();
             try
             {
-                var bike = GetById(conn, tx, bikeId) ?? throw new InvalidOperationException("Bike not found.");
+                var bike = GetById(conn, tx, bikeId) ?? throw new InvalidOperationException(Strings.Get("Error_BikeNotFound"));
                 var color = bike.Colors.FirstOrDefault(x => Same(x.Name, colorName));
                 if (color == null)
                 {
                     color = new WebsiteBikeColor { Name = colorName.Trim(), Hex = NormalHex(colorHex), Image = colorImage.Trim() };
-                    if (string.IsNullOrWhiteSpace(color.Name)) throw new ArgumentException("New colour name is required.");
+                    if (string.IsNullOrWhiteSpace(color.Name)) throw new ArgumentException(Strings.Get("Error_ColourNameRequired"));
                     bike.Colors.Add(color);
                 }
                 else
@@ -167,14 +167,14 @@ VALUES($product,$at,$cost,$qty,$qty,$note); SELECT last_insert_rowid();";
 
         public void SetActive(string bikeId, bool active)
         {
-            if (!AppSession.IsAdmin) throw new InvalidOperationException("Admin access required.");
+            if (!AppSession.IsAdmin) throw new InvalidOperationException(Strings.Get("Admin_AccessRequired"));
             using var conn = Database.OpenConnection(); using var tx = conn.BeginTransaction();
             try
             {
                 using var cmd = conn.CreateCommand(); cmd.Transaction = tx;
                 cmd.CommandText = "UPDATE bikes SET inStock=$active,updatedAt=CURRENT_TIMESTAMP WHERE id=$id;";
                 cmd.Parameters.AddWithValue("$active", active ? 1 : 0); cmd.Parameters.AddWithValue("$id", bikeId);
-                if (cmd.ExecuteNonQuery() != 1) throw new InvalidOperationException("Bike not found.");
+                if (cmd.ExecuteNonQuery() != 1) throw new InvalidOperationException(Strings.Get("Error_BikeNotFound"));
                 using var products = conn.CreateCommand(); products.Transaction = tx;
                 products.CommandText = "UPDATE products SET is_active=$active WHERE UPPER(brand)=UPPER((SELECT brand FROM bikes WHERE id=$id)) AND UPPER(type)=UPPER((SELECT name FROM bikes WHERE id=$id));";
                 products.Parameters.AddWithValue("$active", active ? 1 : 0); products.Parameters.AddWithValue("$id", bikeId); products.ExecuteNonQuery();
@@ -261,11 +261,11 @@ UPDATE stock_movements SET
         private static void NormalizeAndValidate(WebsiteBike bike)
         {
             bike.Brand=bike.Brand.Trim().ToUpperInvariant(); bike.Name=bike.Name.Trim().ToUpperInvariant();
-            if(string.IsNullOrWhiteSpace(bike.Brand)||string.IsNullOrWhiteSpace(bike.Name)) throw new ArgumentException("Brand and model are required.");
+            if(string.IsNullOrWhiteSpace(bike.Brand)||string.IsNullOrWhiteSpace(bike.Name)) throw new ArgumentException(Strings.Get("Error_BrandModelRequired"));
             if(string.IsNullOrWhiteSpace(bike.Id)) bike.Id=Slug($"{bike.Brand}-{bike.Name}");
             bike.Colors=bike.Colors.Where(x=>!string.IsNullOrWhiteSpace(x.Name)).Select(x=>new WebsiteBikeColor{Name=x.Name.Trim().ToUpperInvariant(),Hex=NormalHex(x.Hex),Image=x.Image.Trim(),StockQty=Math.Max(0,x.StockQty)}).ToList();
-            if(bike.Colors.Count==0) throw new ArgumentException("At least one colour is required.");
-            if(bike.Colors.GroupBy(x=>x.Name,StringComparer.OrdinalIgnoreCase).Any(x=>x.Count()>1)) throw new ArgumentException("Colour names must be unique within a bike.");
+            if(bike.Colors.Count==0) throw new ArgumentException(Strings.Get("Error_ColourRequired"));
+            if(bike.Colors.GroupBy(x=>x.Name,StringComparer.OrdinalIgnoreCase).Any(x=>x.Count()>1)) throw new ArgumentException(Strings.Get("Error_ColourUnique"));
         }
 
         private static int EnsureProduct(SqliteConnection conn, SqliteTransaction tx, WebsiteBike bike, WebsiteBikeColor color, string? previousName)
@@ -302,7 +302,7 @@ UPDATE stock_movements SET
             {
                 var remaining=-change;using var lots=conn.CreateCommand();lots.Transaction=tx;lots.CommandText="SELECT id,qty_remaining FROM stock_lots WHERE product_id=$id AND qty_remaining>0 ORDER BY datetime(received_at) DESC,id DESC;";lots.Parameters.AddWithValue("$id",productId);var rows=new List<(long Id,int Qty)>();using(var reader=lots.ExecuteReader()){while(reader.Read())rows.Add((reader.GetInt64(0),reader.GetInt32(1)));}
                 foreach(var row in rows){if(remaining==0)break;var take=Math.Min(remaining,row.Qty);using var update=conn.CreateCommand();update.Transaction=tx;update.CommandText="UPDATE stock_lots SET qty_remaining=qty_remaining-$take WHERE id=$id;";update.Parameters.AddWithValue("$take",take);update.Parameters.AddWithValue("$id",row.Id);update.ExecuteNonQuery();remaining-=take;lotId??=row.Id;}
-                if(remaining>0)throw new InvalidOperationException("Stock correction exceeds available stock.");
+                if(remaining>0)throw new InvalidOperationException(Strings.Get("Error_StockCorrectionExceeds"));
             }
             InsertMovement(conn,tx,productId,lotId,bike,color,change>0?"stock_in":"adjustment",change,before,desired,note);
         }

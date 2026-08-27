@@ -29,10 +29,10 @@ namespace Bike_STore_Project
             root.RowStyles.Add(new RowStyle(SizeType.Percent, 55));
 
             var quick = new FlowLayoutPanel { Dock = DockStyle.Fill, Height = 46, AutoSize = true };
-            quick.Controls.Add(QuickButton("+ New invoice", "sales", UiTheme.Accent));
-            quick.Controls.Add(QuickButton("+ Receive stock", "inventory", UiTheme.Success));
-            quick.Controls.Add(QuickButton("+ New service", "service", UiTheme.Warning));
-            var refresh = QuickButton("Refresh dashboard", "refresh", UiTheme.SidebarHover);
+            quick.Controls.Add(QuickButton(Strings.Get("Dashboard_NewInvoice"), "sales", UiTheme.Accent));
+            quick.Controls.Add(QuickButton(Strings.Get("Dashboard_ReceiveStock"), "inventory", UiTheme.Success));
+            quick.Controls.Add(QuickButton(Strings.Get("Dashboard_NewService"), "service", UiTheme.Warning));
+            var refresh = QuickButton(Strings.Get("Dashboard_Refresh"), "refresh", UiTheme.SidebarHover);
             refresh.Click -= NavigateClick;
             refresh.Click += (_, __) => RefreshDashboard();
             quick.Controls.Add(refresh);
@@ -40,16 +40,16 @@ namespace Bike_STore_Project
             var charts = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, Padding = new Padding(0, 8, 0, 8) };
             charts.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
             charts.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
-            var salesCard = CardWithTitle("Sales — last 7 days", _salesChart);
-            var stockCard = CardWithTitle("Stock movement — last 7 days", _stockChart);
+            var salesCard = CardWithTitle(Strings.Get("Dashboard_SalesChart"), _salesChart);
+            var stockCard = CardWithTitle(Strings.Get("Dashboard_StockChart"), _stockChart);
             charts.Controls.Add(salesCard, 0, 0);
             charts.Controls.Add(stockCard, 1, 0);
 
             var recent = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, Padding = new Padding(0, 4, 0, 0) };
             recent.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 55));
             recent.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 45));
-            var invoiceCard = CardWithTitle("Recent invoices", _invoices);
-            var serviceCard = CardWithTitle("Open services", _services);
+            var invoiceCard = CardWithTitle(Strings.Get("Dashboard_RecentInvoices"), _invoices);
+            var serviceCard = CardWithTitle(Strings.Get("Dashboard_OpenServices"), _services);
             recent.Controls.Add(invoiceCard, 0, 0);
             recent.Controls.Add(serviceCard, 1, 0);
 
@@ -114,12 +114,12 @@ namespace Bike_STore_Project
                 }
                 var cost = Scalar(conn, "SELECT COALESCE(SUM(sl.qty_sold*sl.unit_cost),0) FROM sale_lines sl JOIN sales s ON s.id=sl.sale_id WHERE s.voided=0 AND date(s.date_time)=$date;", today);
 
-                AddMetric("Today's sales", StoreFormat.Money(sales), UiTheme.Accent);
-                AddMetric("Invoices", invoiceCount.ToString("N0"), Color.FromArgb(77, 105, 160));
-                AddMetric("Open services", serviceCount.ToString("N0"), UiTheme.Warning);
-                AddMetric("Stock units", stock.ToString("N0"), UiTheme.Success);
-                AddMetric("Low stock", lowStock.ToString("N0"), UiTheme.Danger);
-                AddMetric("Gross profit", StoreFormat.Money(sales - cost), Color.FromArgb(105, 88, 155));
+                AddMetric(Strings.Get("Dashboard_TodaysSales"), StoreFormat.Money(sales), UiTheme.Accent);
+                AddMetric(Strings.Get("Dashboard_Invoices"), invoiceCount.ToString("N0"), Color.FromArgb(77, 105, 160));
+                AddMetric(Strings.Get("Dashboard_OpenServices"), serviceCount.ToString("N0"), UiTheme.Warning);
+                AddMetric(Strings.Get("Dashboard_StockUnits"), stock.ToString("N0"), UiTheme.Success);
+                AddMetric(Strings.Get("Dashboard_LowStock"), lowStock.ToString("N0"), UiTheme.Danger);
+                AddMetric(Strings.Get("Dashboard_GrossProfit"), StoreFormat.Money(sales - cost), Color.FromArgb(105, 88, 155));
 
                 _invoices.DataSource = Query(conn, @"
 SELECT i.invoice_number AS invoice,i.customer_name AS customer,i.payment_method AS payment,
@@ -139,7 +139,7 @@ ORDER BY datetime(COALESCE(created_at,date_time)) DESC LIMIT 8;");
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Dashboard could not be refreshed: " + ex.Message, "Dashboard");
+                MessageBox.Show(Strings.Format("Dashboard_RefreshFailed", ex.Message), Strings.Get("Dashboard_Title"));
             }
         }
 
@@ -156,8 +156,8 @@ ORDER BY datetime(COALESCE(created_at,date_time)) DESC LIMIT 8;");
                 sales.Add(new ChartValue(day.ToString("ddd"), revenue, 0));
                 stock.Add(new ChartValue(day.ToString("ddd"), stockIn, stockOut));
             }
-            _salesChart.SetData(sales, UiTheme.Accent, Color.Transparent, "Revenue", "");
-            _stockChart.SetData(stock, UiTheme.Success, UiTheme.Danger, "In", "Out");
+            _salesChart.SetData(sales, UiTheme.Accent, Color.Transparent, Strings.Get("Dashboard_Revenue"), "");
+            _stockChart.SetData(stock, UiTheme.Success, UiTheme.Danger, Strings.Get("Dashboard_In"), Strings.Get("Dashboard_Out"));
         }
 
         private Button QuickButton(string text, string destination, Color color)

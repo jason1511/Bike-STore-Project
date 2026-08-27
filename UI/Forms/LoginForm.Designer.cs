@@ -64,7 +64,7 @@
             label1.Name = "label1";
             label1.Size = new Size(75, 20);
             label1.TabIndex = 0;
-            label1.Text = "Username";
+            label1.Text = Strings.Get("Login_Username");
             // 
             // txtUser
             // 
@@ -80,7 +80,7 @@
             label2.Name = "label2";
             label2.Size = new Size(70, 20);
             label2.TabIndex = 2;
-            label2.Text = "Password";
+            label2.Text = Strings.Get("Login_Password");
             // 
             // txtPass
             // 
@@ -97,7 +97,7 @@
             btnLogin.Name = "btnLogin";
             btnLogin.Size = new Size(260, 32);
             btnLogin.TabIndex = 4;
-            btnLogin.Text = "Sign in";
+            btnLogin.Text = Strings.Get("Login_SignIn");
             // 
             // LoginForm
             // 
@@ -107,7 +107,7 @@
             Controls.Add(tableRoot);
             Name = "LoginForm";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Sign in";
+            Text = Strings.Get("Login_SignIn");
             tableRoot.ResumeLayout(false);
             panelLogin.ResumeLayout(false);
             panelLogin.PerformLayout();

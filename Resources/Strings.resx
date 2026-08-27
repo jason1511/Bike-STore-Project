@@ -1,0 +1,508 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="Common_OK" xml:space="preserve"><value>OK</value></data>
+  <data name="Common_Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Common_Close" xml:space="preserve"><value>Close</value></data>
+  <data name="Common_Search" xml:space="preserve"><value>Search</value></data>
+  <data name="Common_Refresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="Common_SaveChanges" xml:space="preserve"><value>Save changes</value></data>
+  <data name="Common_Success" xml:space="preserve"><value>Success</value></data>
+  <data name="Common_Error" xml:space="preserve"><value>Error</value></data>
+  <data name="Common_From" xml:space="preserve"><value>From</value></data>
+  <data name="Common_To" xml:space="preserve"><value>To</value></data>
+  <data name="Common_Today" xml:space="preserve"><value>Today</value></data>
+  <data name="Common_ThisWeek" xml:space="preserve"><value>This week</value></data>
+  <data name="Common_ThisMonth" xml:space="preserve"><value>This month</value></data>
+  <data name="Role_ADMIN" xml:space="preserve"><value>Administrator</value></data>
+  <data name="Role_USER" xml:space="preserve"><value>Staff</value></data>
+  <data name="Status_ALL" xml:space="preserve"><value>All statuses</value></data>
+  <data name="Status_ACTIVE" xml:space="preserve"><value>Active</value></data>
+  <data name="Status_VOID" xml:space="preserve"><value>Void</value></data>
+  <data name="Status_RECEIVED" xml:space="preserve"><value>Received</value></data>
+  <data name="Status_IN_PROGRESS" xml:space="preserve"><value>In progress</value></data>
+  <data name="Status_COMPLETED" xml:space="preserve"><value>Completed</value></data>
+  <data name="Status_CANCELLED" xml:space="preserve"><value>Cancelled</value></data>
+  <data name="Setup_WindowNew" xml:space="preserve"><value>Set up Bike Store Desktop</value></data>
+  <data name="Setup_WindowEdit" xml:space="preserve"><value>Store connection settings</value></data>
+  <data name="Setup_ModeDemo" xml:space="preserve"><value>DEMO&#10;Explore with sample data</value></data>
+  <data name="Setup_ModeLocal" xml:space="preserve"><value>LOCAL SQLITE&#10;Keep data on this computer</value></data>
+  <data name="Setup_ModeOnline" xml:space="preserve"><value>ONLINE API&#10;Connect to a deployed store</value></data>
+  <data name="Setup_SaveContinue" xml:space="preserve"><value>Save and continue</value></data>
+  <data name="Setup_CheckConnection" xml:space="preserve"><value>Check connection</value></data>
+  <data name="Setup_ResetDemoDatabase" xml:space="preserve"><value>Reset demo database</value></data>
+  <data name="Setup_Eyebrow" xml:space="preserve"><value>STORE PROFILE</value></data>
+  <data name="Setup_Title" xml:space="preserve"><value>Set up your Bike Store workspace</value></data>
+  <data name="Setup_Intro" xml:space="preserve"><value>Choose where this profile keeps its data. You can change the connection later from Store settings.</value></data>
+  <data name="Setup_StepSource" xml:space="preserve"><value>1. Choose a data source</value></data>
+  <data name="Setup_StepDetails" xml:space="preserve"><value>2. Store details</value></data>
+  <data name="Setup_DetailsHelp" xml:space="preserve"><value>These names appear in the app and on printed documents.</value></data>
+  <data name="Setup_ProfileName" xml:space="preserve"><value>Profile name</value></data>
+  <data name="Setup_StoreName" xml:space="preserve"><value>Store name</value></data>
+  <data name="Setup_ShortName" xml:space="preserve"><value>Short name</value></data>
+  <data name="Setup_LanguageCurrency" xml:space="preserve"><value>Language / currency</value></data>
+  <data name="Setup_InvoiceTitle" xml:space="preserve"><value>Invoice title</value></data>
+  <data name="Setup_LowStock" xml:space="preserve"><value>Low-stock warning</value></data>
+  <data name="Setup_SqliteFile" xml:space="preserve"><value>SQLite file</value></data>
+  <data name="Setup_StoreApiUrl" xml:space="preserve"><value>Store API URL</value></data>
+  <data name="Setup_Browse" xml:space="preserve"><value>Browse…</value></data>
+  <data name="Setup_SectionDemo" xml:space="preserve"><value>3. Demo storage</value></data>
+  <data name="Setup_SectionLocal" xml:space="preserve"><value>3. Local database</value></data>
+  <data name="Setup_SectionOnline" xml:space="preserve"><value>3. Online connection</value></data>
+  <data name="Setup_DemoSecurity" xml:space="preserve"><value>No connection details are required. Demo data is stored separately and can be reset at any time.</value></data>
+  <data name="Setup_LocalSecurity" xml:space="preserve"><value>Choose one SQLite file for this profile. The app verifies that the folder and database can be opened before saving.</value></data>
+  <data name="Setup_OnlineSecurity" xml:space="preserve"><value>Only the HTTPS server address is saved here. Cloudflare/D1 credentials remain on the server; users sign in normally.</value></data>
+  <data name="Setup_DemoHelp" xml:space="preserve"><value>Best for exploring: safe sample data, stored locally, with no production connection.</value></data>
+  <data name="Setup_LocalHelp" xml:space="preserve"><value>Best for one computer or an offline store: persistent data in a SQLite file you control.</value></data>
+  <data name="Setup_OnlineHelp" xml:space="preserve"><value>Best for a deployed store: the desktop app uses an authenticated HTTPS API backed by Cloudflare Workers and D1.</value></data>
+  <data name="Setup_Required" xml:space="preserve"><value>{0} is required.</value></data>
+  <data name="Setup_ChooseDatabase" xml:space="preserve"><value>Choose a SQLite database file.</value></data>
+  <data name="Setup_InvalidUrl" xml:space="preserve"><value>Enter a valid HTTPS online store URL.</value></data>
+  <data name="Setup_TitleDialog" xml:space="preserve"><value>Store setup</value></data>
+  <data name="Setup_Testing" xml:space="preserve"><value>Testing…</value></data>
+  <data name="Setup_Reachable" xml:space="preserve"><value>The online store API is reachable.</value></data>
+  <data name="Setup_ConnectionSuccess" xml:space="preserve"><value>Connection successful</value></data>
+  <data name="Setup_ConnectionFailed" xml:space="preserve"><value>Connection failed</value></data>
+  <data name="Setup_ChooseDatabaseTitle" xml:space="preserve"><value>Choose database file</value></data>
+  <data name="Setup_ResetQuestion" xml:space="preserve"><value>Reset the demo database to its original sample data?</value></data>
+  <data name="Setup_ResetTitle" xml:space="preserve"><value>Reset demo</value></data>
+  <data name="Setup_ResetDone" xml:space="preserve"><value>Demo data will be recreated when you continue.</value></data>
+  <data name="Setup_ResetDoneTitle" xml:space="preserve"><value>Demo reset</value></data>
+  <data name="Setup_ResetFailed" xml:space="preserve"><value>Demo reset failed</value></data>
+  <data name="Language_Indonesian" xml:space="preserve"><value>Bahasa Indonesia / IDR</value></data>
+  <data name="Language_EnglishAustralia" xml:space="preserve"><value>English (Australia) / AUD</value></data>
+  <data name="Login_Window" xml:space="preserve"><value>{0} — Sign in</value></data>
+  <data name="Login_Eyebrow" xml:space="preserve"><value>DESKTOP ADMIN</value></data>
+  <data name="Login_Subtitle" xml:space="preserve"><value>{0} · Sign in to manage catalogue, stock, invoices and service.</value></data>
+  <data name="Login_FirstRun" xml:space="preserve"><value>First-run admin: admin / {0}</value></data>
+  <data name="Login_Username" xml:space="preserve"><value>Username</value></data>
+  <data name="Login_Password" xml:space="preserve"><value>Password</value></data>
+  <data name="Login_SignIn" xml:space="preserve"><value>Sign in</value></data>
+  <data name="Login_SigningIn" xml:space="preserve"><value>Signing in…</value></data>
+  <data name="Login_Failed" xml:space="preserve"><value>Login failed.</value></data>
+  <data name="Login_Title" xml:space="preserve"><value>Login</value></data>
+  <data name="Startup_SettingsMessage" xml:space="preserve"><value>The saved store settings could not be read. Choose the store connection again.&#10;&#10;{0}</value></data>
+  <data name="Startup_SettingsTitle" xml:space="preserve"><value>Store settings</value></data>
+  <data name="Startup_ProfileMessage" xml:space="preserve"><value>The selected store profile could not be opened.&#10;&#10;{0}</value></data>
+  <data name="Startup_AppTitle" xml:space="preserve"><value>Bike Store Desktop</value></data>
+  <data name="Startup_InvalidSettings" xml:space="preserve"><value>The settings file is empty or invalid.</value></data>
+  <data name="Nav_Overview" xml:space="preserve"><value>Overview</value></data>
+  <data name="Nav_OverviewTip" xml:space="preserve"><value>Daily operations and key figures</value></data>
+  <data name="Nav_Operations" xml:space="preserve"><value>OPERATIONS</value></data>
+  <data name="Nav_Inventory" xml:space="preserve"><value>Bicycles &amp; stock</value></data>
+  <data name="Nav_InventoryTip" xml:space="preserve"><value>Website-style bicycle, colour and stock management</value></data>
+  <data name="Nav_Sales" xml:space="preserve"><value>Sales &amp; invoices</value></data>
+  <data name="Nav_SalesTip" xml:space="preserve"><value>Create, print and review invoices</value></data>
+  <data name="Nav_Service" xml:space="preserve"><value>Service</value></data>
+  <data name="Nav_ServiceTip" xml:space="preserve"><value>Service jobs and status</value></data>
+  <data name="Nav_Administration" xml:space="preserve"><value>ADMINISTRATION</value></data>
+  <data name="Nav_Brands" xml:space="preserve"><value>Brands</value></data>
+  <data name="Nav_BrandsTip" xml:space="preserve"><value>Brand records and visibility</value></data>
+  <data name="Nav_StockMovements" xml:space="preserve"><value>Stock movements</value></data>
+  <data name="Nav_StockMovementsTip" xml:space="preserve"><value>Incoming and outgoing stock</value></data>
+  <data name="Nav_Reports" xml:space="preserve"><value>Reports</value></data>
+  <data name="Nav_ReportsTip" xml:space="preserve"><value>Sales, service and profit</value></data>
+  <data name="Nav_Users" xml:space="preserve"><value>Users</value></data>
+  <data name="Nav_UsersTip" xml:space="preserve"><value>Accounts and roles</value></data>
+  <data name="Nav_Activity" xml:space="preserve"><value>Activity</value></data>
+  <data name="Nav_ActivityTip" xml:space="preserve"><value>Audit trail</value></data>
+  <data name="Nav_SignOut" xml:space="preserve"><value>Sign out</value></data>
+  <data name="Nav_StoreSettings" xml:space="preserve"><value>Store settings</value></data>
+  <data name="Nav_WindowTitle" xml:space="preserve"><value>{0} — Desktop Admin</value></data>
+  <data name="Nav_PageInventoryTip" xml:space="preserve"><value>Manage website-style bike models, colour variants and local stock.</value></data>
+  <data name="Nav_PageSalesTip" xml:space="preserve"><value>Create multi-item invoices, record payments and print customer documents.</value></data>
+  <data name="Nav_PageServiceTip" xml:space="preserve"><value>Create service jobs, follow progress and print service documents.</value></data>
+  <data name="Nav_PageBrandsTip" xml:space="preserve"><value>Maintain the brand directory used by the catalogue.</value></data>
+  <data name="Nav_PageStockTip" xml:space="preserve"><value>Review every receipt, sale, adjustment and void restoration.</value></data>
+  <data name="Nav_PageReportsTip" xml:space="preserve"><value>Analyse sales, service income, gross profit and stock movement.</value></data>
+  <data name="Nav_PageUsersTip" xml:space="preserve"><value>Manage staff access, roles, status and password resets.</value></data>
+  <data name="Nav_PageActivityTip" xml:space="preserve"><value>Trace important actions back to the signed-in user.</value></data>
+  <data name="Nav_SignOutQuestion" xml:space="preserve"><value>Sign out of the desktop admin?</value></data>
+  <data name="Nav_RestartMessage" xml:space="preserve"><value>The app will restart to apply the new store profile.</value></data>
+  <data name="Inventory_Title" xml:space="preserve"><value>Inventory</value></data>
+  <data name="Inventory_Add" xml:space="preserve"><value>Add bicycle</value></data>
+  <data name="Inventory_Edit" xml:space="preserve"><value>Edit selected</value></data>
+  <data name="Inventory_Deactivate" xml:space="preserve"><value>Deactivate</value></data>
+  <data name="Inventory_Reactivate" xml:space="preserve"><value>Reactivate</value></data>
+  <data name="Inventory_Receive" xml:space="preserve"><value>Receive stock</value></data>
+  <data name="Inventory_Brand" xml:space="preserve"><value>Brand</value></data>
+  <data name="Inventory_Model" xml:space="preserve"><value>Model</value></data>
+  <data name="Inventory_Colours" xml:space="preserve"><value>Colour variants</value></data>
+  <data name="Inventory_TotalStock" xml:space="preserve"><value>Total stock</value></data>
+  <data name="Inventory_SellingPrice" xml:space="preserve"><value>Selling price</value></data>
+  <data name="Inventory_Active" xml:space="preserve"><value>Active</value></data>
+  <data name="Inventory_LoadFailed" xml:space="preserve"><value>Failed to load bike inventory: {0}</value></data>
+  <data name="Inventory_SelectBike" xml:space="preserve"><value>Select a bicycle first.</value></data>
+  <data name="Inventory_Added" xml:space="preserve"><value>Bicycle added with its colour stock.</value></data>
+  <data name="Inventory_NotSaved" xml:space="preserve"><value>Bicycle not saved</value></data>
+  <data name="Inventory_Updated" xml:space="preserve"><value>Bicycle and colour variants updated.</value></data>
+  <data name="Inventory_NotUpdated" xml:space="preserve"><value>Bicycle not updated</value></data>
+  <data name="Inventory_StockReceived" xml:space="preserve"><value>Stock received and movement recorded.</value></data>
+  <data name="Inventory_StockNotReceived" xml:space="preserve"><value>Stock not received</value></data>
+  <data name="Inventory_StatusQuestion" xml:space="preserve"><value>{0} {1} {2}?</value></data>
+  <data name="Inventory_StatusTitle" xml:space="preserve"><value>Catalogue status</value></data>
+  <data name="Inventory_StatusFailed" xml:space="preserve"><value>Status update failed</value></data>
+  <data name="Bike_AddTitle" xml:space="preserve"><value>Add bicycle</value></data>
+  <data name="Bike_EditTitle" xml:space="preserve"><value>Edit {0} {1}</value></data>
+  <data name="Bike_DetailsTab" xml:space="preserve"><value>Bicycle details</value></data>
+  <data name="Bike_ColoursTab" xml:space="preserve"><value>Colours and stock</value></data>
+  <data name="Bike_Id" xml:space="preserve"><value>Bike ID</value></data>
+  <data name="Bike_BrandRequired" xml:space="preserve"><value>Brand *</value></data>
+  <data name="Bike_ModelRequired" xml:space="preserve"><value>Model *</value></data>
+  <data name="Bike_Battery" xml:space="preserve"><value>Battery</value></data>
+  <data name="Bike_Motor" xml:space="preserve"><value>Motor</value></data>
+  <data name="Bike_TopSpeed" xml:space="preserve"><value>Top speed</value></data>
+  <data name="Bike_Range" xml:space="preserve"><value>Range</value></data>
+  <data name="Bike_MaxWeight" xml:space="preserve"><value>Max weight</value></data>
+  <data name="Bike_Safety" xml:space="preserve"><value>Safety</value></data>
+  <data name="Bike_MainImage" xml:space="preserve"><value>Main image</value></data>
+  <data name="Bike_Description" xml:space="preserve"><value>Description</value></data>
+  <data name="Bike_Visibility" xml:space="preserve"><value>Visibility</value></data>
+  <data name="Bike_Featured" xml:space="preserve"><value>Featured</value></data>
+  <data name="Bike_VariantHelp" xml:space="preserve"><value>Each colour has its own image and stock quantity. Changing a quantity creates a recorded stock movement.</value></data>
+  <data name="Bike_AddColour" xml:space="preserve"><value>Add colour</value></data>
+  <data name="Bike_RemoveSelected" xml:space="preserve"><value>Remove selected</value></data>
+  <data name="Bike_Save" xml:space="preserve"><value>Save bicycle</value></data>
+  <data name="Bike_ColourName" xml:space="preserve"><value>Colour name</value></data>
+  <data name="Bike_HexCode" xml:space="preserve"><value>Hex code</value></data>
+  <data name="Bike_ImagePath" xml:space="preserve"><value>Image path</value></data>
+  <data name="Bike_StockQuantity" xml:space="preserve"><value>Stock quantity</value></data>
+  <data name="Bike_SelectBrand" xml:space="preserve"><value>Select a brand.</value></data>
+  <data name="Bike_ModelRequiredMessage" xml:space="preserve"><value>Model name is required.</value></data>
+  <data name="Bike_InvalidStock" xml:space="preserve"><value>Invalid stock for {0}.</value></data>
+  <data name="Bike_AddColourMessage" xml:space="preserve"><value>Add at least one colour.</value></data>
+  <data name="Stock_ExistingNewColour" xml:space="preserve"><value>Existing/new colour</value></data>
+  <data name="Stock_NewColourName" xml:space="preserve"><value>New colour name</value></data>
+  <data name="Stock_ColourHex" xml:space="preserve"><value>Colour hex</value></data>
+  <data name="Stock_ColourImage" xml:space="preserve"><value>Colour image path</value></data>
+  <data name="Stock_QuantityReceived" xml:space="preserve"><value>Quantity received</value></data>
+  <data name="Stock_UnitCost" xml:space="preserve"><value>Unit purchase cost</value></data>
+  <data name="Stock_Online" xml:space="preserve"><value>Online stock</value></data>
+  <data name="Stock_OnlineHelp" xml:space="preserve"><value>Quantity is recorded by the Cloudflare store workflow.</value></data>
+  <data name="Stock_ReceivedAt" xml:space="preserve"><value>Received at</value></data>
+  <data name="Stock_Notes" xml:space="preserve"><value>Notes / reference</value></data>
+  <data name="Stock_After" xml:space="preserve"><value>Stock after receipt</value></data>
+  <data name="Stock_AddNewColour" xml:space="preserve"><value>+ Add new colour</value></data>
+  <data name="Stock_Summary" xml:space="preserve"><value>{0} + {1} = {2} units</value></data>
+  <data name="Stock_EnterColour" xml:space="preserve"><value>Enter the new colour name.</value></data>
+  <data name="Stock_EnterCost" xml:space="preserve"><value>Enter the unit purchase cost.</value></data>
+  <data name="Stock_Bicycle" xml:space="preserve"><value>Bicycle</value></data>
+  <data name="Stock_Choice" xml:space="preserve"><value>{0} — stock {1}</value></data>
+  <data name="Dashboard_NewInvoice" xml:space="preserve"><value>+ New invoice</value></data>
+  <data name="Dashboard_ReceiveStock" xml:space="preserve"><value>+ Receive stock</value></data>
+  <data name="Dashboard_NewService" xml:space="preserve"><value>+ New service</value></data>
+  <data name="Dashboard_Refresh" xml:space="preserve"><value>Refresh dashboard</value></data>
+  <data name="Dashboard_SalesChart" xml:space="preserve"><value>Sales — last 7 days</value></data>
+  <data name="Dashboard_StockChart" xml:space="preserve"><value>Stock movement — last 7 days</value></data>
+  <data name="Dashboard_RecentInvoices" xml:space="preserve"><value>Recent invoices</value></data>
+  <data name="Dashboard_OpenServices" xml:space="preserve"><value>Open services</value></data>
+  <data name="Dashboard_TodaysSales" xml:space="preserve"><value>Today's sales</value></data>
+  <data name="Dashboard_Invoices" xml:space="preserve"><value>Invoices</value></data>
+  <data name="Dashboard_StockUnits" xml:space="preserve"><value>Stock units</value></data>
+  <data name="Dashboard_LowStock" xml:space="preserve"><value>Low stock</value></data>
+  <data name="Dashboard_GrossProfit" xml:space="preserve"><value>Gross profit</value></data>
+  <data name="Dashboard_RefreshFailed" xml:space="preserve"><value>Dashboard could not be refreshed: {0}</value></data>
+  <data name="Dashboard_Title" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="Dashboard_Revenue" xml:space="preserve"><value>Revenue</value></data>
+  <data name="Dashboard_In" xml:space="preserve"><value>In</value></data>
+  <data name="Dashboard_Out" xml:space="preserve"><value>Out</value></data>
+  <data name="Online_Connected" xml:space="preserve"><value>Connected to {0}</value></data>
+  <data name="Online_Status" xml:space="preserve"><value>ONLINE · {0}</value></data>
+  <data name="Online_Explanation" xml:space="preserve"><value>Catalogue and colour-stock changes on this screen are sent through the authenticated Cloudflare API. Local-only invoice, service, report, user and audit screens are hidden so cloud data can never be mixed with a local SQLite file.</value></data>
+  <data name="Payment_CASH" xml:space="preserve"><value>Cash</value></data>
+  <data name="Payment_BANK_TRANSFER" xml:space="preserve"><value>Bank transfer</value></data>
+  <data name="Payment_OTHER" xml:space="preserve"><value>Other</value></data>
+  <data name="Invoice_Window" xml:space="preserve"><value>Bike Store - Invoices - {0} ({1})</value></data>
+  <data name="Invoice_NewTab" xml:space="preserve"><value>New invoice</value></data>
+  <data name="Invoice_HistoryTab" xml:space="preserve"><value>Invoice history</value></data>
+  <data name="Invoice_CustomerRequired" xml:space="preserve"><value>Customer *</value></data>
+  <data name="Invoice_Customer" xml:space="preserve"><value>Customer</value></data>
+  <data name="Invoice_Phone" xml:space="preserve"><value>Phone</value></data>
+  <data name="Invoice_Address" xml:space="preserve"><value>Address</value></data>
+  <data name="Invoice_Payment" xml:space="preserve"><value>Payment</value></data>
+  <data name="Invoice_Bank" xml:space="preserve"><value>Bank</value></data>
+  <data name="Invoice_Notes" xml:space="preserve"><value>Notes</value></data>
+  <data name="Invoice_SelectedBike" xml:space="preserve"><value>Selected bicycle</value></data>
+  <data name="Invoice_Quantity" xml:space="preserve"><value>Quantity</value></data>
+  <data name="Invoice_UnitPrice" xml:space="preserve"><value>Unit selling price</value></data>
+  <data name="Invoice_FrameNumbers" xml:space="preserve"><value>Frame numbers (one per line, optional)</value></data>
+  <data name="Invoice_AddItem" xml:space="preserve"><value>Add item</value></data>
+  <data name="Invoice_RemoveSelected" xml:space="preserve"><value>Remove selected</value></data>
+  <data name="Invoice_SavePrint" xml:space="preserve"><value>Save and print invoice</value></data>
+  <data name="Invoice_Save" xml:space="preserve"><value>Save invoice</value></data>
+  <data name="Invoice_Print" xml:space="preserve"><value>Print invoice</value></data>
+  <data name="Invoice_EditDetails" xml:space="preserve"><value>Edit details</value></data>
+  <data name="Invoice_VoidRestore" xml:space="preserve"><value>Void and restore stock</value></data>
+  <data name="Invoice_Delete" xml:space="preserve"><value>Delete invoice</value></data>
+  <data name="Invoice_LoadBikesFailed" xml:space="preserve"><value>Bicycles could not be loaded</value></data>
+  <data name="Invoice_TotalRevenue" xml:space="preserve"><value>Total revenue</value></data>
+  <data name="Invoice_ActiveInvoices" xml:space="preserve"><value>Active invoices</value></data>
+  <data name="Invoice_Voided" xml:space="preserve"><value>Voided</value></data>
+  <data name="Invoice_HistoryFailed" xml:space="preserve"><value>Invoice history could not be loaded</value></data>
+  <data name="Invoice_UpdateFailed" xml:space="preserve"><value>Invoice update failed</value></data>
+  <data name="Invoice_DeleteRecord" xml:space="preserve"><value>Delete invoice record</value></data>
+  <data name="Invoice_DeleteReason" xml:space="preserve"><value>Reason for permanent record deletion:</value></data>
+  <data name="Invoice_AdminCorrection" xml:space="preserve"><value>Administrative correction</value></data>
+  <data name="Invoice_DeleteQuestion" xml:space="preserve"><value>This removes the invoice record after restoring stock. Continue?</value></data>
+  <data name="Invoice_DeleteFailed" xml:space="preserve"><value>Delete failed</value></data>
+  <data name="Invoice_SelectBike" xml:space="preserve"><value>Select an available bicycle first.</value></data>
+  <data name="Invoice_Available" xml:space="preserve"><value>Only {0} more unit(s) are available.</value></data>
+  <data name="Invoice_FrameLimit" xml:space="preserve"><value>Frame-number count cannot exceed item quantity.</value></data>
+  <data name="Invoice_NotSaved" xml:space="preserve"><value>Invoice not saved</value></data>
+  <data name="Invoice_Saved" xml:space="preserve"><value>Invoice {0} saved.</value></data>
+  <data name="Invoice_SavedTitle" xml:space="preserve"><value>Invoice saved</value></data>
+  <data name="Invoice_ReloadFailed" xml:space="preserve"><value>The invoice was saved, but it could not be reloaded.&#10;&#10;{0}</value></data>
+  <data name="Invoice_PrintPreviewFailed" xml:space="preserve"><value>The invoice was saved, but print preview could not be opened.&#10;&#10;{0}</value></data>
+  <data name="Invoice_PrintPreview" xml:space="preserve"><value>Print preview</value></data>
+  <data name="Invoice_Void" xml:space="preserve"><value>Void invoice</value></data>
+  <data name="Invoice_VoidReason" xml:space="preserve"><value>Reason for voiding this invoice:</value></data>
+  <data name="Invoice_CustomerCancellation" xml:space="preserve"><value>Customer cancellation</value></data>
+  <data name="Invoice_VoidQuestion" xml:space="preserve"><value>Void this invoice and restore all stock?</value></data>
+  <data name="Invoice_ConfirmVoid" xml:space="preserve"><value>Confirm void</value></data>
+  <data name="Invoice_VoidFailed" xml:space="preserve"><value>Void failed</value></data>
+  <data name="Invoice_PrintFailed" xml:space="preserve"><value>Invoice could not be printed</value></data>
+  <data name="Invoice_SelectInvoice" xml:space="preserve"><value>Select an invoice first.</value></data>
+  <data name="Invoice_Total" xml:space="preserve"><value>Total: {0}</value></data>
+  <data name="Invoice_EditTitle" xml:space="preserve"><value>Edit {0}</value></data>
+  <data name="Invoice_CustomerNameRequired" xml:space="preserve"><value>Customer name is required.</value></data>
+  <data name="Print_Date" xml:space="preserve"><value>Date: {0}</value></data>
+  <data name="Print_CustomerPhone" xml:space="preserve"><value>Customer: {0}   Phone: {1}</value></data>
+  <data name="Print_Address" xml:space="preserve"><value>Address: {0}</value></data>
+  <data name="Print_FrameNumber" xml:space="preserve"><value>Frame no.: {0}</value></data>
+  <data name="Print_Total" xml:space="preserve"><value>TOTAL</value></data>
+  <data name="Print_Payment" xml:space="preserve"><value>Payment: {0} {1}</value></data>
+  <data name="Print_CreatedStatus" xml:space="preserve"><value>Created by: {0}    Status: {1}</value></data>
+  <data name="Service_Window" xml:space="preserve"><value>Bike Store - Service - {0} ({1})</value></data>
+  <data name="Service_NewTab" xml:space="preserve"><value>New service</value></data>
+  <data name="Service_HistoryTab" xml:space="preserve"><value>Service history</value></data>
+  <data name="Service_CustomerRequired" xml:space="preserve"><value>Customer *</value></data>
+  <data name="Service_Phone" xml:space="preserve"><value>Phone</value></data>
+  <data name="Service_Address" xml:space="preserve"><value>Address</value></data>
+  <data name="Service_BrandRequired" xml:space="preserve"><value>Brand *</value></data>
+  <data name="Service_ModelRequired" xml:space="preserve"><value>Type/model *</value></data>
+  <data name="Service_Colour" xml:space="preserve"><value>Colour</value></data>
+  <data name="Service_TypeRequired" xml:space="preserve"><value>Service type *</value></data>
+  <data name="Service_Cost" xml:space="preserve"><value>Service cost</value></data>
+  <data name="Service_Notes" xml:space="preserve"><value>Notes</value></data>
+  <data name="Service_SavePrint" xml:space="preserve"><value>Save and print</value></data>
+  <data name="Service_Save" xml:space="preserve"><value>Save service</value></data>
+  <data name="Service_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Service_Print" xml:space="preserve"><value>Print service job</value></data>
+  <data name="Service_UpdateStatus" xml:space="preserve"><value>Update status</value></data>
+  <data name="Service_EditDetails" xml:space="preserve"><value>Edit details</value></data>
+  <data name="Service_Delete" xml:space="preserve"><value>Delete service job</value></data>
+  <data name="Service_RequiredMessage" xml:space="preserve"><value>Customer, brand, model, and service type are required.</value></data>
+  <data name="Service_NotSaved" xml:space="preserve"><value>Service not saved</value></data>
+  <data name="Service_Saved" xml:space="preserve"><value>Service {0} saved.</value></data>
+  <data name="Service_PrintAfterSaveFailed" xml:space="preserve"><value>The service job was saved, but print preview could not be opened.&#10;&#10;{0}</value></data>
+  <data name="Service_HistoryFailed" xml:space="preserve"><value>Service history could not be loaded</value></data>
+  <data name="Service_StatusPrompt" xml:space="preserve"><value>Enter {0}, {1}, {2}, or {3}:</value></data>
+  <data name="Service_InvalidStatus" xml:space="preserve"><value>Invalid service status.</value></data>
+  <data name="Service_StatusUpdateFailed" xml:space="preserve"><value>Service status could not be updated</value></data>
+  <data name="Service_SelectFirst" xml:space="preserve"><value>Select a service first.</value></data>
+  <data name="Service_UpdateFailed" xml:space="preserve"><value>Service update failed</value></data>
+  <data name="Service_JobUpdateFailed" xml:space="preserve"><value>Service job could not be updated</value></data>
+  <data name="Service_DeleteRecord" xml:space="preserve"><value>Delete service record</value></data>
+  <data name="Service_DeleteReason" xml:space="preserve"><value>Reason for deletion:</value></data>
+  <data name="Service_DeleteQuestion" xml:space="preserve"><value>Permanently delete this service record?</value></data>
+  <data name="Service_DeleteTitle" xml:space="preserve"><value>Delete service</value></data>
+  <data name="Service_DeleteFailed" xml:space="preserve"><value>Delete failed</value></data>
+  <data name="Service_PrintFailed" xml:space="preserve"><value>Service job could not be printed</value></data>
+  <data name="Service_EditTitle" xml:space="preserve"><value>Edit service details</value></data>
+  <data name="Service_CustomerBrandRequired" xml:space="preserve"><value>Customer, brand, model and service type are required.</value></data>
+  <data name="Print_ServiceTitle" xml:space="preserve"><value>ELECTRIC BICYCLE SERVICE FORM</value></data>
+  <data name="Print_Number" xml:space="preserve"><value>Number: {0}</value></data>
+  <data name="Print_Phone" xml:space="preserve"><value>Phone: {0}</value></data>
+  <data name="Print_Bicycle" xml:space="preserve"><value>Bicycle: {0} {1} {2}</value></data>
+  <data name="Print_ServiceType" xml:space="preserve"><value>Service type: {0}</value></data>
+  <data name="Print_Status" xml:space="preserve"><value>Status: {0}</value></data>
+  <data name="Print_Cost" xml:space="preserve"><value>Cost: {0}</value></data>
+  <data name="Print_Notes" xml:space="preserve"><value>Notes: {0}</value></data>
+  <data name="Print_Technician" xml:space="preserve"><value>Technician / Staff</value></data>
+  <data name="Print_Customer" xml:space="preserve"><value>Customer</value></data>
+  <data name="Print_CustomerValue" xml:space="preserve"><value>Customer: {0}</value></data>
+  <data name="Admin_AccessRequired" xml:space="preserve"><value>Admin access required.</value></data>
+  <data name="Admin_Window" xml:space="preserve"><value>Bike Store - Local Admin - {0} (ADMIN)</value></data>
+  <data name="Admin_BrandsTab" xml:space="preserve"><value>Brands</value></data>
+  <data name="Admin_AddBrand" xml:space="preserve"><value>Add brand</value></data>
+  <data name="Admin_RenameSelected" xml:space="preserve"><value>Rename selected</value></data>
+  <data name="Admin_DeactivateBrand" xml:space="preserve"><value>Deactivate brand</value></data>
+  <data name="Admin_ActivateBrand" xml:space="preserve"><value>Activate brand</value></data>
+  <data name="Admin_AddBrandFailed" xml:space="preserve"><value>Brand could not be added</value></data>
+  <data name="Admin_RenameBrandFailed" xml:space="preserve"><value>Brand could not be renamed</value></data>
+  <data name="Admin_BrandStatusFailed" xml:space="preserve"><value>Brand status could not be changed</value></data>
+  <data name="Admin_StockTab" xml:space="preserve"><value>Stock movements</value></data>
+  <data name="Admin_StockHelp" xml:space="preserve"><value>Stock receipts, invoice sales, and void restorations are recorded automatically.</value></data>
+  <data name="Admin_ReportsTab" xml:space="preserve"><value>Reports</value></data>
+  <data name="Admin_RefreshReport" xml:space="preserve"><value>Refresh report</value></data>
+  <data name="Admin_PrintReport" xml:space="preserve"><value>Print report</value></data>
+  <data name="Admin_ActivityTab" xml:space="preserve"><value>Activity log</value></data>
+  <data name="Admin_BrandsLoadFailed" xml:space="preserve"><value>Brands could not be loaded</value></data>
+  <data name="Admin_MovementsLoadFailed" xml:space="preserve"><value>Stock movements could not be loaded</value></data>
+  <data name="Admin_ActivityLoadFailed" xml:space="preserve"><value>Activity could not be loaded</value></data>
+  <data name="Admin_ReportGenerateFailed" xml:space="preserve"><value>Report could not be generated</value></data>
+  <data name="Admin_DateInvalid" xml:space="preserve"><value>The end date must be on or after the start date.</value></data>
+  <data name="Admin_ReportSummary" xml:space="preserve"><value>Period: {0} – {1}    Sales: {2}    Service: {3}    Gross profit: {4}    Stock in/out: {5}/{6}</value></data>
+  <data name="Admin_BrandName" xml:space="preserve"><value>Brand name:</value></data>
+  <data name="Admin_RenameBrand" xml:space="preserve"><value>Rename brand</value></data>
+  <data name="Admin_NewBrandName" xml:space="preserve"><value>New brand name:</value></data>
+  <data name="Admin_SelectBrand" xml:space="preserve"><value>Select a brand first.</value></data>
+  <data name="Admin_BrandUpdateFailed" xml:space="preserve"><value>Brand update failed</value></data>
+  <data name="Admin_ReportDocument" xml:space="preserve"><value>Bike Store Report</value></data>
+  <data name="Admin_ReportLine" xml:space="preserve"><value>{0}    Sales: {1}    Service: {2}    Total: {3}</value></data>
+  <data name="Admin_ReportPrintFailed" xml:space="preserve"><value>Report could not be printed</value></data>
+  <data name="Common_PermissionDenied" xml:space="preserve"><value>Permission denied</value></data>
+  <data name="Common_Blocked" xml:space="preserve"><value>Blocked</value></data>
+  <data name="Backend_Demo" xml:space="preserve"><value>Demo · Local</value></data>
+  <data name="Backend_Local" xml:space="preserve"><value>Local database</value></data>
+  <data name="Backend_Online" xml:space="preserve"><value>Online · Cloudflare</value></data>
+  <data name="Movement_STOCK_IN" xml:space="preserve"><value>Stock in</value></data>
+  <data name="Movement_SALE" xml:space="preserve"><value>Sale</value></data>
+  <data name="Movement_VOID_RESTORE" xml:space="preserve"><value>Void restoration</value></data>
+  <data name="Movement_CORRECTION" xml:space="preserve"><value>Correction</value></data>
+  <data name="Grid_id" xml:space="preserve"><value>ID</value></data>
+  <data name="Grid_username" xml:space="preserve"><value>Username</value></data>
+  <data name="Grid_role" xml:space="preserve"><value>Role</value></data>
+  <data name="Grid_is_active" xml:space="preserve"><value>Active</value></data>
+  <data name="Grid_created_at" xml:space="preserve"><value>Created</value></data>
+  <data name="Grid_updated_at" xml:space="preserve"><value>Updated</value></data>
+  <data name="Grid_brand" xml:space="preserve"><value>Brand</value></data>
+  <data name="Grid_products" xml:space="preserve"><value>Products</value></data>
+  <data name="Grid_sort_order" xml:space="preserve"><value>Order</value></data>
+  <data name="Grid_movement_type" xml:space="preserve"><value>Movement</value></data>
+  <data name="Grid_type" xml:space="preserve"><value>Model</value></data>
+  <data name="Grid_color" xml:space="preserve"><value>Colour</value></data>
+  <data name="Grid_quantity_change" xml:space="preserve"><value>Change</value></data>
+  <data name="Grid_quantity_before" xml:space="preserve"><value>Before</value></data>
+  <data name="Grid_quantity_after" xml:space="preserve"><value>After</value></data>
+  <data name="Grid_note" xml:space="preserve"><value>Note</value></data>
+  <data name="Grid_created_by" xml:space="preserve"><value>Created by</value></data>
+  <data name="Grid_date" xml:space="preserve"><value>Date</value></data>
+  <data name="Grid_sales" xml:space="preserve"><value>Sales</value></data>
+  <data name="Grid_service" xml:space="preserve"><value>Service</value></data>
+  <data name="Grid_total" xml:space="preserve"><value>Total</value></data>
+  <data name="Grid_section" xml:space="preserve"><value>Section</value></data>
+  <data name="Grid_label" xml:space="preserve"><value>Label</value></data>
+  <data name="Grid_value" xml:space="preserve"><value>Value</value></data>
+  <data name="Grid_actor" xml:space="preserve"><value>Actor</value></data>
+  <data name="Grid_action" xml:space="preserve"><value>Action</value></data>
+  <data name="Grid_entity" xml:space="preserve"><value>Entity</value></data>
+  <data name="Grid_entity_id" xml:space="preserve"><value>Entity ID</value></data>
+  <data name="Grid_detail" xml:space="preserve"><value>Detail</value></data>
+  <data name="User_Title" xml:space="preserve"><value>User management</value></data>
+  <data name="User_AccessDenied" xml:space="preserve"><value>Access denied. Admin only.</value></data>
+  <data name="User_Add" xml:space="preserve"><value>Add user</value></data>
+  <data name="User_ResetPassword" xml:space="preserve"><value>Reset password</value></data>
+  <data name="User_Enable" xml:space="preserve"><value>Enable user</value></data>
+  <data name="User_Disable" xml:space="preserve"><value>Disable user</value></data>
+  <data name="User_MakeStaff" xml:space="preserve"><value>Make staff</value></data>
+  <data name="User_MakeAdmin" xml:space="preserve"><value>Make administrator</value></data>
+  <data name="User_Delete" xml:space="preserve"><value>Delete user</value></data>
+  <data name="User_LoadFailed" xml:space="preserve"><value>Failed to load users: {0}</value></data>
+  <data name="User_UsernamePrompt" xml:space="preserve"><value>Username (e.g. cashier1):</value></data>
+  <data name="User_PasswordPrompt" xml:space="preserve"><value>Password:</value></data>
+  <data name="User_RolePrompt" xml:space="preserve"><value>Role (Administrator or Staff):</value></data>
+  <data name="User_InvalidRoleMessage" xml:space="preserve"><value>Role must be Administrator or Staff.</value></data>
+  <data name="User_InvalidRoleTitle" xml:space="preserve"><value>Invalid role</value></data>
+  <data name="User_Created" xml:space="preserve"><value>User created.</value></data>
+  <data name="User_CreateFailed" xml:space="preserve"><value>Create user failed: {0}</value></data>
+  <data name="User_SelectFirst" xml:space="preserve"><value>Select a user first.</value></data>
+  <data name="User_NewPasswordPrompt" xml:space="preserve"><value>New password for '{0}':</value></data>
+  <data name="User_PasswordReset" xml:space="preserve"><value>Password reset.</value></data>
+  <data name="User_ResetFailed" xml:space="preserve"><value>Reset failed: {0}</value></data>
+  <data name="User_CannotDisableSelf" xml:space="preserve"><value>You cannot disable the currently signed-in user.</value></data>
+  <data name="User_UpdateFailed" xml:space="preserve"><value>Update failed: {0}</value></data>
+  <data name="User_CannotDemoteSelf" xml:space="preserve"><value>You cannot demote yourself while logged in.</value></data>
+  <data name="User_RoleFailed" xml:space="preserve"><value>Role change failed: {0}</value></data>
+  <data name="User_CannotDeleteSelf" xml:space="preserve"><value>You cannot delete the currently signed-in user.</value></data>
+  <data name="User_DeleteQuestion" xml:space="preserve"><value>Delete user '{0}'?</value></data>
+  <data name="User_ConfirmDelete" xml:space="preserve"><value>Confirm delete</value></data>
+  <data name="User_DeleteFailed" xml:space="preserve"><value>Delete failed: {0}</value></data>
+  <data name="User_Details" xml:space="preserve"><value>User details</value></data>
+  <data name="Error_OnlineUrlHttps" xml:space="preserve"><value>Online store URL must be a valid HTTPS address.</value></data>
+  <data name="Error_NoSessionToken" xml:space="preserve"><value>The server did not return a session token.</value></data>
+  <data name="Error_ServerHttp" xml:space="preserve"><value>Server returned HTTP {0}.</value></data>
+  <data name="Error_OnlineSignInFirst" xml:space="preserve"><value>Sign in to the online store first.</value></data>
+  <data name="Error_InvalidServerResponse" xml:space="preserve"><value>The server returned an empty or invalid response.</value></data>
+  <data name="Error_PasswordEmpty" xml:space="preserve"><value>Password cannot be empty.</value></data>
+  <data name="Error_DatabasePathRequired" xml:space="preserve"><value>Database path is required.</value></data>
+  <data name="Error_UserNotFound" xml:space="preserve"><value>User not found.</value></data>
+  <data name="Error_CredentialsRequired" xml:space="preserve"><value>Username and password are required.</value></data>
+  <data name="Error_InvalidCredentials" xml:space="preserve"><value>Invalid username or password.</value></data>
+  <data name="Error_UserDisabled" xml:space="preserve"><value>This user is disabled.</value></data>
+  <data name="Error_LoginFailedDetail" xml:space="preserve"><value>Login failed: {0}</value></data>
+  <data name="Error_UsernameRequired" xml:space="preserve"><value>Username required.</value></data>
+  <data name="Error_PasswordRequired" xml:space="preserve"><value>Password required.</value></data>
+  <data name="Error_RoleCode" xml:space="preserve"><value>Role must be ADMIN or USER.</value></data>
+  <data name="Error_SignInBeforeInvoice" xml:space="preserve"><value>Sign in before creating an invoice.</value></data>
+  <data name="Error_CustomerRequired" xml:space="preserve"><value>Customer name is required.</value></data>
+  <data name="Error_InvoiceItemRequired" xml:space="preserve"><value>Add at least one invoice item.</value></data>
+  <data name="Error_InvoiceItemPositive" xml:space="preserve"><value>Every item requires a positive quantity and unit price.</value></data>
+  <data name="Error_AdminVoidInvoice" xml:space="preserve"><value>Admin access is required to void an invoice.</value></data>
+  <data name="Error_VoidReasonRequired" xml:space="preserve"><value>A void reason is required.</value></data>
+  <data name="Error_InvoiceNotFound" xml:space="preserve"><value>Invoice not found.</value></data>
+  <data name="Error_InvoiceAlreadyVoid" xml:space="preserve"><value>Invoice is already void.</value></data>
+  <data name="Error_AdminEditInvoice" xml:space="preserve"><value>Admin access is required to edit an invoice.</value></data>
+  <data name="Error_AdminDeleteInvoice" xml:space="preserve"><value>Admin access is required to delete an invoice record.</value></data>
+  <data name="Error_BikeIdExists" xml:space="preserve"><value>Bike ID already exists.</value></data>
+  <data name="Error_BikeNotFound" xml:space="preserve"><value>Bike not found.</value></data>
+  <data name="Error_AdminCatalogueStatus" xml:space="preserve"><value>Only an administrator can change catalogue status.</value></data>
+  <data name="Error_QuantityMinimum" xml:space="preserve"><value>Quantity must be at least 1.</value></data>
+  <data name="Error_UnitCostPositive" xml:space="preserve"><value>Unit cost must be greater than 0.</value></data>
+  <data name="Error_ColourNameRequired" xml:space="preserve"><value>New colour name is required.</value></data>
+  <data name="Error_BrandModelRequired" xml:space="preserve"><value>Brand and model are required.</value></data>
+  <data name="Error_ColourRequired" xml:space="preserve"><value>At least one colour is required.</value></data>
+  <data name="Error_ColourUnique" xml:space="preserve"><value>Colour names must be unique within a bike.</value></data>
+  <data name="Error_StockCorrectionExceeds" xml:space="preserve"><value>Stock correction exceeds available stock.</value></data>
+  <data name="Breakdown_PAYMENT" xml:space="preserve"><value>Payment</value></data>
+  <data name="Breakdown_TOP_BRAND" xml:space="preserve"><value>Top brand</value></data>
+  <data name="Breakdown_TOP_MODEL" xml:space="preserve"><value>Top model</value></data>
+  <data name="Breakdown_TOP_COLOUR" xml:space="preserve"><value>Top colour</value></data>
+  <data name="Payment_UNSPECIFIED" xml:space="preserve"><value>Unspecified</value></data>
+  <data name="Payment_NO_COLOUR" xml:space="preserve"><value>No colour</value></data>
+  <data name="Service_Title" xml:space="preserve"><value>Service</value></data>
+  <data name="Report_Header" xml:space="preserve"><value>{0} — BUSINESS REPORT</value></data>
+  <data name="Error_InsufficientStock" xml:space="preserve"><value>Insufficient stock for {0}. Available: {1}.</value></data>
+  <data name="Error_FifoAllocation" xml:space="preserve"><value>FIFO allocation failed for {0}.</value></data>
+  <data name="Setup_DatabaseFilter" xml:space="preserve"><value>SQLite database (*.db)|*.db|All files (*.*)|*.*</value></data>
+  <data name="Grid_name" xml:space="preserve"><value>Name</value></data>
+  <data name="Grid_sell_price" xml:space="preserve"><value>Selling price</value></data>
+  <data name="Grid_available" xml:space="preserve"><value>Available</value></data>
+  <data name="Grid_invoice_number" xml:space="preserve"><value>Invoice number</value></data>
+  <data name="Grid_customer_name" xml:space="preserve"><value>Customer</value></data>
+  <data name="Grid_customer_phone" xml:space="preserve"><value>Phone</value></data>
+  <data name="Grid_customer_address" xml:space="preserve"><value>Address</value></data>
+  <data name="Grid_payment_method" xml:space="preserve"><value>Payment</value></data>
+  <data name="Grid_payment_bank" xml:space="preserve"><value>Bank</value></data>
+  <data name="Grid_status" xml:space="preserve"><value>Status</value></data>
+  <data name="Grid_created_by_username" xml:space="preserve"><value>Created by</value></data>
+  <data name="Grid_product_id" xml:space="preserve"><value>Product ID</value></data>
+  <data name="Grid_quantity" xml:space="preserve"><value>Quantity</value></data>
+  <data name="Grid_unit_price" xml:space="preserve"><value>Unit price</value></data>
+  <data name="Grid_line_total" xml:space="preserve"><value>Line total</value></data>
+  <data name="Grid_frame_numbers" xml:space="preserve"><value>Frame numbers</value></data>
+  <data name="Grid_service_number" xml:space="preserve"><value>Service number</value></data>
+  <data name="Grid_service_type" xml:space="preserve"><value>Service type</value></data>
+  <data name="Grid_service_status" xml:space="preserve"><value>Status</value></data>
+  <data name="Grid_service_cost" xml:space="preserve"><value>Cost</value></data>
+  <data name="Grid_notes" xml:space="preserve"><value>Notes</value></data>
+  <data name="Grid_invoice" xml:space="preserve"><value>Invoice</value></data>
+  <data name="Grid_customer" xml:space="preserve"><value>Customer</value></data>
+  <data name="Grid_payment" xml:space="preserve"><value>Payment</value></data>
+  <data name="Grid_created" xml:space="preserve"><value>Created</value></data>
+  <data name="Grid_bicycle" xml:space="preserve"><value>Bicycle</value></data>
+  <data name="Grid_battery" xml:space="preserve"><value>Battery</value></data>
+  <data name="Grid_motor" xml:space="preserve"><value>Motor</value></data>
+  <data name="Grid_topspeed" xml:space="preserve"><value>Top speed</value></data>
+  <data name="Grid_range" xml:space="preserve"><value>Range</value></data>
+  <data name="Grid_maxweight" xml:space="preserve"><value>Maximum weight</value></data>
+  <data name="Grid_safety" xml:space="preserve"><value>Safety</value></data>
+  <data name="Grid_description" xml:space="preserve"><value>Description</value></data>
+  <data name="Grid_price" xml:space="preserve"><value>Price</value></data>
+  <data name="Grid_featured" xml:space="preserve"><value>Featured</value></data>
+  <data name="Grid_instock" xml:space="preserve"><value>Active</value></data>
+  <data name="Grid_stockqty" xml:space="preserve"><value>Stock</value></data>
+</root>
