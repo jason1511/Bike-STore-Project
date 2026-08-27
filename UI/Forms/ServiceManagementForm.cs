@@ -2,7 +2,6 @@ using System;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Printing;
-using System.Globalization;
 using System.Windows.Forms;
 
 namespace Bike_STore_Project
@@ -37,12 +36,10 @@ namespace Bike_STore_Project
             _type.CharacterCasing = CharacterCasing.Upper;
             _color.CharacterCasing = CharacterCasing.Upper;
 
-            var menu = new MainMenuControl { Dock = DockStyle.Top };
             var tabs = new TabControl { Dock = DockStyle.Fill };
             tabs.TabPages.Add(BuildEntry());
             tabs.TabPages.Add(BuildHistory());
             Controls.Add(tabs);
-            Controls.Add(menu);
             Load += (_, __) => LoadHistory();
             _search.TextChanged += (_, __) => LoadHistory();
         }

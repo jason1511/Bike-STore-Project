@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Bike_STore_Project
 {
-    public sealed record LoginResult(bool Success, int UserId, string Username, string Role, string Error = "", string Token = "");
+    public sealed record LoginResult(bool Success, int UserId, string Username, string Role, string Error = "");
     public sealed record StoreBrand(string Id, string Name, bool IsActive = true);
 
     public interface IStoreBackend : IDisposable
@@ -129,7 +129,7 @@ namespace Bike_STore_Project
             if (string.IsNullOrWhiteSpace(_token))
                 return new LoginResult(false, 0, username, "USER", "The server did not return a session token.");
             return new LoginResult(true, StableUserId(envelope.Username ?? username), envelope.Username ?? username,
-                NormalizeRole(envelope.Role), Token: _token);
+                NormalizeRole(envelope.Role));
         }
 
         public async Task TestConnectionAsync(CancellationToken cancellationToken = default)

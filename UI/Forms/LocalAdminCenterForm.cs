@@ -3,7 +3,6 @@ using System;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Printing;
-using System.Globalization;
 using System.Windows.Forms;
 
 namespace Bike_STore_Project
@@ -39,7 +38,6 @@ namespace Bike_STore_Project
             _from.Value = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
             _to.Value = DateTime.Today;
 
-            var menu = new MainMenuControl { Dock = DockStyle.Top };
             if (singleSection == null)
             {
                 var tabs = new TabControl { Dock = DockStyle.Fill };
@@ -66,7 +64,6 @@ namespace Bike_STore_Project
                     Controls.Add(content);
                 }
             }
-            Controls.Add(menu);
             Load += (_, __) => { LoadBrands(); LoadMovements(); LoadActivity(); GenerateReport(); };
         }
 

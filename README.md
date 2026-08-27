@@ -165,6 +165,24 @@ New Demo and Local databases create the starter administrator shown above. Chang
 - Cloudflare Workers/Pages Functions and D1 for the CV Niaga Bersama deployment
 - GitHub Actions using `windows-latest`
 
+## Repository layout
+
+```text
+Backends/       Local SQLite and Cloudflare API backend implementations
+Configuration/ Store profiles, paths and persisted non-secret settings
+Core/          Session, permissions, password hashing and shared formatting
+Data/
+  Models/      Invoice, user and catalogue data models
+  Repositories SQLite repositories and transaction logic
+UI/
+  Controls/    Dashboard, online overview and shared theme components
+  Dialogs/     Bicycle and stock workflow dialogs
+  Forms/       Login, setup and administration screens
+Program.cs     Application startup and backend selection
+```
+
+The current dashboard is the only application shell. Superseded catalogue, product-editor, sales, service-log and transaction-log forms have been removed instead of being kept as an unused second UI path.
+
 ## Project status
 
 - Demo mode: available

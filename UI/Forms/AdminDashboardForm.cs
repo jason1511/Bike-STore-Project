@@ -171,7 +171,7 @@ namespace Bike_STore_Project
         {
             foreach (Control control in root.Controls.Cast<Control>().ToArray())
             {
-                if (control is MainMenuControl || control is MenuStrip ||
+                if (control is MenuStrip ||
                     (control is Button button &&
                      (button.Text.Equals("Close", StringComparison.OrdinalIgnoreCase) ||
                       button.Text.Equals("Logout", StringComparison.OrdinalIgnoreCase))))

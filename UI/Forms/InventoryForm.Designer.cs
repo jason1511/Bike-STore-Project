@@ -23,12 +23,10 @@
             btnAdd = new Button();
             btnEdit = new Button();
             btnDelete = new Button();
-            mainMenuControl1 = new MainMenuControl();
             btnReceiveStock = new Button();
             tableLayoutPanel1 = new TableLayoutPanel();
             tlpSearchRow = new TableLayoutPanel();
             flpActions = new FlowLayoutPanel();
-            btnLogout = new Button();
             ((System.ComponentModel.ISupportInitialize)dgvProducts).BeginInit();
             tableLayoutPanel1.SuspendLayout();
             tlpSearchRow.SuspendLayout();
@@ -108,15 +106,6 @@
             btnDelete.Text = "DELETE";
             btnDelete.UseVisualStyleBackColor = true;
             // 
-            // mainMenuControl1
-            // 
-            mainMenuControl1.Dock = DockStyle.Top;
-            mainMenuControl1.Location = new Point(0, 0);
-            mainMenuControl1.Margin = new Padding(5);
-            mainMenuControl1.Name = "mainMenuControl1";
-            mainMenuControl1.Size = new Size(1000, 40);
-            mainMenuControl1.TabIndex = 0;
-            // 
             // btnReceiveStock
             // 
             btnReceiveStock.Location = new Point(378, 0);
@@ -170,7 +159,6 @@
             flpActions.Controls.Add(btnEdit);
             flpActions.Controls.Add(btnDelete);
             flpActions.Controls.Add(btnReceiveStock);
-            flpActions.Controls.Add(btnLogout);
             flpActions.Dock = DockStyle.Fill;
             flpActions.Location = new Point(12, 124);
             flpActions.Margin = new Padding(0, 6, 0, 6);
@@ -178,22 +166,12 @@
             flpActions.Size = new Size(976, 36);
             flpActions.TabIndex = 3;
             // 
-            // btnLogout
-            // 
-            btnLogout.Location = new Point(538, 3);
-            btnLogout.Name = "btnLogout";
-            btnLogout.Size = new Size(94, 29);
-            btnLogout.TabIndex = 8;
-            btnLogout.Text = "Logout";
-            btnLogout.UseVisualStyleBackColor = true;
-            // 
             // InventoryForm
             // 
             AutoScaleDimensions = new SizeF(120F, 120F);
             AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(1000, 562);
             Controls.Add(tableLayoutPanel1);
-            Controls.Add(mainMenuControl1);
             MinimumSize = new Size(900, 520);
             Name = "InventoryForm";
             StartPosition = FormStartPosition.CenterScreen;
@@ -216,12 +194,10 @@
         private Button btnAdd;
         private Button btnEdit;
         private Button btnDelete;
-        private MainMenuControl mainMenuControl1;
         private Button btnReceiveStock;
 
         private TableLayoutPanel tableLayoutPanel1;
         private TableLayoutPanel tlpSearchRow;
         private FlowLayoutPanel flpActions;
-        private Button btnLogout;
     }
 }

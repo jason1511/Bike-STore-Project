@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Printing;
-using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -37,12 +36,10 @@ namespace Bike_STore_Project
             WindowState = FormWindowState.Maximized;
             MinimumSize = new Size(1100, 700);
 
-            var menu = new MainMenuControl { Dock = DockStyle.Top };
             var tabs = new TabControl { Dock = DockStyle.Fill };
             tabs.TabPages.Add(BuildCreateTab());
             tabs.TabPages.Add(BuildHistoryTab());
             Controls.Add(tabs);
-            Controls.Add(menu);
 
             _payment.Items.AddRange(new object[] { "CASH", "BANK TRANSFER" });
             _payment.SelectedIndex = 0;

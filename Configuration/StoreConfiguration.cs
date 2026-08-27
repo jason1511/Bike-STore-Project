@@ -71,7 +71,6 @@ namespace Bike_STore_Project
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "BikeStoreDesktop");
         public static string SettingsPath => Path.Combine(DataDirectory, "store-profile.json");
-        public static string TokenPath => Path.Combine(DataDirectory, "session.dat");
         public static string DemoDatabasePath => Path.Combine(DataDirectory, "demo.db");
         public static string LocalDatabasePath => Path.Combine(DataDirectory, "store.db");
 

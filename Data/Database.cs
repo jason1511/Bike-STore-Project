@@ -22,8 +22,6 @@ namespace Bike_STore_Project
             _connectionString = new SqliteConnectionStringBuilder { DataSource = fullPath }.ToString();
         }
 
-        public static string CurrentDataSource => new SqliteConnectionStringBuilder(_connectionString).DataSource;
-
         public static void DeleteDatabaseFile(string filePath)
         {
             var fullPath = Path.GetFullPath(filePath);
