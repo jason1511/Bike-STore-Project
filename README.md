@@ -70,15 +70,29 @@ Invoices, services, reports, users and audit activity remain complete in Demo/Lo
 ## Architecture
 
 ```mermaid
-flowchart LR
-    UI[WinForms UI] --> Contract[IStoreBackend]
-    Contract --> Demo[Demo backend]
-    Contract --> Local[SQLite backend]
-    Contract --> Cloud[Cloudflare API backend]
-    Demo --> SQLite[(SQLite)]
-    Local --> SQLite
-    Cloud --> Worker[Pages Functions / Worker]
-    Worker --> D1[(Cloudflare D1)]
+flowchart TD
+    desktop["Bike Store Desktop<br/>WinForms UI"]
+    backend["IStoreBackend"]
+
+    demo["Demo mode"]
+    local["Local mode"]
+    online["Online mode"]
+
+    demoDb[("Seeded SQLite")]
+    localDb[("Store SQLite")]
+    api["Cloudflare HTTPS API"]
+    worker["Worker / Pages Functions"]
+    cloudDb[("Cloudflare D1")]
+
+    desktop --> backend
+    backend --> demo
+    backend --> local
+    backend --> online
+    demo --> demoDb
+    local --> localDb
+    online --> api
+    api --> worker
+    worker --> cloudDb
 ```
 
 `IStoreBackend` describes application operations rather than exposing SQL. This allows local transactions to remain inside the SQLite implementation while online operations remain inside the server API.
