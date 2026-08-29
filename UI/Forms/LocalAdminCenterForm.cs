@@ -151,14 +151,39 @@ namespace Bike_STore_Project
             actions.Controls.AddRange(new Control[] { today, week, month, generate, print });
             root.Controls.Add(actions, 0, 0);
             root.Controls.Add(_summary, 0, 1);
-            var detail = new SplitContainer { Dock = DockStyle.Fill, Orientation = Orientation.Vertical, BackColor = UiTheme.Border };
-            detail.SizeChanged += (_, __) =>
+            var detail = new SplitContainer
             {
-                var stacked = detail.Width < 760;
-                detail.Orientation = stacked ? Orientation.Horizontal : Orientation.Vertical;
-                if (stacked && detail.Height > 280) detail.SplitterDistance = Math.Max(150, detail.Height / 2);
-                else if (!stacked && detail.Width > 360) detail.SplitterDistance = Math.Max(220, detail.Width * 2 / 3);
+                Dock = DockStyle.Fill, Orientation = Orientation.Vertical, BackColor = UiTheme.Border
             };
+            var adjustingDetail = false;
+            void ResizeDetail()
+            {
+                if (adjustingDetail || detail.ClientSize.Width <= 0 || detail.ClientSize.Height <= 0) return;
+                adjustingDetail = true;
+                try
+                {
+                    var targetOrientation = detail.Width < 760 ? Orientation.Horizontal : Orientation.Vertical;
+                    if (detail.Orientation != targetOrientation)
+                    {
+                        // SplitterDistance is validated while Orientation changes. First move it to a
+                        // position that is legal for both the old and new axes.
+                        var sharedExtent = Math.Min(detail.ClientSize.Width, detail.ClientSize.Height);
+                        var sharedMaximum = sharedExtent - detail.SplitterWidth - detail.Panel2MinSize;
+                        if (sharedMaximum < detail.Panel1MinSize) return;
+                        detail.SplitterDistance = Math.Clamp(detail.SplitterDistance, detail.Panel1MinSize, sharedMaximum);
+                        detail.Orientation = targetOrientation;
+                    }
+
+                    var extent = detail.Orientation == Orientation.Vertical ? detail.ClientSize.Width : detail.ClientSize.Height;
+                    var available = extent - detail.SplitterWidth;
+                    var maximum = available - detail.Panel2MinSize;
+                    if (maximum < detail.Panel1MinSize) return;
+                    var desired = detail.Orientation == Orientation.Horizontal ? available / 2 : available * 2 / 3;
+                    detail.SplitterDistance = Math.Clamp(desired, detail.Panel1MinSize, maximum);
+                }
+                finally { adjustingDetail = false; }
+            }
+            detail.SizeChanged += (_, __) => ResizeDetail();
             detail.Panel1.Padding = new Padding(0, 6, 6, 0); detail.Panel2.Padding = new Padding(6, 6, 0, 0);
             detail.Panel1.Controls.Add(_report); detail.Panel2.Controls.Add(_breakdown);
             root.Controls.Add(detail, 0, 2);
