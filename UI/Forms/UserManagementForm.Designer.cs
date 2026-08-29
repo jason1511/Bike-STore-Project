@@ -15,7 +15,7 @@
 
         private void InitializeComponent()
         {
-            tableRoot = new TableLayoutPanel();
+            tableRoot = new Panel();
             dataGridViewUsers = new DataGridView();
             panelButtons = new FlowLayoutPanel();
             btnAddUser = new Button();
@@ -31,16 +31,11 @@
             // 
             // tableRoot
             // 
-            tableRoot.ColumnCount = 2;
-            tableRoot.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableRoot.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 210F));
-            tableRoot.Controls.Add(dataGridViewUsers, 0, 0);
-            tableRoot.Controls.Add(panelButtons, 1, 0);
+            tableRoot.Controls.Add(dataGridViewUsers);
+            tableRoot.Controls.Add(panelButtons);
             tableRoot.Dock = DockStyle.Fill;
             tableRoot.Location = new Point(0, 0);
             tableRoot.Name = "tableRoot";
-            tableRoot.RowCount = 1;
-            tableRoot.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableRoot.Size = new Size(1000, 600);
             tableRoot.TabIndex = 0;
             // 
@@ -50,15 +45,15 @@
             dataGridViewUsers.AllowUserToDeleteRows = false;
             dataGridViewUsers.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dataGridViewUsers.ColumnHeadersHeight = 29;
-            dataGridViewUsers.Dock = DockStyle.Fill;
-            dataGridViewUsers.Location = new Point(3, 3);
+            dataGridViewUsers.Dock = DockStyle.None;
+            dataGridViewUsers.Location = new Point(0, 0);
             dataGridViewUsers.MultiSelect = false;
             dataGridViewUsers.Name = "dataGridViewUsers";
             dataGridViewUsers.ReadOnly = true;
             dataGridViewUsers.RowHeadersVisible = false;
             dataGridViewUsers.RowHeadersWidth = 51;
             dataGridViewUsers.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dataGridViewUsers.Size = new Size(774, 594);
+            dataGridViewUsers.Size = new Size(780, 600);
             dataGridViewUsers.TabIndex = 0;
             // 
             // panelButtons
@@ -70,12 +65,12 @@
             panelButtons.Controls.Add(btnToggleRole);
             panelButtons.Controls.Add(btnDeleteUser);
             panelButtons.Controls.Add(btnClose);
-            panelButtons.Dock = DockStyle.Fill;
+            panelButtons.Dock = DockStyle.None;
             panelButtons.FlowDirection = FlowDirection.TopDown;
-            panelButtons.Location = new Point(783, 3);
+            panelButtons.Location = new Point(780, 0);
             panelButtons.Name = "panelButtons";
             panelButtons.Padding = new Padding(10);
-            panelButtons.Size = new Size(214, 594);
+            panelButtons.Size = new Size(220, 600);
             panelButtons.TabIndex = 1;
             panelButtons.WrapContents = false;
             // 
@@ -150,7 +145,7 @@
 
         #endregion
 
-        private TableLayoutPanel tableRoot;
+        private Panel tableRoot;
         private DataGridView dataGridViewUsers;
         private FlowLayoutPanel panelButtons;
         private Button btnAddUser;

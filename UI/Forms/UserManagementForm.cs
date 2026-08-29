@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Bike_STore_Project
@@ -37,7 +38,7 @@ namespace Bike_STore_Project
             btnDeleteUser.Click += (_, __) => DeleteUser();
             btnClose.Click += (_, __) => Close();
             dataGridViewUsers.SelectionChanged += (_, __) => UpdateSelectionActions();
-            Resize += (_, __) => UpdateResponsiveLayout();
+            tableRoot.SizeChanged += (_, __) => UpdateResponsiveLayout();
             Shown += (_, __) => UpdateResponsiveLayout();
         }
 
@@ -280,30 +281,37 @@ namespace Bike_STore_Project
 
         private void UpdateResponsiveLayout()
         {
-            var stacked = ClientSize.Width < 760;
-            if (stacked == (tableRoot.ColumnCount == 1)) return;
-            tableRoot.SuspendLayout(); tableRoot.ColumnStyles.Clear(); tableRoot.RowStyles.Clear();
-            tableRoot.ColumnCount = stacked ? 1 : 2; tableRoot.RowCount = stacked ? 2 : 1;
+            if (tableRoot.ClientSize.Width <= 0 || tableRoot.ClientSize.Height <= 0) return;
+            var stacked = tableRoot.ClientSize.Width < 760;
+            tableRoot.SuspendLayout();
+            panelButtons.SuspendLayout();
+            dataGridViewUsers.Dock = DockStyle.None;
+            panelButtons.Dock = DockStyle.None;
+            foreach (Control button in panelButtons.Controls) button.Height = 36;
             if (stacked)
             {
-                tableRoot.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-                tableRoot.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-                tableRoot.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-                tableRoot.SetCellPosition(dataGridViewUsers, new TableLayoutPanelCellPosition(0, 0));
-                tableRoot.SetCellPosition(panelButtons, new TableLayoutPanelCellPosition(0, 1));
-                panelButtons.FlowDirection = FlowDirection.LeftToRight; panelButtons.WrapContents = true; panelButtons.AutoSize = true;
+                panelButtons.FlowDirection = FlowDirection.LeftToRight;
+                panelButtons.WrapContents = true;
+                panelButtons.AutoSize = false;
                 foreach (Control button in panelButtons.Controls) button.Width = 155;
+                var visibleButtons = panelButtons.Controls.Cast<Control>().Count(x => x.Visible);
+                var perRow = Math.Max(1, (tableRoot.ClientSize.Width - panelButtons.Padding.Horizontal) / 161);
+                var rows = Math.Max(1, (int)Math.Ceiling(visibleButtons / (double)perRow));
+                var actionHeight = panelButtons.Padding.Vertical + rows * 42 + 4;
+                dataGridViewUsers.SetBounds(0, 0, tableRoot.ClientSize.Width, Math.Max(0, tableRoot.ClientSize.Height - actionHeight));
+                panelButtons.SetBounds(0, dataGridViewUsers.Bottom, tableRoot.ClientSize.Width, actionHeight);
             }
             else
             {
-                tableRoot.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-                tableRoot.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 210));
-                tableRoot.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-                tableRoot.SetCellPosition(dataGridViewUsers, new TableLayoutPanelCellPosition(0, 0));
-                tableRoot.SetCellPosition(panelButtons, new TableLayoutPanelCellPosition(1, 0));
-                panelButtons.FlowDirection = FlowDirection.TopDown; panelButtons.WrapContents = false; panelButtons.AutoSize = false;
+                panelButtons.FlowDirection = FlowDirection.TopDown;
+                panelButtons.WrapContents = false;
+                panelButtons.AutoSize = false;
                 foreach (Control button in panelButtons.Controls) button.Width = 190;
+                const int actionWidth = 220;
+                dataGridViewUsers.SetBounds(0, 0, Math.Max(0, tableRoot.ClientSize.Width - actionWidth), tableRoot.ClientSize.Height);
+                panelButtons.SetBounds(dataGridViewUsers.Right, 0, actionWidth, tableRoot.ClientSize.Height);
             }
+            panelButtons.ResumeLayout();
             tableRoot.ResumeLayout();
         }
 
