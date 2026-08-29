@@ -17,7 +17,7 @@
         {
             tableRoot = new Panel();
             dataGridViewUsers = new DataGridView();
-            panelButtons = new FlowLayoutPanel();
+            panelButtons = new Panel();
             btnAddUser = new Button();
             btnResetPassword = new Button();
             btnToggleActive = new Button();
@@ -58,7 +58,7 @@
             // 
             // panelButtons
             // 
-            panelButtons.AutoScroll = true;
+            panelButtons.AutoScroll = false;
             panelButtons.Controls.Add(btnAddUser);
             panelButtons.Controls.Add(btnResetPassword);
             panelButtons.Controls.Add(btnToggleActive);
@@ -66,13 +66,11 @@
             panelButtons.Controls.Add(btnDeleteUser);
             panelButtons.Controls.Add(btnClose);
             panelButtons.Dock = DockStyle.None;
-            panelButtons.FlowDirection = FlowDirection.TopDown;
-            panelButtons.Location = new Point(780, 0);
+            panelButtons.Location = new Point(0, 0);
             panelButtons.Name = "panelButtons";
             panelButtons.Padding = new Padding(10);
-            panelButtons.Size = new Size(220, 600);
+            panelButtons.Size = new Size(1000, 62);
             panelButtons.TabIndex = 1;
-            panelButtons.WrapContents = false;
             // 
             // btnAddUser
             // 
@@ -147,7 +145,7 @@
 
         private Panel tableRoot;
         private DataGridView dataGridViewUsers;
-        private FlowLayoutPanel panelButtons;
+        private Panel panelButtons;
         private Button btnAddUser;
         private Button btnResetPassword;
         private Button btnToggleActive;

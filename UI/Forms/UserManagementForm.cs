@@ -14,6 +14,7 @@ namespace Bike_STore_Project
         {
             InitializeComponent();
             ApplyLocalizedText();
+            panelButtons.BackColor = UiTheme.Canvas;
 
             // ✅ Admin-only guard
             if (!AppSession.IsAdmin)
@@ -282,35 +283,28 @@ namespace Bike_STore_Project
         private void UpdateResponsiveLayout()
         {
             if (tableRoot.ClientSize.Width <= 0 || tableRoot.ClientSize.Height <= 0) return;
-            var stacked = tableRoot.ClientSize.Width < 760;
             tableRoot.SuspendLayout();
             panelButtons.SuspendLayout();
             dataGridViewUsers.Dock = DockStyle.None;
             panelButtons.Dock = DockStyle.None;
-            foreach (Control button in panelButtons.Controls) button.Height = 36;
-            if (stacked)
+            var buttons = panelButtons.Controls.Cast<Control>().Where(x => x.Visible).ToArray();
+            var buttonWidth = tableRoot.ClientSize.Width >= 900 ? 180 : 155;
+            const int buttonHeight = 36;
+            const int horizontalGap = 8;
+            const int verticalGap = 8;
+            const int left = 12;
+            const int top = 10;
+            var perRow = Math.Max(1, (tableRoot.ClientSize.Width - left * 2 + horizontalGap) / (buttonWidth + horizontalGap));
+            for (var index = 0; index < buttons.Length; index++)
             {
-                panelButtons.FlowDirection = FlowDirection.LeftToRight;
-                panelButtons.WrapContents = true;
-                panelButtons.AutoSize = false;
-                foreach (Control button in panelButtons.Controls) button.Width = 155;
-                var visibleButtons = panelButtons.Controls.Cast<Control>().Count(x => x.Visible);
-                var perRow = Math.Max(1, (tableRoot.ClientSize.Width - panelButtons.Padding.Horizontal) / 161);
-                var rows = Math.Max(1, (int)Math.Ceiling(visibleButtons / (double)perRow));
-                var actionHeight = panelButtons.Padding.Vertical + rows * 42 + 4;
-                dataGridViewUsers.SetBounds(0, 0, tableRoot.ClientSize.Width, Math.Max(0, tableRoot.ClientSize.Height - actionHeight));
-                panelButtons.SetBounds(0, dataGridViewUsers.Bottom, tableRoot.ClientSize.Width, actionHeight);
+                var row = index / perRow;
+                var column = index % perRow;
+                buttons[index].SetBounds(left + column * (buttonWidth + horizontalGap), top + row * (buttonHeight + verticalGap), buttonWidth, buttonHeight);
             }
-            else
-            {
-                panelButtons.FlowDirection = FlowDirection.TopDown;
-                panelButtons.WrapContents = false;
-                panelButtons.AutoSize = false;
-                foreach (Control button in panelButtons.Controls) button.Width = 190;
-                const int actionWidth = 220;
-                dataGridViewUsers.SetBounds(0, 0, Math.Max(0, tableRoot.ClientSize.Width - actionWidth), tableRoot.ClientSize.Height);
-                panelButtons.SetBounds(dataGridViewUsers.Right, 0, actionWidth, tableRoot.ClientSize.Height);
-            }
+            var rows = Math.Max(1, (int)Math.Ceiling(buttons.Length / (double)perRow));
+            var actionHeight = top + rows * buttonHeight + (rows - 1) * verticalGap + 10;
+            panelButtons.SetBounds(0, 0, tableRoot.ClientSize.Width, actionHeight);
+            dataGridViewUsers.SetBounds(0, actionHeight, tableRoot.ClientSize.Width, Math.Max(0, tableRoot.ClientSize.Height - actionHeight));
             panelButtons.ResumeLayout();
             tableRoot.ResumeLayout();
         }
