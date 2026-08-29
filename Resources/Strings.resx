@@ -505,4 +505,9 @@
   <data name="Grid_featured" xml:space="preserve"><value>Featured</value></data>
   <data name="Grid_instock" xml:space="preserve"><value>Active</value></data>
   <data name="Grid_stockqty" xml:space="preserve"><value>Stock</value></data>
+  <data name="Login_ForgotPassword" xml:space="preserve"><value>Forgot password?</value></data>
+  <data name="Login_ResetAdminTitle" xml:space="preserve"><value>Reset local administrator</value></data>
+  <data name="Login_ResetAdminQuestion" xml:space="preserve"><value>Generate a new password for the local 'admin' account? The previous password will stop working and the account will be reactivated.</value></data>
+  <data name="Login_ResetAdminSuccess" xml:space="preserve"><value>The local administrator password has been regenerated. The credentials are filled into the login form.&#xA;&#xA;Username: admin&#xA;Password: {0}&#xA;&#xA;Copy this password before continuing.</value></data>
+  <data name="Login_ResetAdminFailed" xml:space="preserve"><value>The administrator password could not be regenerated.&#xA;&#xA;{0}</value></data>
 </root>

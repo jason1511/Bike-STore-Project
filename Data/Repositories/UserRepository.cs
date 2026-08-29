@@ -52,6 +52,41 @@ CREATE TABLE IF NOT EXISTS users (
             return new string(password);
         }
 
+        public string RegenerateLocalAdminPassword()
+        {
+            var password = GenerateInitialPassword();
+            using var conn = Database.OpenConnection();
+            using var tx = conn.BeginTransaction();
+            try
+            {
+                int adminId;
+                using (var find = conn.CreateCommand())
+                {
+                    find.Transaction = tx;
+                    find.CommandText = "SELECT id FROM users WHERE username='admin' AND role='ADMIN' LIMIT 1;";
+                    adminId = Convert.ToInt32(find.ExecuteScalar() ?? 0);
+                }
+                if (adminId == 0) throw new InvalidOperationException(Strings.Get("Error_UserNotFound"));
+
+                using (var update = conn.CreateCommand())
+                {
+                    update.Transaction = tx;
+                    update.CommandText = "UPDATE users SET password_hash=$hash,is_active=1 WHERE id=$id;";
+                    update.Parameters.AddWithValue("$hash", PasswordHasher.Hash(password));
+                    update.Parameters.AddWithValue("$id", adminId);
+                    update.ExecuteNonQuery();
+                }
+                WriteAudit(conn, tx, "RECOVER_ADMIN_PASSWORD", "users", adminId, "username=admin; account_reactivated=1");
+                tx.Commit();
+                return password;
+            }
+            catch
+            {
+                try { tx.Rollback(); } catch { }
+                throw;
+            }
+        }
+
         // ---------- AUDIT HELPERS ----------
 
         private static void WriteAudit(

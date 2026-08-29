@@ -26,7 +26,9 @@ namespace Bike_STore_Project
             var profile = AppServices.Profile;
             Text = Strings.Format("Login_Window", profile.StoreName);
             BackColor = UiTheme.Canvas;
-            MinimumSize = new Size(620, 480);
+            WindowState = FormWindowState.Normal;
+            ClientSize = new Size(490, 425);
+            MinimumSize = new Size(480, 415);
             AutoScaleMode = AutoScaleMode.Dpi;
             tableRoot.BackColor = UiTheme.Canvas;
             panelLogin.Size = new Size(430, 365);
@@ -47,9 +49,40 @@ namespace Bike_STore_Project
                 var demo = new Label { Text = Strings.Format("Login_FirstRun", initialAdminPassword), Left = 40, Top = 268, Width = 345, Height = 20, ForeColor = UiTheme.Accent, Font = new Font("Segoe UI Semibold", 8.5F) };
                 panelLogin.Controls.Add(demo); demo.BringToFront();
             }
+            else if (!profile.IsOnline)
+            {
+                var forgot = new LinkLabel
+                {
+                    Text = Strings.Get("Login_ForgotPassword"), Left = 40, Top = 267, Width = 345, Height = 20,
+                    TextAlign = ContentAlignment.MiddleRight, LinkColor = UiTheme.Accent, ActiveLinkColor = UiTheme.Sidebar,
+                    Font = new Font("Segoe UI", 8.5F), TabStop = true
+                };
+                forgot.LinkClicked += (_, __) => RegenerateAdminPassword();
+                panelLogin.Controls.Add(forgot); forgot.BringToFront();
+            }
             eyebrow.BringToFront(); title.BringToFront(); subtitle.BringToFront();
             UiTheme.Apply(this);
             btnLogin.BackColor = UiTheme.Sidebar; btnLogin.ForeColor = Color.White; btnLogin.FlatAppearance.BorderSize = 0;
+        }
+
+        private void RegenerateAdminPassword()
+        {
+            if (MessageBox.Show(Strings.Get("Login_ResetAdminQuestion"), Strings.Get("Login_ResetAdminTitle"),
+                MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes) return;
+            try
+            {
+                var password = new UserRepository().RegenerateLocalAdminPassword();
+                txtUser.Text = "admin";
+                txtPass.Text = password;
+                MessageBox.Show(Strings.Format("Login_ResetAdminSuccess", password), Strings.Get("Login_ResetAdminTitle"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                txtPass.Focus();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(Strings.Format("Login_ResetAdminFailed", ex.Message), Strings.Get("Login_ResetAdminTitle"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private async void BtnLogin_Click(object? sender, EventArgs e)

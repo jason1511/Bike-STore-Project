@@ -40,7 +40,7 @@
             tableRoot.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
             tableRoot.RowStyles.Add(new RowStyle());
             tableRoot.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableRoot.Size = new Size(900, 600);
+            tableRoot.Size = new Size(490, 425);
             tableRoot.TabIndex = 0;
             // 
             // panelLogin
@@ -51,7 +51,7 @@
             panelLogin.Controls.Add(label2);
             panelLogin.Controls.Add(txtPass);
             panelLogin.Controls.Add(btnLogin);
-            panelLogin.Location = new Point(275, 190);
+            panelLogin.Location = new Point(30, 30);
             panelLogin.Name = "panelLogin";
             panelLogin.Padding = new Padding(30);
             panelLogin.Size = new Size(350, 220);
@@ -103,7 +103,7 @@
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Dpi;
-            ClientSize = new Size(900, 600);
+            ClientSize = new Size(490, 425);
             Controls.Add(tableRoot);
             Name = "LoginForm";
             StartPosition = FormStartPosition.CenterScreen;

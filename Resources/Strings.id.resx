@@ -505,4 +505,9 @@
   <data name="Grid_featured" xml:space="preserve"><value>Unggulan</value></data>
   <data name="Grid_instock" xml:space="preserve"><value>Aktif</value></data>
   <data name="Grid_stockqty" xml:space="preserve"><value>Stok</value></data>
+  <data name="Login_ForgotPassword" xml:space="preserve"><value>Lupa kata sandi?</value></data>
+  <data name="Login_ResetAdminTitle" xml:space="preserve"><value>Atur ulang administrator lokal</value></data>
+  <data name="Login_ResetAdminQuestion" xml:space="preserve"><value>Buat kata sandi baru untuk akun 'admin' lokal? Kata sandi sebelumnya tidak akan berlaku dan akun akan diaktifkan kembali.</value></data>
+  <data name="Login_ResetAdminSuccess" xml:space="preserve"><value>Kata sandi administrator lokal telah dibuat ulang. Kredensial telah diisikan ke formulir masuk.&#xA;&#xA;Nama pengguna: admin&#xA;Kata sandi: {0}&#xA;&#xA;Salin kata sandi ini sebelum melanjutkan.</value></data>
+  <data name="Login_ResetAdminFailed" xml:space="preserve"><value>Kata sandi administrator tidak dapat dibuat ulang.&#xA;&#xA;{0}</value></data>
 </root>
